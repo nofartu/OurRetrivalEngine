@@ -15,19 +15,19 @@ import static sample.ReadFile.mySplit;
 
 public class Parse {
 
-    private Stemmer stemmer;
-    private HashSet<Character> delimiters;
-    private HashSet<String> stopwords;
-    private HashMap<String, String> months;
+    private Stemmer stemmer;//
+    private HashSet<Character> delimiters; //
+    private HashSet<String> stopwords; //
+    private HashMap<String, String> months; //
     private ArrayList<String> allWords;
     private HashMap<String, Integer[]> terms; //pair: key ->number of occurrence. value -> location in text  {number of occurrence, location in text}
     private boolean isStem;
     private ApiJson apiJson;
 
-    public Parse(HashSet<String> s, boolean stem, ApiJson api) {
+    public Parse(HashSet<String> stop, boolean stem, ApiJson api) {
         delimiters = new HashSet<>();
         initialDelimiter();
-        stopwords = s;
+        stopwords = stop;
         allWords = new ArrayList<>();
         months = new HashMap<>();
         initialMonths();
@@ -312,7 +312,7 @@ public class Parse {
             term = term.substring(1);
         }
         if (term.contains(",")) {
-            term = term.replace(",", "");
+            term = OurReplace(term,",", "");
         }
         if (i + 1 < allWords.size() - 1) {
             String nextTerm = allWords.get(i + 1);
@@ -363,7 +363,7 @@ public class Parse {
     private int handleNumbers(int i) {
         String term = allWords.get(i);
         if (term.contains(",")) {
-            term = term.replace(",", "");
+            term = OurReplace(term,",", "");
         }
         String nextTerm = allWords.get(i + 1);
         if (nextTerm.equalsIgnoreCase("Thousand")) {
@@ -448,7 +448,7 @@ public class Parse {
     private int handlePriceSign(int i) {
         String term = allWords.get(i);
         if (term.contains(",")) {
-            term = term.replace(",", "");
+            term = OurReplace(term,",", "");
         }
         String nextTerm = "";
         // term = term.replace("$", "");
@@ -517,7 +517,7 @@ public class Parse {
     private int handlePrice(int i, int location) {
         String term = allWords.get(i);
         if (term.contains(",")) {
-            term = term.replace(",", "");
+            term = OurReplace(term,",", "");
         }
         String nextTerm = allWords.get(i + location);
         if (location == 0) {
@@ -651,7 +651,9 @@ public class Parse {
             if (allWords.get(i + 2).equalsIgnoreCase("and")) {
                 String iThree = allWords.get(i + 3);
                 if (iThree.contains(",")) {
-                    iThree = iThree.replace(",", "");
+                  //  iThree = iThree.replace(",", ""); nofar changed
+                    iThree = OurReplace(iThree,",", "");
+
                 }
                 //two of the words are numbers.
                 if (isNum(allWords.get(i + 1)) && i + 3 < allWords.size() - 1 && isNum(iThree)) {
@@ -660,7 +662,8 @@ public class Parse {
                         String num2 = "";
                         String iFour = allWords.get(i + 4);
                         if (iFour.contains(",")) {
-                            iFour = iFour.replace(",", "");
+                          //  iFour = iFour.replace(",", "");
+                            iFour = OurReplace(iFour,",", "");
                         }
 
                         if (iFour.equalsIgnoreCase("million")) {
@@ -729,19 +732,23 @@ public class Parse {
                     String num2 = "";
                     String iTwo = allWords.get(i + 2);
                     if (iTwo.contains(",")) {
-                        iTwo = iTwo.replace(",", "");
+                        //iTwo = iTwo.replace(",", "");
+                        iTwo = OurReplace(iTwo,",", "");
                     }
                     String iOne = allWords.get(i + 1);
                     if (iOne.contains(",")) {
-                        iOne = iTwo.replace(",", "");
+                       // iOne = iTwo.replace(",", "");
+                        iOne = OurReplace(iOne,",", "");
                     }
                     String iFour = allWords.get(i + 4);
                     if (iFour.contains(",")) {
-                        iFour = iFour.replace(",", "");
+                       // iFour = iFour.replace(",", "");
+                        iFour = OurReplace(iFour,",", "");
                     }
                     String iFive = allWords.get(i + 5);
                     if (iFive.contains(",")) {
-                        iFive = iFive.replace(",", "");
+                        //iFive = iFive.replace(",", "");
+                        iFive = OurReplace(iFive,",", "");
                     }
                     if (iTwo.equalsIgnoreCase("million")) {
                         double tmp = Double.parseDouble(iOne);
@@ -1079,7 +1086,7 @@ public class Parse {
 
             return 1;
         } else {
-            term = term.replace("%", "");
+            term = OurReplace(term,"%", "");
             if (isNum(term)) {
                 term = addLetter(term) + "%";
                 if (terms.containsKey(term)) {
@@ -1097,7 +1104,8 @@ public class Parse {
 
     private String addLetter(String numberS) {
         if (numberS.contains(",")) {
-            numberS = numberS.replace(",", "");
+            numberS = OurReplace(numberS,",", "");
+
         }
         double number;
         String numLet = "";
@@ -1215,16 +1223,50 @@ public class Parse {
                             tmps = tmps.substring(0, i);
                         }
                     } else if (delimiters.contains((tmps.charAt(i + 1)))) {
-                        tmps = tmps.replace(tmps.charAt(i) + "", "");
+                        //tmps = tmps.replace(tmps.charAt(i) + "", "");
+                        tmps = OurReplace(tmps, tmps.charAt(i) + "", "");
                     } else {
-                        tmps = tmps.replace(tmps.charAt(i) + "", " ");
+                        //tmps = tmps.replace(tmps.charAt(i) + "", " ");
+                        tmps = OurReplace(tmps,tmps.charAt(i) + "", " ");
                     }
                 }
             }
         }
         return tmps;
     }
+    private String OurReplace(String s, String target, String replacement) {
+        StringBuilder sb = null;
+        int start = 0;
+        for (int i; (i = s.indexOf(target, start)) != -1; ) {
+            if (sb == null) sb = new StringBuilder();
+            sb.append(s, start, i);
+            sb.append(replacement);
+            start = i + target.length();
+        }
+        if (sb == null) return s;
+        sb.append(s, start, s.length());
+        return sb.toString();
+    }
 
+    private String OurReplace(String s, char[] targets, String replacement) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < s.length(); i++){
+            char check = s.charAt(i);
+            boolean contain = false;
+            for(int j = 0; !contain && j < targets.length; j++){
+                if(check == targets[j]){
+                    contain = true;
+                }
+            }
+            if(contain){
+                sb.append(replacement);
+            }
+            else{
+                sb.append(check);
+            }
+        }
+        return sb.toString();
+    }
 
     public void addToCities2(String tmp, String docName, int locationInDoc, String bNoB) {
         if (!Character.isDigit(tmp.charAt(0)) && tmp.charAt(0) != '<' && tmp.charAt(0) != '-' && tmp.charAt(0) != '\'' && tmp.charAt(0) != '[' && tmp.charAt(0) != '(' && !Character.isDigit(tmp.charAt(0))) {

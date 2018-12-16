@@ -53,6 +53,11 @@ public class Documents {
         this.terms = terms;
     }
 
+    public void resetTerms() {
+this.terms=new HashMap<>();
+    }
+
+
     public void setMax_tf(int max_tf) {
         this.max_tf = max_tf;
     }

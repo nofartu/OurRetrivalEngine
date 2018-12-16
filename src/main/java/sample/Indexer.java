@@ -46,6 +46,7 @@ public class Indexer {
     public void addDocument(ArrayList<Documents> listDocs) {
         this.listDocs = listDocs;
         tmpPosting();
+       this.listDocs=new ArrayList<>();    //nofar add
     }
 
     /**
@@ -140,8 +141,9 @@ public class Indexer {
                     posting.get(key).add(insert);
                 }
             }
+            doc.resetTerms(); //saving some memory
             addToCorpus(doc, max, min, size); //adding to the corpus of docs
-            doc.setTerms(null); //saving some memory
+
         }
      //   writeToDisk();
     }
@@ -149,12 +151,20 @@ public class Indexer {
 
     //adding to list of documents and for each doc the max tf, origin, num of unique
     private void addToCorpus(Documents doc, int max, int min, int size) {
+
+      /*
         Documents d = new Documents(doc.getIdDoc(), null);
         d.setMax_tf(max);
         d.setOrigin(doc.getOrigin());
         d.setNumOfUniqe(min);
         d.setSize(size);
         docsCoprus.add(d);
+        */
+        doc.setMax_tf(max);
+        doc.setOrigin(doc.getOrigin());
+        doc.setNumOfUniqe(min);
+        doc.setSize(size);
+        docsCoprus.add(doc);
     }
 
     /**

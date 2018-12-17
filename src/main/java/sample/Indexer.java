@@ -46,7 +46,7 @@ public class Indexer {
     public void addDocument(ArrayList<Documents> listDocs) {
         this.listDocs = listDocs;
         tmpPosting();
-       this.listDocs=new ArrayList<>();    //nofar add
+        this.listDocs = new ArrayList<>();    //nofar add
     }
 
     /**
@@ -60,8 +60,8 @@ public class Indexer {
             int max = 0;
             int min = 0;
             countDocNumber++;
-            Integer[] getSize=doc.getTerms().remove("***+++***+++***");
-            int size=getSize[0];
+            Integer[] getSize = doc.getTerms().remove("***+++***+++***");
+            int size = getSize[0];
             for (Map.Entry<String, Integer[]> entry : doc.getTerms().entrySet()) { //go through the docs terms
                 String key = entry.getKey();
                 int value = entry.getValue()[0]; //num of occurrence
@@ -87,7 +87,7 @@ public class Indexer {
                         //exist in upper case - but key is in lower.
                         //change the word to lower case because it came in lower so it should be in the dictionary in lower.
                         else if (dictionary.containsKey(keyUpper)) {
-                            Integer[] tmp=dictionary.remove(keyUpper);
+                            Integer[] tmp = dictionary.remove(keyUpper);
                             Integer newVal = value + tmp[1];
                             Integer[] arr = {0, newVal};
                             //dictionary.remove(keyUpper);
@@ -117,6 +117,7 @@ public class Indexer {
                         Integer newVal = value + dictionary.get(key)[1];
                         Integer[] arr = {0, newVal};
                         dictionary.put(key, arr);
+
                     }
                     if (!posting.containsKey(key)) {
                         //checking for lower/upper case problem
@@ -145,7 +146,7 @@ public class Indexer {
             addToCorpus(doc, max, min, size); //adding to the corpus of docs
 
         }
-     //   writeToDisk();
+        //   writeToDisk();
     }
 
 
@@ -181,9 +182,12 @@ public class Indexer {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathPost + "\\PostingDirectory\\postFile" + postingNumber + ".txt", false), StandardCharsets.UTF_8));
             postingNumber++;
             int count = 0;
-            for (Map.Entry<String, List<String>> entry : posting.entrySet()) { //go through the docs terms
+            //for (Map.Entry<String, List<String>> entry : posting.entrySet()) { //go through the docs terms
+            while (posting.size() > 0) {
+                String key = posting.firstKey();
+                List<String> value = posting.remove(key);
                 count++;
-                String key = entry.getKey();
+                //String key = entry.getKey();
                 String keyUpper = key.toUpperCase();
                 String keyLower = key.toLowerCase();
                 if (!dictionary.containsKey(key)) {
@@ -193,13 +197,14 @@ public class Indexer {
                         key = keyUpper;
                 }
                 toWrite.append(key + "*;~ ");
-                for (Iterator post = posting.get(key).iterator(); post.hasNext(); ) {
+                for (Iterator post = value.iterator(); post.hasNext(); ) {
                     toWrite.append(post.next() + " ");
 
                 }
-
                 toWrite.append("\n");
+
             }
+            //}
             bw.write(toWrite.toString());
             bw.flush();
             bw.close();

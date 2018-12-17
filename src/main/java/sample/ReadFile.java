@@ -84,10 +84,10 @@ public class ReadFile {
                                     d.setOrigin(city);
                                 }
                                 dirDocuments.add(d);
-                                //////////////////////////////
-                                indexer.addDocument(dirDocuments);
-                                dirDocuments = new ArrayList<>();  //should delete all the dir array
-                                ///////////////////////////////
+//                                //////////////////////////////
+//                                indexer.addDocument(dirDocuments);
+//                                dirDocuments = new ArrayList<>();  //should delete all the dir array
+//                                ///////////////////////////////
 
 
                             }
@@ -97,6 +97,10 @@ public class ReadFile {
                     }
                     count++;
                 }
+                //////////////////////////////
+                indexer.addDocument(dirDocuments);
+                dirDocuments = new ArrayList<>();  //should delete all the dir array
+                ///////////////////////////////
                 if (count % 15 == 0 || count == size) {
                     // indexer.addDocument(dirDocuments);
                     //  dirDocuments = new ArrayList<>();  //should delete all the dir array

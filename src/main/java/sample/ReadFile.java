@@ -26,6 +26,7 @@ public class ReadFile {
     private boolean isStem;
     private HashSet<String> languages;
     private String pathPost;
+    private Parse parse;
 
 
     public ReadFile(String corpusPath, String stopWordsPath, String postingPath, boolean stem) throws IOException {
@@ -41,6 +42,7 @@ public class ReadFile {
         isStem = stem;
         pathPost = postingPath;
         languages = new HashSet<>();
+        parse = new Parse(stopwords, isStem, apiJson);
     }
 
 
@@ -68,7 +70,6 @@ public class ReadFile {
                             Elements docs = doc.select("DOC");
                             //Elements docs = doc.getElementsByTag("DOC");
                             for (Element e : docs) {
-                                Parse parse = new Parse(stopwords, isStem, apiJson);
                                 String toPars = e.getElementsByTag("TEXT").text();
                                 String docName = e.getElementsByTag("DOCNO").text();
                                 try {
@@ -84,6 +85,7 @@ public class ReadFile {
                                     d.setOrigin(city);
                                 }
                                 dirDocuments.add(d);
+                                parse.resetParse();
 //                                //////////////////////////////
 //                                indexer.addDocument(dirDocuments);
 //                                dirDocuments = new ArrayList<>();  //should delete all the dir array

@@ -157,6 +157,7 @@ public class Parse {
                                 term = removeDelimiter(term);
                                 checkLetter(term, i);
                             }
+                            delimiters.remove('%'); //check this
 
                         }
                     }
@@ -170,10 +171,14 @@ public class Parse {
         Integer[] arr = {size, 0};
         terms.put("***+++***+++***", arr);
         return terms;
-
-
     }
 
+
+    public void resetParse(){
+        terms=new HashMap<>();
+        stemmer = new Stemmer();
+        allWords = new ArrayList<>();
+    }
 
     private void checkLetter(String term, int i) {
         String upper = term.toUpperCase();

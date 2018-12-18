@@ -215,7 +215,7 @@ public class ApiJson {
                     }
                 }
                 toWrite.append(printadd + "\n");
-                if (count % 100 == 0) {
+                if (count % 10 == 0) {
                     bw.write(toWrite.toString());
                     bw.flush();
                     toWrite = new StringBuilder("");

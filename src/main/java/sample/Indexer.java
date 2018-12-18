@@ -202,6 +202,11 @@ public class Indexer {
 
                 }
                 toWrite.append("\n");
+                if (count % 10 == 0) {
+                    bw.write(toWrite.toString());
+                    bw.flush();
+                    toWrite = new StringBuilder("");
+                }
 
             }
             //}

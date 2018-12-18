@@ -67,7 +67,7 @@ public class View extends Application {
         System.out.println("End time:" + dateFormat.format(date2));
 
         System.out.println("end");
-        exit(0);
+        //exit(0);
     }
 
 

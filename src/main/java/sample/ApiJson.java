@@ -10,9 +10,7 @@ import okhttp3.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ApiJson {
 
@@ -143,6 +141,48 @@ public class ApiJson {
         return "";
     }
 
+//    public void writeCityToDisk(boolean stemming, String pathPost) {
+//        try {
+//            int count = 0;
+//            String namedir = "";
+//            if (stemming) {
+//                namedir = "Stem";
+//            } else {
+//                namedir = "WithoutStem";
+//            }
+//            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathPost + "\\" + namedir + "\\Cities.txt",true), StandardCharsets.UTF_8));
+//            StringBuilder toWrite = new StringBuilder("");
+//            for (Map.Entry<String, City> entry : cities.entrySet()) {
+//                count++;
+//                City value = entry.getValue();
+//                String print = value.getCityname() + ";" + value.getCountry() + ";" + value.getCurrency() + ";" + value.getPopulation() + ".";
+//                toWrite.append(print + " ");
+//                String printadd = "";
+//                for (Map.Entry<String, ArrayList<String>> entryLocation : value.getLocations().entrySet()) {
+//                    String keyLoc = entryLocation.getKey();
+//                    ArrayList<String> ValueList = entryLocation.getValue();
+//                    printadd += keyLoc + "; ";
+//                    for (String val : ValueList) {
+//                        printadd += val + ",";
+//                    }
+//                }
+//                toWrite.append(printadd + "\n");
+//                if (count % 100 == 0) {
+//                    bw.write(toWrite.toString());
+//                    bw.flush();
+//                    toWrite = new StringBuilder("");
+//                }
+//            }
+//            bw.write(toWrite.toString());
+//            bw.flush();
+//            bw.close();
+//            System.out.println(cities.size());
+//            cities=new HashMap<>();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     public void writeCityToDisk(boolean stemming, String pathPost) {
         try {
             int count = 0;
@@ -152,11 +192,17 @@ public class ApiJson {
             } else {
                 namedir = "WithoutStem";
             }
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathPost + "\\" + namedir + "\\Cities.txt",true), StandardCharsets.UTF_8));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathPost + "\\" + namedir + "\\Cities.txt", false), StandardCharsets.UTF_8));
             StringBuilder toWrite = new StringBuilder("");
-            for (Map.Entry<String, City> entry : cities.entrySet()) {
+
+            HashSet<String> keys = getKeysByValue();
+            Iterator<String> it = keys.iterator();
+            while (it.hasNext()) {
+                //for (Map.Entry<String, City> entry : cities.entrySet()) {
+                String key = it.next();
+                City value = cities.remove(key);
                 count++;
-                City value = entry.getValue();
+                //City value = entry.getValue();
                 String print = value.getCityname() + ";" + value.getCountry() + ";" + value.getCurrency() + ";" + value.getPopulation() + ".";
                 toWrite.append(print + " ");
                 String printadd = "";
@@ -174,15 +220,24 @@ public class ApiJson {
                     bw.flush();
                     toWrite = new StringBuilder("");
                 }
+                //   }
             }
             bw.write(toWrite.toString());
             bw.flush();
             bw.close();
             System.out.println(cities.size());
-            cities=new HashMap<>();
+            cities = new HashMap<>();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public HashSet<String> getKeysByValue() {
+        HashSet<String> keys = new HashSet<>();
+        for (Map.Entry<String, City> entry : cities.entrySet()) {
+            keys.add(entry.getKey());
+        }
+        return keys;
     }
 
 }

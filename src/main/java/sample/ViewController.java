@@ -50,9 +50,9 @@ public class ViewController implements Observer {
     public void setStage(Stage stage) {
         this.primaryStage = stage;
         //controller = new Controller(model);
-        txtfld_corpus.setText("d:\\documents\\users\\nofartu\\Downloads\\corpus");
-        txtfld_stopWords.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine");
-        txtfld_dirPath.setText("d:\\documents\\users\\nofartu\\Downloads\\post");
+        txtfld_corpus.setText("C:\\Users\\maya8\\Desktop\\corpus\\corpus3");
+        txtfld_stopWords.setText("C:\\Users\\maya8\\IdeaProjects\\OurRetrivalEngine");
+        txtfld_dirPath.setText("C:\\Users\\maya8\\Desktop\\corpus\\HashMap");
 
         comboBox.setDisable(true);
         txt_Info.setDisable(true);

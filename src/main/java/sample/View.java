@@ -26,7 +26,7 @@ public class View extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader();
         Parent root = null;
         root = fxmlLoader.load(getClass().getResource("/MainView.fxml").openStream());
-        Scene scene = new Scene(root, 700, 500);
+        Scene scene = new Scene(root, 700, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Search Engine");
         ViewController viewControllr = fxmlLoader.getController();

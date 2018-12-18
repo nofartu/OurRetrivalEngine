@@ -258,6 +258,7 @@ public class Indexer {
 //                    writeIt = new StringBuilder("");
 //                }
 //            }
+
             bw.write(writeIt.toString());
             bw.flush();
             bw.close();

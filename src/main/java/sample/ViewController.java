@@ -32,12 +32,14 @@ public class ViewController implements Observer {
     public javafx.scene.control.Button btn_browseCorpus;
     public javafx.scene.control.Button btn_browseStop;
     public javafx.scene.control.Button btn_browseDir;
+    public javafx.scene.control.Button btn_browseQuery;
     public javafx.scene.control.Button btn_showDictionary;
 
     @FXML
     public javafx.scene.control.TextField txtfld_corpus;
     public javafx.scene.control.TextField txtfld_stopWords;
     public javafx.scene.control.TextField txtfld_dirPath;
+    public javafx.scene.control.TextField txtfld_Query;
     public javafx.scene.control.TextArea txt_Info;
     public javafx.scene.control.CheckBox check_stemm;
     public javafx.scene.control.ComboBox comboBox;
@@ -246,6 +248,16 @@ public class ViewController implements Observer {
             txtfld_dirPath.setText(path.getAbsolutePath());
         }
         btn_browseDir.setDisable(false);
+    }
+
+    public void BrowseQuery(ActionEvent actionEvent) {
+        btn_browseQuery.setDisable(true);
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File path = directoryChooser.showDialog(null);
+        if (path != null) {
+            txtfld_Query.setText(path.getAbsolutePath());
+        }
+        btn_browseQuery.setDisable(false);
     }
 
     private void showAlert(String title, String header, String alertMessage) {

@@ -20,7 +20,7 @@ public class Parse {
     private HashSet<String> stopwords; //
     private HashMap<String, String> months; //
     private ArrayList<String> allWords;
-    private HashMap<String, Integer[]> terms; //pair: key ->number of occurrence. value -> location in text  {number of occurrence, location in text}
+    private HashMap<String, Integer[]> terms; //{number of occurrence, location in text}
     private boolean isStem;
     private ApiJson apiJson;
 
@@ -164,21 +164,23 @@ public class Parse {
                 }
             }
         }
-
         if (isStem) {
             terms = stemmer.stemming(terms);
         }
-        Integer[] arr = {size, 0};
-        terms.put("***+++***+++***", arr);
+        if (!docName.equals("")) {
+            Integer[] arr = {size, 0};
+            terms.put("***+++***+++***", arr);
+        }
         return terms;
     }
 
 
-    public void resetParse(){
-        terms=new HashMap<>();
+    public void resetParse() {
+        terms = new HashMap<>();
         stemmer = new Stemmer();
         allWords = new ArrayList<>();
     }
+
 
     private void checkLetter(String term, int i) {
         String upper = term.toUpperCase();
@@ -317,7 +319,7 @@ public class Parse {
             term = term.substring(1);
         }
         if (term.contains(",")) {
-            term = OurReplace(term,",", "");
+            term = OurReplace(term, ",", "");
         }
         if (i + 1 < allWords.size() - 1) {
             String nextTerm = allWords.get(i + 1);
@@ -368,7 +370,7 @@ public class Parse {
     private int handleNumbers(int i) {
         String term = allWords.get(i);
         if (term.contains(",")) {
-            term = OurReplace(term,",", "");
+            term = OurReplace(term, ",", "");
         }
         String nextTerm = allWords.get(i + 1);
         if (nextTerm.equalsIgnoreCase("Thousand")) {
@@ -453,7 +455,7 @@ public class Parse {
     private int handlePriceSign(int i) {
         String term = allWords.get(i);
         if (term.contains(",")) {
-            term = OurReplace(term,",", "");
+            term = OurReplace(term, ",", "");
         }
         String nextTerm = "";
         // term = term.replace("$", "");
@@ -522,7 +524,7 @@ public class Parse {
     private int handlePrice(int i, int location) {
         String term = allWords.get(i);
         if (term.contains(",")) {
-            term = OurReplace(term,",", "");
+            term = OurReplace(term, ",", "");
         }
         String nextTerm = allWords.get(i + location);
         if (location == 0) {
@@ -656,8 +658,8 @@ public class Parse {
             if (allWords.get(i + 2).equalsIgnoreCase("and")) {
                 String iThree = allWords.get(i + 3);
                 if (iThree.contains(",")) {
-                  //  iThree = iThree.replace(",", ""); nofar changed
-                    iThree = OurReplace(iThree,",", "");
+                    //  iThree = iThree.replace(",", ""); nofar changed
+                    iThree = OurReplace(iThree, ",", "");
 
                 }
                 //two of the words are numbers.
@@ -667,8 +669,8 @@ public class Parse {
                         String num2 = "";
                         String iFour = allWords.get(i + 4);
                         if (iFour.contains(",")) {
-                          //  iFour = iFour.replace(",", "");
-                            iFour = OurReplace(iFour,",", "");
+                            //  iFour = iFour.replace(",", "");
+                            iFour = OurReplace(iFour, ",", "");
                         }
 
                         if (iFour.equalsIgnoreCase("million")) {
@@ -738,22 +740,22 @@ public class Parse {
                     String iTwo = allWords.get(i + 2);
                     if (iTwo.contains(",")) {
                         //iTwo = iTwo.replace(",", "");
-                        iTwo = OurReplace(iTwo,",", "");
+                        iTwo = OurReplace(iTwo, ",", "");
                     }
                     String iOne = allWords.get(i + 1);
                     if (iOne.contains(",")) {
-                       // iOne = iTwo.replace(",", "");
-                        iOne = OurReplace(iOne,",", "");
+                        // iOne = iTwo.replace(",", "");
+                        iOne = OurReplace(iOne, ",", "");
                     }
                     String iFour = allWords.get(i + 4);
                     if (iFour.contains(",")) {
-                       // iFour = iFour.replace(",", "");
-                        iFour = OurReplace(iFour,",", "");
+                        // iFour = iFour.replace(",", "");
+                        iFour = OurReplace(iFour, ",", "");
                     }
                     String iFive = allWords.get(i + 5);
                     if (iFive.contains(",")) {
                         //iFive = iFive.replace(",", "");
-                        iFive = OurReplace(iFive,",", "");
+                        iFive = OurReplace(iFive, ",", "");
                     }
                     if (iTwo.equalsIgnoreCase("million")) {
                         double tmp = Double.parseDouble(iOne);
@@ -1091,7 +1093,7 @@ public class Parse {
 
             return 1;
         } else {
-            term = OurReplace(term,"%", "");
+            term = OurReplace(term, "%", "");
             if (isNum(term)) {
                 term = addLetter(term) + "%";
                 if (terms.containsKey(term)) {
@@ -1109,7 +1111,7 @@ public class Parse {
 
     private String addLetter(String numberS) {
         if (numberS.contains(",")) {
-            numberS = OurReplace(numberS,",", "");
+            numberS = OurReplace(numberS, ",", "");
 
         }
         double number;
@@ -1232,13 +1234,14 @@ public class Parse {
                         tmps = OurReplace(tmps, tmps.charAt(i) + "", "");
                     } else {
                         //tmps = tmps.replace(tmps.charAt(i) + "", " ");
-                        tmps = OurReplace(tmps,tmps.charAt(i) + "", " ");
+                        tmps = OurReplace(tmps, tmps.charAt(i) + "", " ");
                     }
                 }
             }
         }
         return tmps;
     }
+
     private String OurReplace(String s, String target, String replacement) {
         StringBuilder sb = null;
         int start = 0;
@@ -1255,18 +1258,17 @@ public class Parse {
 
     private String OurReplace(String s, char[] targets, String replacement) {
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < s.length(); i++){
+        for (int i = 0; i < s.length(); i++) {
             char check = s.charAt(i);
             boolean contain = false;
-            for(int j = 0; !contain && j < targets.length; j++){
-                if(check == targets[j]){
+            for (int j = 0; !contain && j < targets.length; j++) {
+                if (check == targets[j]) {
                     contain = true;
                 }
             }
-            if(contain){
+            if (contain) {
                 sb.append(replacement);
-            }
-            else{
+            } else {
                 sb.append(check);
             }
         }
@@ -1274,28 +1276,29 @@ public class Parse {
     }
 
     public void addToCities2(String tmp, String docName, int locationInDoc, String bNoB) {
-        if (!Character.isDigit(tmp.charAt(0)) && tmp.charAt(0) != '<' && tmp.charAt(0) != '-' && tmp.charAt(0) != '\'' && tmp.charAt(0) != '[' && tmp.charAt(0) != '(' && !Character.isDigit(tmp.charAt(0))) {
-            String ci = tmp.toUpperCase();
-            if (cities.containsKey(ci)) {
-                if (!cities.get(ci).getLocations().containsKey(docName)) {
-                    cities.get(ci).getLocations().put(docName, new ArrayList<String>());
+        if (!docName.equals("")) {
+            if (!Character.isDigit(tmp.charAt(0)) && tmp.charAt(0) != '<' && tmp.charAt(0) != '-' && tmp.charAt(0) != '\'' && tmp.charAt(0) != '[' && tmp.charAt(0) != '(' && !Character.isDigit(tmp.charAt(0))) {
+                String ci = tmp.toUpperCase();
+                if (cities.containsKey(ci)) {
+                    if (!cities.get(ci).getLocations().containsKey(docName)) {
+                        cities.get(ci).getLocations().put(docName, new ArrayList<String>());
+                    }
+                    cities.get(ci).getLocations().get(docName).add(locationInDoc + bNoB);
+
+                    //(cities.get(tmp).locations.containsKey(docName));
+                } else {
+                    //ApiJson apiJson = new ApiJson();
+                    City c = apiJson.findInCities(tmp);
+                    if (c != null) {
+                        c.getLocations().put(docName, new ArrayList<String>());
+                        c.setLocations(docName, locationInDoc + bNoB);
+                        cities.put(tmp, c);
+
+                    }
+
                 }
-                cities.get(ci).getLocations().get(docName).add(locationInDoc + bNoB);
-
-                //(cities.get(tmp).locations.containsKey(docName));
-            } else {
-                //ApiJson apiJson = new ApiJson();
-                City c = apiJson.findInCities(tmp);
-                if (c != null) {
-                    c.getLocations().put(docName, new ArrayList<String>());
-                    c.setLocations(docName, locationInDoc + bNoB);
-                    cities.put(tmp, c);
-
-                }
-
             }
         }
-
     }
 
 }

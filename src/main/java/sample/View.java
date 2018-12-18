@@ -12,10 +12,13 @@ import javafx.stage.WindowEvent;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static java.lang.System.exit;
+import static sample.ReadFile.mySplit;
 
 
 public class View extends Application {
@@ -62,6 +65,9 @@ public class View extends Application {
         launch(args);
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
+//        Searcher searcher=new Searcher(null,"","D:\\post",false,new ApiJson());
+//        searcher.createDocsContainsQuery();
+ //       System.out.println(searcher.getAllPostings(45000));
 
         Date date2 = new Date();
         System.out.println("End time:" + dateFormat.format(date2));

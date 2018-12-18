@@ -14,7 +14,7 @@ public class Indexer {
     private ArrayList<Documents> listDocs;
     private int max_tf = 0;
     //the list is the name of the files where int the posting is located (line number)
-    private static HashMap<String, Integer[]> dictionary; //{line number, num of occurrence}
+    public static HashMap<String, Integer[]> dictionary; //{line number, num of occurrence}
     private int postingNumber;
     private TreeMap<String, List<String>> posting;
     private boolean stemming;

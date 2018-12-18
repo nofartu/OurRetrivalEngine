@@ -212,14 +212,6 @@ public class ReadFile {
     private void createHashStopWords(String path) {
         String line;
         BufferedReader br = null;
-        //FileReader fr = null;
-//        try {
-//            fr = new FileReader(path + "\\stop_words.txt");
-//
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path + "\\stop_words.txt"), StandardCharsets.UTF_8));
             while ((line = br.readLine()) != null) {

@@ -57,6 +57,9 @@ public class TermPost implements Comparable<TermPost> {
         ArrayList<String> posts = mySplit(itsPost, " ");
         numOfDocuments = posts.size();
     }
+    public String getPost(){
+        return this.post;
+    }
 
     public int hashCode() {
         return TermPost.class.hashCode();

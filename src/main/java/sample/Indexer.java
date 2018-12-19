@@ -20,7 +20,7 @@ public class Indexer {
     private boolean stemming;
     private String pathPost;
     private File directory;
-    private static ArrayList<Documents> docsCoprus;
+    public static ArrayList<Documents> docsCoprus;
     private HashMap<TermPost, List<Integer>> hashTermToPost;
     private PriorityQueue<TermPost> terms;
     private int numOfDoc;

@@ -525,9 +525,14 @@ public class Indexer {
                 String information = arrayList.get(1);
                 ArrayList<String> arrayList1 = mySplit(information, ";");
                 String maxTf = arrayList1.get(0);
+                maxTf=maxTf.substring(1);
                 String unique = arrayList1.get(1);
                 String size = arrayList1.get(2);
-                String origin = arrayList1.get(3);
+                String origin = "";
+                if (arrayList1.size() > 3) {
+                    origin = arrayList1.get(3);
+                }
+
                 int maxTfNum = Integer.parseInt(maxTf);
                 int uniqueNum = Integer.parseInt(unique);
                 int sizeNum = Integer.parseInt(size);

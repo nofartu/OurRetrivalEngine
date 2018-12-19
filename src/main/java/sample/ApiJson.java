@@ -254,9 +254,14 @@ public class ApiJson {
                 ArrayList<String> arrayListLine = mySplit(line, "*");
                 ArrayList<String> arrayListStart = mySplit(arrayListLine.get(0), ";");
                 String cityname = arrayListStart.get(0);
-                String country = arrayListStart.get(1);
-                String currency = arrayListStart.get(2);
-                String population = arrayListStart.get(3);
+                String country="";
+                String currency="";
+                String population="";
+                if(arrayListStart.size()>1) {
+                    country = arrayListStart.get(1);
+                    currency = arrayListStart.get(2);
+                    population = arrayListStart.get(3);
+                }
                 City cityAdd = new City(cityname, country, population, currency);
                 ArrayList<String> alldocs = mySplit(arrayListLine.get(1), " ");
                 for (int i = 0; i < alldocs.size(); i++) {

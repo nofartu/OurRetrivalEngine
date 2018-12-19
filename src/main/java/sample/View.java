@@ -53,7 +53,7 @@ public class View extends Application {
                 alert.setContentText("Are you sure you want to quit?");
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.OK) {
-                    if (viewControllr.t.isAlive()) {
+                    if (viewControllr.t!=null && viewControllr.t.isAlive()) {
                         viewControllr.t.interrupt();
                     }
                     //model.stopServers();

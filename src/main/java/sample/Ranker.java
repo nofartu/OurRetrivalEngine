@@ -1,17 +1,14 @@
 package sample;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 import static sample.Indexer.docsCoprus;
 
 public class Ranker {
-    HashMap<String,Integer> allDocs;
+    HashMap<String, Double> allDocs;
 
     public Ranker() {
-allDocs=new HashMap<>();
+        allDocs = new HashMap<>();
     }
 
     public void rankBM25(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, int numOfDocs) {
@@ -31,10 +28,11 @@ allDocs=new HashMap<>();
                 double tmp = cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
                 sum = sum + tmp;
             }
-            System.out.println("doc num: " + entry.getKey() + " and the bm25 is: " + sum);
+            allDocs.put(entry.getKey(), sum);
+            // System.out.println("doc num: " + entry.getKey() + " and the bm25 is: " + sum);
             sum = 0;
         }
-
+        getTop50();
     }
 
     private double getAvdl() {
@@ -47,5 +45,31 @@ allDocs=new HashMap<>();
             total = 1;
         }
         return sum / total;
+    }
+
+    public TreeMap<String, Double> getTop50() {
+        TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(allDocs));
+        sorted.putAll(allDocs);
+        System.out.println("hey i'm here");
+        return sorted;
+
+    }
+
+    class ValueComparator implements Comparator<String> {
+
+        HashMap<String, Double> map = new HashMap<String, Double>();
+
+        public ValueComparator(HashMap<String, Double> map) {
+            this.map.putAll(map);
+        }
+
+        @Override
+        public int compare(String s1, String s2) {
+            if (map.get(s1) >= map.get(s2)) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
     }
 }

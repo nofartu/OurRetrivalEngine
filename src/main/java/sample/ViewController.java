@@ -14,6 +14,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.util.*;
@@ -334,6 +338,22 @@ public class ViewController implements Observer {
         comboBox.getItems().addAll(languages
         );
 
+    }
+    public String getTheQuery(String path) {
+        File file = new File(path);
+        if (file.isFile()) {
+            try {
+                Document doc = Jsoup.parse(file, "UTF-8");
+                Elements docs = doc.select("top");
+                for (Element e : docs) {
+                    String query = e.getElementsByTag("title").text();
+                    return query;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
     }
 
 

@@ -153,23 +153,7 @@ public class Searcher {
         return stopwords;
     }
 
+    
 
-    // TODO: 19/12/2018 add it to the view controller 
-    public String getTheQuery(String path) {
-        File file = new File(path);
-        if (file.isFile()) {
-            try {
-                Document doc = Jsoup.parse(file, "UTF-8");
-                Elements docs = doc.select("top");
-                for (Element e : docs) {
-                    String query = e.getElementsByTag("title").text();
-                    return query;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return "";
-    }
 
 }

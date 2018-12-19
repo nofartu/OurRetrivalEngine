@@ -35,7 +35,7 @@
     </Text>
     <TextField fx:id="txtfld_corpus1" layoutX="221.0" layoutY="474.0" />
     <Text layoutX="83.0" layoutY="489.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your query" wrappingWidth="101.99999903142452" />
-    <Button layoutX="396.0" layoutY="472.0" mnemonicParsing="false" text="Run" />
+    <Button layoutX="396.0" layoutY="472.0" mnemonicParsing="false" onAction="#doIt" text="Run" />
     <TextField fx:id="txtfld_corpus2" layoutX="221.0" layoutY="514.0" />
     <Text layoutX="79.0" layoutY="531.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Import you query file" wrappingWidth="115.728515625" />
     <Button fx:id="btn_browseQuery" layoutX="396.0" layoutY="514.0" mnemonicParsing="false" onAction="#BrowseQuery" text="Browse" />

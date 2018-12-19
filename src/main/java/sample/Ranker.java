@@ -11,9 +11,10 @@ public class Ranker {
 
     }
 
-    public void rankBM25(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, int numOdDocs, double avdl) {
+    public void rankBM25(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, int numOfDocs) {
         double sum = 0;
         int k = 0, b = 0;
+        double avdl=getAvdl();
         for (Map.Entry<String, ArrayList<String[]>> entry : docsContainsQuery.entrySet()) {
             for (String[] info : entry.getValue()) {
                 String key = info[0]; //word name
@@ -21,13 +22,14 @@ public class Ranker {
                 int cWD = Integer.parseInt(info[1]); //word tf
                 int dLength = Integer.parseInt(info[2]); // |d|
                 int df = Integer.parseInt(info[3]); //df of word
-                double tmp = cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOdDocs + 1) / df);
+                double tmp = cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
                 sum = sum + tmp;
             }
         }
+        System.out.println(sum);
     }
 
-    private int avdl() {
+    private double getAvdl() {
         int sum = 0;
         for (int i = 0; i < docsCoprus.size(); i++) {
             sum += docsCoprus.get(i).getSize();

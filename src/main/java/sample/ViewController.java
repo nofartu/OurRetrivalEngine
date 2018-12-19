@@ -56,9 +56,9 @@ public class ViewController implements Observer {
     public void setStage(Stage stage) {
         this.primaryStage = stage;
         //controller = new Controller(model);
-        txtfld_corpus.setText("C:\\Users\\maya8\\Desktop\\corpus\\corpus2");
-        txtfld_stopWords.setText("C:\\Users\\maya8\\IdeaProjects\\OurRetrivalEngine");
-        txtfld_dirPath.setText("C:\\Users\\maya8\\Desktop\\corpus\\HashMap");
+        txtfld_corpus.setText("D:\\documents\\users\\nofartu\\Downloads\\corpus\\corpus");
+        txtfld_stopWords.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine");
+        txtfld_dirPath.setText("D:\\documents\\users\\nofartu\\Downloads\\post");
 
         comboBox.setDisable(true);
         txt_Info.setDisable(true);
@@ -356,5 +356,12 @@ public class ViewController implements Observer {
         return "";
     }
 
+    public void doIt(){
+        Searcher searcher=new Searcher(null,"C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine","D:\\documents\\users\\nofartu\\Downloads\\post",false,new ApiJson());
+        searcher.parseTheQuery("human smuggling");
+        searcher.createCountWordsQuery("human smuggling");
+        searcher.createDocsContainsQuery();
+        searcher.sendToRanker();
+    }
 
 }

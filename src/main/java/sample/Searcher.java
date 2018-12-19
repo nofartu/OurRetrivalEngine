@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static sample.Indexer.dictionary;
+import static sample.Indexer.docsCoprus;
 import static sample.ReadFile.mySplit;
 
 public class Searcher {
@@ -29,15 +30,16 @@ public class Searcher {
     private boolean stem;
     private int numOfDocs;
 
-    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson,int numOfDoc) {
+    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson) {
         this.stem = stem;
         HashSet<String> stopWords = stopwords;
-        if (stopwords.size() <= 0) {
+        if (stopwords!=null) {
             stopWords = createHashStopWords(stopwordsPath);
         }
         parse = new Parse(stopWords, stem, apiJson);
         this.postPath = postPath;
-        this.numOfDocs=numOfDoc;
+        this.numOfDocs=docsCoprus.size();
+//        this.numOfDocs=472525;
         wordAndLocations=new HashMap<>();
         docsContainsQuery=new HashMap<>();
         countWordsQuery=new HashMap<>();
@@ -100,6 +102,11 @@ public class Searcher {
         }
     }
 
+    public void sendToRanker(){
+        Ranker ranker=new Ranker();
+        ranker.rankBM25(docsContainsQuery,countWordsQuery,numOfDocs);
+    }
+
 //    public HashMap<String, ArrayList<String>> createit(){
 //        HashMap<String, ArrayList<String>> arr=new HashMap<>();
 //        ArrayList<String> tmp=mySplit("LA100590-0148:1:207/1362 LA041689-0056:2:334/659 LA042190-0155:1:981/1037 LA050690-0199:1:964/1066 FT921-8666:1:271/471 bla"," ");
@@ -153,7 +160,7 @@ public class Searcher {
         return stopwords;
     }
 
-    
+
 
 
 }

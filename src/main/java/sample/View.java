@@ -34,7 +34,7 @@ public class View extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader();
         Parent root = null;
         root = fxmlLoader.load(getClass().getResource("/MainView.fxml").openStream());
-        Scene scene = new Scene(root, 700, 600);
+        Scene scene = new Scene(root, 700, 700);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Search Engine");
         ViewController viewControllr = fxmlLoader.getController();
@@ -70,8 +70,7 @@ public class View extends Application {
         launch(args);
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-//        Searcher searcher=new Searcher(null,"","D:\\post",false,new ApiJson());
-//        searcher.createDocsContainsQuery();
+
  //       System.out.println(searcher.getAllPostings(45000));
 
         Date date2 = new Date();

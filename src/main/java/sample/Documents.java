@@ -54,7 +54,7 @@ public class Documents {
     }
 
     public void resetTerms() {
-this.terms=new HashMap<>();
+        this.terms = new HashMap<>();
     }
 
 
@@ -72,5 +72,9 @@ this.terms=new HashMap<>();
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public int getSize() {
+        return size;
     }
 }

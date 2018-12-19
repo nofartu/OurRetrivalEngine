@@ -8,10 +8,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -21,6 +18,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.*;
 
+import static sample.ApiJson.cities;
 import static sample.Indexer.sort;
 
 
@@ -34,6 +32,7 @@ public class ViewController implements Observer {
     public javafx.scene.control.Button btn_browseDir;
     public javafx.scene.control.Button btn_browseQuery;
     public javafx.scene.control.Button btn_showDictionary;
+    public javafx.scene.control.Button btn_chooseCity;
 
     @FXML
     public javafx.scene.control.TextField txtfld_corpus;
@@ -46,6 +45,7 @@ public class ViewController implements Observer {
 
     private Stage primaryStage;
     private TableView table;
+    private TableView tableCity;
     private String info;
     private ReadFile readFile;
 
@@ -131,7 +131,7 @@ public class ViewController implements Observer {
         txtfld_dirPath.setText("");
         txt_Info.setText(" ");
         btn_showDictionary.setDisable(true);
-        showAlert("Alert", "Reset completed","Press ok to continue");
+        showAlert("Alert", "Reset completed", "Press ok to continue");
     }
 
 
@@ -144,7 +144,7 @@ public class ViewController implements Observer {
             stage.setWidth(440);
             stage.setHeight(940);
             final Label label = new Label("Dictionary:");
-            label.setFont(new Font("Arial", 22));
+            label.setFont(new Font("Calibri Light", 22));
             table.setEditable(false);
 
             TableColumn termName = new TableColumn("Term");
@@ -186,6 +186,60 @@ public class ViewController implements Observer {
         return data;
     }
 
+
+    public void showCities() {
+        try {
+
+            tableCity = new TableView();
+            Stage stage = new Stage();
+            Scene scene = new Scene(new Group());
+            stage.setTitle("Cities");
+            stage.setWidth(900);
+            stage.setHeight(500);
+            final Label label = new Label("Cities:");
+            label.setFont(new Font("Calibri Light", 22));
+            tableCity.setEditable(false);
+
+            TableColumn city = new TableColumn("City");
+            city.setMinWidth(150);
+            city.setCellValueFactory(new PropertyValueFactory<CityShow, String>("cityName"));
+
+
+            TableColumn checkbox = new TableColumn("Choose city");
+            checkbox.setMinWidth(100);
+            checkbox.setCellValueFactory(new PropertyValueFactory<CityShow, CheckBox>("cb_request"));
+
+
+            //table.setItems(getData());
+            tableCity.setItems(getDataCities());
+            tableCity.getColumns().addAll(city, checkbox);
+            tableCity.setMinHeight(200);
+            tableCity.setMaxHeight(600);
+
+            final VBox vbox = new VBox();
+            vbox.setSpacing(20);
+            vbox.setPadding(new Insets(10, 0, 0, 10));
+            vbox.getChildren().addAll(label, tableCity);
+
+            ((Group) scene.getRoot()).getChildren().addAll(vbox);
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (Exception e) {
+            System.out.println("not opening");
+        }
+    }
+
+    public ObservableList<CityShow> getDataCities() {
+        ObservableList<CityShow> data = FXCollections.observableArrayList();
+        Map<String, City> set = cities;
+        for (Map.Entry<String, City> entry : set.entrySet()) {
+            data.add(new CityShow(entry.getKey()));
+        }
+        return data;
+    }
+
+
     public void loadDictToMemory() {
         String path = txtfld_dirPath.getText();
         boolean isStem = check_stemm.isSelected();
@@ -196,19 +250,24 @@ public class ViewController implements Observer {
                 boolean b = check_stemm.isSelected();
                 Indexer indexer = new Indexer(b, path);
                 indexer.addToDict();
+                indexer.loadDocuments();
+                ApiJson api = new ApiJson();
+                api.loadCities(b, path);
                 btn_showDictionary.setDisable(false);
-                showAlert("Alert", "Dictionary uploaded","Press ok to continue");
+                showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
-        }
-        else if (isStem) {
+        } else if (isStem) {
             if (!new File(path + "\\Stem\\dictionaryStem.txt").exists())
                 showAlert("Bad request", "There is no file to load", "Check it again");
             else {
                 boolean b = check_stemm.isSelected();
                 Indexer indexer = new Indexer(b, path);
                 indexer.addToDict();
+                indexer.loadDocuments();
+                ApiJson api = new ApiJson();
+                api.loadCities(b, path);
                 btn_showDictionary.setDisable(false);
-                showAlert("Alert", "Dictionary uploaded","Press ok to continue");
+                showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         }
 

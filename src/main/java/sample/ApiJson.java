@@ -12,23 +12,29 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static sample.ReadFile.mySplit;
+
 public class ApiJson {
 
     private JsonElement ele;
     public static HashMap<String, City> cityHashMap;
     public static HashMap<String, City> cities;
 
-    public ApiJson() throws IOException {
+    public ApiJson() {
         cityHashMap = new HashMap<>();
         cities = new HashMap<>();
-        OkHttpClient client = new OkHttpClient();
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://restcountries.eu/rest/v2/all?fields=capital;name;population;currencies").newBuilder();
-        String url = urlBuilder.build().toString();
-        Request request = new Request.Builder().url(url).build();
-        Call call = client.newCall(request);
-        Response response = call.execute();
-        JsonParser parser = new JsonParser();
-        ele = parser.parse(response.body().string());
+        try {
+            OkHttpClient client = new OkHttpClient();
+            HttpUrl.Builder urlBuilder = HttpUrl.parse("https://restcountries.eu/rest/v2/all?fields=capital;name;population;currencies").newBuilder();
+            String url = urlBuilder.build().toString();
+            Request request = new Request.Builder().url(url).build();
+            Call call = client.newCall(request);
+            Response response = call.execute();
+            JsonParser parser = new JsonParser();
+            ele = parser.parse(response.body().string());
+        } catch (Exception e) {
+
+        }
         init();
 
     }
@@ -203,16 +209,17 @@ public class ApiJson {
                 City value = cities.remove(key);
                 count++;
                 //City value = entry.getValue();
-                String print = value.getCityname() + ";" + value.getCountry() + ";" + value.getCurrency() + ";" + value.getPopulation() + ".";
+                String print = value.getCityname() + ";" + value.getCountry() + ";" + value.getCurrency() + ";" + value.getPopulation() + "*";
                 toWrite.append(print + " ");
                 String printadd = "";
                 for (Map.Entry<String, ArrayList<String>> entryLocation : value.getLocations().entrySet()) {
                     String keyLoc = entryLocation.getKey();
                     ArrayList<String> ValueList = entryLocation.getValue();
-                    printadd += keyLoc + "; ";
+                    printadd += keyLoc + ";";
                     for (String val : ValueList) {
                         printadd += val + ",";
                     }
+                    printadd += " ";
                 }
                 toWrite.append(printadd + "\n");
                 if (count % 10 == 0) {
@@ -227,6 +234,43 @@ public class ApiJson {
             bw.close();
             System.out.println(cities.size());
             cities = new HashMap<>();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadCities(boolean stemming, String pathPost) { //
+        try {
+            BufferedReader br = null;
+            if (stemming)
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(pathPost + "\\Stem\\Cities.txt"), StandardCharsets.UTF_8));
+            else
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(pathPost + "\\WithoutStem\\Cities.txt"), StandardCharsets.UTF_8));
+            String line;
+            int count = 0;
+
+            while ((line = br.readLine()) != null) {
+                count++;
+                ArrayList<String> arrayListLine = mySplit(line, "*");
+                ArrayList<String> arrayListStart = mySplit(arrayListLine.get(0), ";");
+                String cityname = arrayListStart.get(0);
+                String country = arrayListStart.get(1);
+                String currency = arrayListStart.get(2);
+                String population = arrayListStart.get(3);
+                City cityAdd = new City(cityname, country, population, currency);
+                ArrayList<String> alldocs = mySplit(arrayListLine.get(1), " ");
+                for (int i = 0; i < alldocs.size(); i++) {
+                    ArrayList<String> docAppear = mySplit(alldocs.get(i), ";");
+                    String docName = docAppear.get(0);
+                    cityAdd.addLocation(docName);
+                    ArrayList<String> locations = mySplit(docAppear.get(1), ",");
+                    for (int j = 0; j < locations.size(); j++) {
+                        cityAdd.setLocations(docName, locations.get(j));
+                    }
+                }
+                cities.put(cityname, cityAdd);
+            }
+            br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

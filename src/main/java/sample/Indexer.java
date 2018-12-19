@@ -20,7 +20,7 @@ public class Indexer {
     private boolean stemming;
     private String pathPost;
     private File directory;
-    private ArrayList<Documents> docsCoprus;
+    private static ArrayList<Documents> docsCoprus;
     private HashMap<TermPost, List<Integer>> hashTermToPost;
     private PriorityQueue<TermPost> terms;
     private int numOfDoc;
@@ -152,15 +152,12 @@ public class Indexer {
 
     //adding to list of documents and for each doc the max tf, origin, num of unique
     private void addToCorpus(Documents doc, int max, int min, int size) {
-
-      /*
-        Documents d = new Documents(doc.getIdDoc(), null);
-        d.setMax_tf(max);
-        d.setOrigin(doc.getOrigin());
-        d.setNumOfUniqe(min);
-        d.setSize(size);
-        docsCoprus.add(d);
-        */
+//        Documents d = new Documents(doc.getIdDoc(), null);
+//        d.setMax_tf(max);
+//        d.setOrigin(doc.getOrigin());
+//        d.setNumOfUniqe(min);
+//        d.setSize(size);
+//        docsCoprus.add(d);
         doc.setMax_tf(max);
         doc.setOrigin(doc.getOrigin());
         doc.setNumOfUniqe(min);
@@ -239,7 +236,8 @@ public class Indexer {
                 int unique = docsCoprus.get(i).getNumOfUniqe();
                 String origin = docsCoprus.get(i).getOrigin();
                 String name = docsCoprus.get(i).getIdDoc();
-                writeIt.append(name + ": " + maxTf + ";" + unique + ";" + origin + "\n");
+                int size = docsCoprus.get(i).getSize();
+                writeIt.append(name + ": " + maxTf + ";" + unique + ";" + size + ";" + origin + "\n");
                 if (count % 10000 == 0) {
                     bw.write(writeIt.toString());
                     bw.flush();
@@ -492,10 +490,9 @@ public class Indexer {
             else
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(pathPost + "\\WithoutStem\\dictionaryNoStem.txt"), StandardCharsets.UTF_8));
             String line;
-            int cou = 0;
-
+            int count = 0;
             while ((line = br.readLine()) != null) {
-                cou++;
+                count++;
                 ArrayList<String> arrayList = mySplit(line, "*;~");
                 String term = arrayList.get(0);
                 String information = arrayList.get(1);
@@ -512,6 +509,41 @@ public class Indexer {
             e.printStackTrace();
         }
     }
+
+    public void loadDocuments() {
+        try {
+            BufferedReader br = null;
+            String namedir = "";
+            if (stemming)
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(pathPost + "\\Stem\\Documents.txt"), StandardCharsets.UTF_8));
+            else
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(pathPost + "\\WithoutStem\\Documents.txt"), StandardCharsets.UTF_8));
+            String line;
+            while ((line = br.readLine()) != null) {
+                ArrayList<String> arrayList = mySplit(line, ":");
+                String docName = arrayList.get(0);
+                String information = arrayList.get(1);
+                ArrayList<String> arrayList1 = mySplit(information, ";");
+                String maxTf = arrayList1.get(0);
+                String unique = arrayList1.get(1);
+                String size = arrayList1.get(2);
+                String origin = arrayList1.get(3);
+                int maxTfNum = Integer.parseInt(maxTf);
+                int uniqueNum = Integer.parseInt(unique);
+                int sizeNum = Integer.parseInt(size);
+                Documents doc = new Documents(docName, null);
+                doc.setMax_tf(maxTfNum);
+                doc.setNumOfUniqe(uniqueNum);
+                doc.setOrigin(origin);
+                doc.setSize(sizeNum);
+                docsCoprus.add(doc);
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     static class TreeCompare implements Comparator<String> {
         /* Compares keys based on the

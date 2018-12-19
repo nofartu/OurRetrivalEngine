@@ -58,6 +58,10 @@ public class City {
         locations.get(doc).add(locationInDoc);
     }
 
+    public void addLocation(String doc){
+        locations.put(doc,new ArrayList<>());
+    }
+
     @Override
     public int hashCode() {
         return City.class.hashCode();

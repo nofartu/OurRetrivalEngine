@@ -3,6 +3,7 @@ package sample;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -14,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -45,6 +47,7 @@ public class ViewController implements Observer {
     public javafx.scene.control.TextField txtfld_Query;
     public javafx.scene.control.TextArea txt_Info;
     public javafx.scene.control.CheckBox check_stemm;
+    public javafx.scene.control.CheckBox cb_choseCity;
     public javafx.scene.control.ComboBox comboBox;
 
     private Stage primaryStage;
@@ -52,6 +55,8 @@ public class ViewController implements Observer {
     private TableView tableCity;
     private String info;
     private ReadFile readFile;
+    public Thread t;
+    private static ArrayList<String> chosenCities = new ArrayList<>();
 
     public void setStage(Stage stage) {
         this.primaryStage = stage;
@@ -64,6 +69,7 @@ public class ViewController implements Observer {
         txt_Info.setDisable(true);
         txt_Info.setVisible(false);
         btn_showDictionary.setDisable(true);
+        btn_chooseCity.setDisable(true);
 
     }
 
@@ -80,8 +86,17 @@ public class ViewController implements Observer {
             //controller.startOperation(txtfld_corpus.getText(),txtfld_stopWords.getText(),txtfld_dirPath.getText(),stemm);
             long start = System.currentTimeMillis();
             try {
+
                 readFile = new ReadFile(corpus, stopWords, dirPath, stemm);
-                info = readFile.reading();
+                t = new Thread(() -> {
+                    info = readFile.reading();
+                });
+                try {
+                    t.start();
+                    t.join();
+                } catch (InterruptedException e1) {
+                    System.out.println("Problem thread");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -198,14 +213,14 @@ public class ViewController implements Observer {
             Stage stage = new Stage();
             Scene scene = new Scene(new Group());
             stage.setTitle("Cities");
-            stage.setWidth(900);
-            stage.setHeight(500);
-            final Label label = new Label("Cities:");
+            stage.setWidth(450);
+            stage.setHeight(900);
+            final Label label = new Label("Choose Cities:");
             label.setFont(new Font("Calibri Light", 22));
             tableCity.setEditable(false);
 
             TableColumn city = new TableColumn("City");
-            city.setMinWidth(150);
+            city.setMinWidth(200);
             city.setCellValueFactory(new PropertyValueFactory<CityShow, String>("cityName"));
 
 
@@ -217,8 +232,10 @@ public class ViewController implements Observer {
             //table.setItems(getData());
             tableCity.setItems(getDataCities());
             tableCity.getColumns().addAll(city, checkbox);
-            tableCity.setMinHeight(200);
-            tableCity.setMaxHeight(600);
+            tableCity.setMinHeight(800);
+            tableCity.setMaxHeight(900);
+            tableCity.setMinWidth(350);
+            tableCity.setMaxWidth(450);
 
             final VBox vbox = new VBox();
             vbox.setSpacing(20);
@@ -228,6 +245,7 @@ public class ViewController implements Observer {
             ((Group) scene.getRoot()).getChildren().addAll(vbox);
             stage.setScene(scene);
             stage.show();
+
 
         } catch (Exception e) {
             System.out.println("not opening");
@@ -243,6 +261,28 @@ public class ViewController implements Observer {
         return data;
     }
 
+//    private void SetStageCloseEvent(Stage primaryStage) {
+//        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+//            public void handle(WindowEvent windowEvent) {
+//                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//                alert.setTitle("Exit");
+//                alert.setHeaderText("Exit confirmation");
+//                alert.setContentText("Are you sure you want to quit?");
+//                Optional<ButtonType> result = alert.showAndWait();
+//                if (result.get() == ButtonType.OK) {
+//                    //model.stopServers();
+//                    // ... user chose OK
+//                    // Close program
+//                } else {
+//                    // ... user chose CANCEL or closed the dialog
+//                    windowEvent.consume();
+//                }
+//                for(int i=0;i<chosenCities.size();i++){
+//                    System.out.println(chosenCities.get(i));
+//                }
+//            }
+//        });
+//    }
 
     public void loadDictToMemory() {
         String path = txtfld_dirPath.getText();
@@ -277,6 +317,9 @@ public class ViewController implements Observer {
 
     }
 
+    public static void addingCitiesFromChoose(String cityname) {
+        chosenCities.add(cityname);
+    }
 
     @Override
     public void update(Observable o, Object arg) {
@@ -339,6 +382,14 @@ public class ViewController implements Observer {
         );
 
     }
+
+    public void checkCities() {
+        if (cb_choseCity.isSelected())
+            btn_chooseCity.setDisable(false);
+        else
+            btn_chooseCity.setDisable(true);
+    }
+
     public String getTheQuery(String path) {
         File file = new File(path);
         if (file.isFile()) {
@@ -356,8 +407,8 @@ public class ViewController implements Observer {
         return "";
     }
 
-    public void doIt(){
-        Searcher searcher=new Searcher(null,"C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine","D:\\documents\\users\\nofartu\\Downloads\\post",false,new ApiJson());
+    public void doIt() {
+        Searcher searcher = new Searcher(null, "C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine", "D:\\documents\\users\\nofartu\\Downloads\\post", false, new ApiJson());
         searcher.parseTheQuery("human smuggling");
         searcher.createCountWordsQuery("human smuggling");
         searcher.createDocsContainsQuery();

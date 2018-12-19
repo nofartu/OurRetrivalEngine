@@ -28,6 +28,7 @@ import static sample.ReadFile.mySplit;
 
 public class View extends Application {
 
+    private ViewController viewControllr;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -37,7 +38,7 @@ public class View extends Application {
         Scene scene = new Scene(root, 700, 700);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Search Engine");
-        ViewController viewControllr = fxmlLoader.getController();
+        viewControllr = fxmlLoader.getController();
         viewControllr.setStage(primaryStage);
         SetStageCloseEvent(primaryStage);
         primaryStage.show();
@@ -52,6 +53,9 @@ public class View extends Application {
                 alert.setContentText("Are you sure you want to quit?");
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.OK) {
+                    if (viewControllr.t.isAlive()) {
+                        viewControllr.t.interrupt();
+                    }
                     //model.stopServers();
                     // ... user chose OK
                     // Close program
@@ -71,7 +75,7 @@ public class View extends Application {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
 
- //       System.out.println(searcher.getAllPostings(45000));
+        //       System.out.println(searcher.getAllPostings(45000));
 
         Date date2 = new Date();
         System.out.println("End time:" + dateFormat.format(date2));
@@ -79,7 +83,6 @@ public class View extends Application {
         System.out.println("end");
         //exit(0);
     }
-
 
 
 }

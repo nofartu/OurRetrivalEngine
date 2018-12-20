@@ -159,6 +159,7 @@ public class Searcher {
         Ranker ranker = new Ranker(numOfDocs);
         ranker.rankAll(docsContainsQuery,countWordsQuery,wordAndLocations);
         System.out.println("i'm done");
+        
         //ranker.rankBM25(docsContainsQuery, countWordsQuery, numOfDocs);
     }
 

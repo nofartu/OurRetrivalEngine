@@ -21,7 +21,7 @@
     <Text layoutX="18.0" layoutY="237.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choose language" />
     <ComboBox fx:id="comboBox" layoutX="147.0" layoutY="220.0" prefWidth="150.0" />
     <Button fx:id="btn_showDictionary" layoutX="163.0" layoutY="292.0" mnemonicParsing="false" onAction="#showDictionary" text="Show Dictionary" />
-    <Button layoutX="134.0" layoutY="336.0" mnemonicParsing="false" onAction="#loadDictToMemory" text="Load Dictionary to Memory" />
+    <Button fx:id="btn_loadDictionary" layoutX="134.0" layoutY="336.0" mnemonicParsing="false" onAction="#loadDictToMemory" text="Load Dictionary to Memory" />
     <Button fx:id="btn_browseCorpus" layoutX="324.0" layoutY="39.0" mnemonicParsing="false" onAction="#BrowseCorpus" text="Browse" />
     <Button fx:id="btn_browseStop" layoutX="324.0" layoutY="74.0" mnemonicParsing="false" onAction="#BrowseStop" text="Browse" />
     <Button fx:id="btn_browseDir" layoutX="324.0" layoutY="110.0" mnemonicParsing="false" onAction="#BrowseDirPath" text="Browse" />

@@ -39,6 +39,7 @@ public class ViewController implements Observer {
     public javafx.scene.control.Button btn_browseQuery;
     public javafx.scene.control.Button btn_showDictionary;
     public javafx.scene.control.Button btn_chooseCity;
+    public javafx.scene.control.Button btn_loadDictionary;
 
     @FXML
     public javafx.scene.control.TextField txtfld_corpus;
@@ -56,7 +57,7 @@ public class ViewController implements Observer {
     private String info;
     private ReadFile readFile;
     public Thread t;
-    private static ArrayList<String> chosenCities = new ArrayList<>();
+    public static ArrayList<String> chosenCities = new ArrayList<>();
 
     public void setStage(Stage stage) {
         this.primaryStage = stage;
@@ -91,9 +92,11 @@ public class ViewController implements Observer {
                 t = new Thread(() -> {
                     info = readFile.reading();
                 });
+                controlAll(true);
                 try {
                     t.start();
                     t.join();
+                    controlAll(false);
                 } catch (InterruptedException e1) {
                     System.out.println("Problem thread");
                 }
@@ -110,6 +113,16 @@ public class ViewController implements Observer {
             //do the func
         }
         btn_showDictionary.setDisable(false);
+    }
+
+    private void controlAll(boolean what) {
+        btn_browseCorpus.setDisable(what);
+        btn_browseDir.setDisable(what);
+        btn_browseStop.setDisable(what);
+        btn_resetAndDelete.setDisable(what);
+        check_stemm.setDisable(what);
+        btn_loadDictionary.setDisable(what);
+
     }
 
     private void showResults(String finalInfo) {
@@ -408,7 +421,7 @@ public class ViewController implements Observer {
     }
 
     public void doIt() {
-        Searcher searcher = new Searcher(null, "C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine", "D:\\documents\\users\\nofartu\\Downloads\\post", false, new ApiJson(),false);
+        Searcher searcher = new Searcher(null, "C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine", "D:\\documents\\users\\nofartu\\Downloads\\post", false, new ApiJson(), false);
         searcher.parseTheQuery("human smuggling");
         searcher.createCountWordsQuery("human smuggling");
         searcher.createDocsContainsQuery();

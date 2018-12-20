@@ -29,6 +29,7 @@ import static sample.ReadFile.mySplit;
 public class Searcher {
     private Parse parse;
     private HashMap<String, ArrayList<String>> wordAndLocations;
+    private HashMap<String, ArrayList<String>> wordAndLocationsSemantic;
     private HashMap<String, ArrayList<String[]>> docsContainsQuery;
     private HashMap<String, Integer> countWordsQuery;
     private String postPath;
@@ -55,30 +56,68 @@ public class Searcher {
     public void parseTheQuery(String query) {
         createCountWordsQuery(query);
         HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
-        Integer[] dictionaryLoc;
+        if (semantic) {
+            wordAndLocationsSemantic = doSemantic(queryParsed);
+        }
+        wordAndLocations = runQuery(queryParsed);
+//        for (Map.Entry<String, Integer[]> entry : queryParsed.entrySet()) {
+//            String key = entry.getKey();
+//            String keyLower = key.toLowerCase();
+//            String keyUpper = key.toUpperCase();
+//            if (dictionary.containsKey(keyLower)) {
+//                if (!wordAndLocations.containsKey(key)) {
+//                    Integer[] fromDictionary = dictionary.get(keyLower);
+//                    wordAndLocations.put(key, getAllPostings(fromDictionary[0]));
+//                }
+//            } else if (dictionary.containsKey(keyUpper)) {
+//                if (!wordAndLocations.containsKey(key)) {
+//                    Integer[] fromDictionary = dictionary.get(keyUpper);
+//                    wordAndLocations.put(key, getAllPostings(fromDictionary[0]));
+//                }
+//            } else {
+//                System.out.println("we don't have this word in our dictionary");
+//            }
+//        }
+
+    }
+
+
+    private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed) {
+        HashMap<String, ArrayList<String>> wordAndLocationsTmp = new HashMap<>();
         for (Map.Entry<String, Integer[]> entry : queryParsed.entrySet()) {
             String key = entry.getKey();
             String keyLower = key.toLowerCase();
             String keyUpper = key.toUpperCase();
             if (dictionary.containsKey(keyLower)) {
-                if (!wordAndLocations.containsKey(key)) {
-                    dictionaryLoc = entry.getValue();
+                if (!wordAndLocationsTmp.containsKey(key)) {
                     Integer[] fromDictionary = dictionary.get(keyLower);
-                    wordAndLocations.put(key, getAllPostings(fromDictionary[0]));
+                    wordAndLocationsTmp.put(key, getAllPostings(fromDictionary[0]));
                 }
             } else if (dictionary.containsKey(keyUpper)) {
-                if (!wordAndLocations.containsKey(key)) {
-                    dictionaryLoc = entry.getValue();
+                if (!wordAndLocationsTmp.containsKey(key)) {
                     Integer[] fromDictionary = dictionary.get(keyUpper);
-                    wordAndLocations.put(key, getAllPostings(fromDictionary[0]));
+                    wordAndLocationsTmp.put(key, getAllPostings(fromDictionary[0]));
                 }
             } else {
                 System.out.println("we don't have this word in our dictionary");
             }
         }
-
+        return wordAndLocationsTmp;
     }
 
+    private HashMap<String, ArrayList<String>> doSemantic(HashMap<String, Integer[]> queryParsed) {
+        HashMap<String, Integer[]> separateQuery = new HashMap<>();
+        for (Map.Entry<String, Integer[]> entry : queryParsed.entrySet()) {
+            String key = entry.getKey();
+            ArrayList<String> fromSemantic = semantic(key);
+            if (fromSemantic != null) {
+                for (String s : fromSemantic) {
+                    separateQuery.put(s, null);
+                }
+            }
+        }
+        return runQuery(separateQuery);
+    }
 
     public ArrayList<String> getAllPostings(int lineNumber) {
         String line = "";

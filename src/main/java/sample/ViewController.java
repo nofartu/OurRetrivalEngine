@@ -408,11 +408,11 @@ public class ViewController implements Observer {
     }
 
     public void doIt() {
-//        Searcher searcher = new Searcher(null, "C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine", "D:\\documents\\users\\nofartu\\Downloads\\post", false, new ApiJson());
-//        searcher.parseTheQuery("human smuggling");
-//        searcher.createCountWordsQuery("human smuggling");
-//        searcher.createDocsContainsQuery();
-//        searcher.sendToRanker();
+        Searcher searcher = new Searcher(null, "C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine", "D:\\documents\\users\\nofartu\\Downloads\\post", false, new ApiJson(),false);
+        searcher.parseTheQuery("human smuggling");
+        searcher.createCountWordsQuery("human smuggling");
+        searcher.createDocsContainsQuery();
+        searcher.sendToRanker();
     }
 
 }

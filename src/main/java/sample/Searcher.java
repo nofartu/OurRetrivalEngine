@@ -156,7 +156,9 @@ public class Searcher {
     }
 
     public void sendToRanker() {
-        Ranker ranker = new Ranker();
+        Ranker ranker = new Ranker(numOfDocs);
+        ranker.rankAll(docsContainsQuery,countWordsQuery,wordAndLocations);
+        System.out.println("i'm done");
         //ranker.rankBM25(docsContainsQuery, countWordsQuery, numOfDocs);
     }
 

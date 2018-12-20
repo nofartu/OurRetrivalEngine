@@ -71,7 +71,7 @@ public class View extends Application {
 
         System.out.println("start");
 
-        //launch(args);
+        launch(args);
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
         //       System.out.println(searcher.getAllPostings(45000));

@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="701.0" prefWidth="721.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ViewController">
+<AnchorPane prefHeight="701.0" prefWidth="721.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ViewController">
   <children>
     <TextField fx:id="txtfld_corpus" layoutX="147.0" layoutY="39.0" />
     <TextField fx:id="txtfld_stopWords" layoutX="147.0" layoutY="74.0" />
@@ -41,5 +41,6 @@
     <Button fx:id="btn_browseQuery" layoutX="396.0" layoutY="514.0" mnemonicParsing="false" onAction="#BrowseQuery" text="Browse" />
     <CheckBox fx:id="cb_choseCity" layoutX="79.0" layoutY="581.0" mnemonicParsing="false" onAction="#checkCities" text="Limit search by cities: " />
     <Button id="btn_browseQuery" fx:id="btn_chooseCity" layoutX="233.0" layoutY="581.0" mnemonicParsing="false" onAction="#showCities" text="Choose city" />
+      <CheckBox fx:id="cb_semantic" layoutX="80.0" layoutY="549.0" mnemonicParsing="false" text="Semantic " />
   </children>
 </AnchorPane>

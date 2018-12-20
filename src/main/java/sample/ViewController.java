@@ -271,8 +271,9 @@ public class ViewController implements Observer {
 
     public ObservableList<CityShow> getDataCities() {
         ObservableList<CityShow> data = FXCollections.observableArrayList();
-        Map<String, City> set = cities;
-        for (Map.Entry<String, City> entry : set.entrySet()) {
+        TreeMap<String, City> sets = new TreeMap<>();
+        sets.putAll(cities);
+        for (Map.Entry<String, City> entry : sets.entrySet()) {
             data.add(new CityShow(entry.getKey()));
         }
         return data;
@@ -484,9 +485,9 @@ public class ViewController implements Observer {
         String stopWords = txtfld_stopWords.getText();
         String dirPath = txtfld_dirPath.getText();
         boolean stem = check_stemm.isSelected();
-        //boolean semantic=cb_semantic.isSelected();
+        boolean semantic=cb_semantic.isSelected();
 
-        Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, false);
+        Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
 
         searcher.parseTheQuery("human smuggling");
         searcher.createCountWordsQuery("human smuggling");

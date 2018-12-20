@@ -166,25 +166,25 @@ public class Searcher {
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
         rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocations);
-       withCities();
-       System.out.println("i'm done");
+        withCities();
+        System.out.println("i'm done");
     }
 
     public HashMap<String, ArrayList<String>> getAllCityPostings(String word) {
-        HashMap<String, City> c=getCities();
+        HashMap<String, City> c = getCities();
         return c.get(word).getLocations();
     }
 
     public void withCities() {
         HashMap<String, ArrayList<String>> files;
-        HashMap<String,Double> tmp=new HashMap<>();
+        HashMap<String, Double> tmp = new HashMap<>();
         tmp.putAll(rankedFiles);
         // int size = chosenCities.size();
         for (String city : chosenCities) {
             //for (String city : cities.keySet()) {
             files = getAllCityPostings(city);
             for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()) {
-                if(entry.getKey().equals("FBIS3-9870"))
+                if (entry.getKey().equals("FBIS3-9870"))
                     System.out.println("hey123");
                 if (tmp.containsKey(entry.getKey())) {
                     combinedFilesWithCity.add(entry.getKey());
@@ -263,6 +263,10 @@ public class Searcher {
             e.printStackTrace();
         }
         return stopwords;
+    }
+
+    public TreeMap<String, Double> getDocs() {
+        return rankedFiles;
     }
 
 }

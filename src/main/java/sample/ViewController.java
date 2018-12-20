@@ -58,8 +58,10 @@ public class ViewController implements Observer {
     private TableView tableQuery;
     private String info;
     private ReadFile readFile;
+    private ApiJson api;
     public Thread t;
     public static ArrayList<String> chosenCities = new ArrayList<>();
+
 
     public void setStage(Stage stage) {
         this.primaryStage = stage;
@@ -365,7 +367,7 @@ public class ViewController implements Observer {
                 Indexer indexer = new Indexer(b, path);
                 indexer.addToDict();
                 indexer.loadDocuments();
-                ApiJson api = new ApiJson();
+                api = new ApiJson();
                 api.loadCities(b, path);
                 btn_showDictionary.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
@@ -378,7 +380,7 @@ public class ViewController implements Observer {
                 Indexer indexer = new Indexer(b, path);
                 indexer.addToDict();
                 indexer.loadDocuments();
-                ApiJson api = new ApiJson();
+                api = new ApiJson();
                 api.loadCities(b, path);
                 btn_showDictionary.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
@@ -484,7 +486,7 @@ public class ViewController implements Observer {
         boolean stem = check_stemm.isSelected();
         boolean semantic=cb_semantic.isSelected();
 
-        Searcher searcher = new Searcher(null, stopWords, dirPath, stem, new ApiJson(), semantic);
+        Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
 
         searcher.parseTheQuery("human smuggling");
         searcher.createCountWordsQuery("human smuggling");

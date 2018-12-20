@@ -174,7 +174,7 @@ public class Searcher {
             files=getAllCityPostings(city).getLocations();
             for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()){
                 if(rankedFiles.containsKey(entry.getKey())){
-                    
+
                 }
             }
         }

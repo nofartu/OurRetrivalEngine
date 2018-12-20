@@ -84,7 +84,7 @@ public class Searcher {
 //        }
 
     }
-    
+
 
     private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed) {
         HashMap<String, ArrayList<String>> wordAndLocationsTmp = new HashMap<>();

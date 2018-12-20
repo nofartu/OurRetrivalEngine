@@ -296,7 +296,7 @@ public class ViewController implements Observer {
             Docs.setCellValueFactory(new PropertyValueFactory<DocShow, String>("docName"));
 
 
-            TableColumn button = new TableColumn("See entities");
+            TableColumn button = new TableColumn("Entities");
             button.setMinWidth(100);
             button.setCellValueFactory(new PropertyValueFactory<DocShow, Button>("btn_Entities"));
 

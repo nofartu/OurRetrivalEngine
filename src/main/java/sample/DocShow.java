@@ -12,7 +12,7 @@ public class DocShow {
 
     public DocShow(String cityName) {
         this.docName = new SimpleStringProperty(cityName);
-        this.btn_Entities = new Button();
+        this.btn_Entities = new Button("Show entities");
         btn_Entities.setOnAction(event -> {
 
         });

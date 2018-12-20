@@ -54,7 +54,7 @@ public class Searcher {
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
         combinedFilesWithCity = new HashSet<>();
-        toDeleteLater();
+
     }
 
     public void parseTheQuery(String query) {
@@ -84,10 +84,7 @@ public class Searcher {
 //        }
 
     }
-
-    private void toDeleteLater() {
-        chosenCities.add("PRAGUE");
-    }
+    
 
     private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed) {
         HashMap<String, ArrayList<String>> wordAndLocationsTmp = new HashMap<>();

@@ -896,14 +896,7 @@ public class Parse {
                 Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
                 terms.put(num0, add);
             }
-            if (terms.containsKey(arr[1])) {
-                Integer[] tmp = terms.get(arr[1]); //~~~~************~~~~~~~~~~
-                Integer[] add = {tmp[0] + 1, tmp[1]};
-                terms.put(arr[1], add);
-            } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
-                terms.put(arr[1], add);
-            }
+            checkLetter(arr[1], i);
         } else if (!a0 && a1) {
             arr[0] = arr[0].toLowerCase();
             if (terms.containsKey(arr[0] + "-" + num1)) {
@@ -922,14 +915,7 @@ public class Parse {
                 Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
                 terms.put(num1, add);
             }
-            if (terms.containsKey(arr[0])) {
-                Integer[] tmp = terms.get(arr[0]); //~~~~************~~~~~~~~~~
-                Integer[] add = {tmp[0] + 1, tmp[1]};
-                terms.put(arr[0], add);
-            } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
-                terms.put(arr[0], add);
-            }
+            checkLetter(arr[0], i);
         } else {
             String toAdd = arr[0] + "-" + arr[1];
             if (terms.containsKey(toAdd)) { //for the whole phrase
@@ -940,22 +926,8 @@ public class Parse {
                 Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
                 terms.put(toAdd, add);
             }
-            if (terms.containsKey(arr[0])) { //one of the word
-                Integer[] tmp = terms.get(arr[0]); //~~~~************~~~~~~~~~~
-                Integer[] add = {tmp[0] + 1, tmp[1]};
-                terms.put(arr[0], add);
-            } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
-                terms.put(arr[0], add);
-            }
-            if (terms.containsKey(arr[1])) { //one of the word
-                Integer[] tmp = terms.get(arr[1]); //~~~~************~~~~~~~~~~
-                Integer[] add = {tmp[0] + 1, tmp[1]};
-                terms.put(arr[1], add);
-            } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
-                terms.put(arr[1], add);
-            }
+            checkLetter(arr[0], i);
+            checkLetter(arr[1], i);
 
         }
         return 0;

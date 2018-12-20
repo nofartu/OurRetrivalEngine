@@ -33,10 +33,12 @@ public class Searcher {
     private HashMap<String, Integer> countWordsQuery;
     private String postPath;
     private boolean stem;
+    private boolean semantic;
     private int numOfDocs;
 
-    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson) {
+    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson, boolean semantic) {
         this.stem = stem;
+        this.semantic = semantic;
         HashSet<String> stopWords = stopwords;
         if (stopwords == null) {
             stopWords = createHashStopWords(stopwordsPath);
@@ -44,7 +46,7 @@ public class Searcher {
         parse = new Parse(stopWords, stem, apiJson);
         this.postPath = postPath;
         this.numOfDocs = docsCoprus.size();
-      // this.numOfDocs=472525;
+        // this.numOfDocs=472525;
         wordAndLocations = new HashMap<>();
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
@@ -143,8 +145,9 @@ public class Searcher {
 
     }
 
-    public ArrayList<String> semantic(String word) {
-        ArrayList<String> semanticWords=new ArrayList<>();
+
+    private ArrayList<String> semantic(String word) {
+        ArrayList<String> semanticWords = new ArrayList<>();
         try {
             String urlLink = "https://api.datamuse.com/words?ml=" + word;
             OkHttpClient client = new OkHttpClient();
@@ -159,7 +162,7 @@ public class Searcher {
             for (int i = 0; i < 12; i++) {
                 JsonObject o = (JsonObject) (arr.get(i));
                 String str = o.get("word").getAsString();
-               semanticWords.add(str);
+                semanticWords.add(str);
             }
             return semanticWords;
         } catch (Exception e) {

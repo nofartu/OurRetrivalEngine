@@ -148,16 +148,18 @@ public class Parse {
                     if (!isStopWord(term)) {
                         if (!term.equals("")) {
                             delimiters.add('%');
+                            delimiters.add('$');
                             if (delimiters.contains(term.charAt(0)) || delimiters.contains(term.charAt(term.length() - 1))) {
                                 term = deleteSpares(term);
                                 finalCheck = isStopWord(term);
                             }
-                            if (!finalCheck) {
+                            if (!finalCheck && !term.equals("")) {
                                 addToCities2(term, docName, i, "L"); //adding to cities
                                 term = removeDelimiter(term);
                                 checkLetter(term, i);
                             }
                             delimiters.remove('%'); //check this
+                            delimiters.remove('$'); //check this
 
                         }
                     }
@@ -838,18 +840,60 @@ public class Parse {
 
     private int handleHyphen(int i) {
         String arr[] = quickSplit(allWords.get(i), "-");
+        boolean minus0 = false;
+        boolean minus1 = false;
+        if (arr[0].charAt(0) == '-') {
+            minus0 = true;
+        }
+        if (arr[1].charAt(0) == '-') {
+            minus1 = true;
+        }
+        delimiters.add('%');
         arr[0] = deleteSpares(arr[0]);
         arr[1] = deleteSpares(arr[1]);
+        delimiters.remove('%');
+        if (arr[0].equals("")) {
+            if (!arr[1].equals("")) {
+                checkLetter(arr[1], i);
+                return 0;
+            } else {
+                return 0;
+            }
+        }
+        if (arr[1].equals("")) {
+            if (!arr[0].equals("")) {
+                checkLetter(arr[0], i);
+                return 0;
+            } else {
+                return 0;
+            }
+        }
         boolean a0 = false;
         boolean a1 = false;
         String num0 = "";
         String num1 = "";
-        if (isNum(arr[0])) {
-            num0 = addLetter(arr[0]);
+        if (isNum(arr[0]) || (arr[0].charAt(0) == '$' && (isNum(arr[0].substring(1)) || isNum(arr[0].substring(1, arr[0].length() - 1))))) {
+            if (minus0)
+                arr[0] = "-" + arr[0];
+            if (arr[0].charAt(0) == '$') {
+                if (Character.isLetter(arr[0].charAt(arr[0].length() - 1))) {
+                    arr[0] = arr[0].substring(0, arr[0].length() - 1);
+                }
+                num0 = arr[0];
+            } else
+                num0 = addLetter(arr[0]);
             a0 = true;
         }
-        if (isNum(arr[1])) {
-            num1 = addLetter(arr[1]);
+        if (isNum(arr[1]) || (arr[1].charAt(0) == '$' && (isNum(arr[1].substring(1)) || isNum(arr[1].substring(1, arr[1].length() - 1))))) {
+            if (minus1)
+                arr[1] = "-" + arr[1];
+            if (arr[1].charAt(0) == '$') {
+                if (Character.isLetter(arr[1].charAt(arr[1].length() - 1))) {
+                    arr[1] = arr[1].substring(0, arr[1].length() - 1);
+                }
+                num1 = arr[1];
+            } else
+                num1 = addLetter(arr[1]);
             a1 = true;
         }
         if (a0 && a1) {
@@ -865,17 +909,27 @@ public class Parse {
                 Integer[] tmp = terms.get(num0); //~~~~************~~~~~~~~~~
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num0, add);
+
             } else {
                 Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
-                terms.put(num0, add);
+                if (num0.charAt(0) == '$') {
+                    num0 = num0.substring(1);
+                    handleNumHypen(num0, i);
+                } else
+                    terms.put(num0, add);
             }
             if (terms.containsKey(num1)) {
                 Integer[] tmp = terms.get(num1); //~~~~************~~~~~~~~~~
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num1, add);
+
             } else {
                 Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
-                terms.put(num1, add);
+                if (num1.charAt(0) == '$') {
+                    num1 = num1.substring(1);
+                    handleNumHypen(num1, i);
+                } else
+                    terms.put(num1, add);
             }
 
         } else if (a0 && !a1) {
@@ -893,8 +947,13 @@ public class Parse {
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num0, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
-                terms.put(num0, add);
+                if (num0.charAt(0) == '$') {
+                    num0 = num0.substring(1);
+                    handleNumHypen(num0, i);
+                } else {
+                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    terms.put(num0, add);
+                }
             }
             checkLetter(arr[1], i);
         } else if (!a0 && a1) {
@@ -912,8 +971,13 @@ public class Parse {
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num1, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
-                terms.put(num1, add);
+                if (num1.charAt(0) == '$') {
+                    num1 = num1.substring(1);
+                    handleNumHypen(num1, i);
+                } else {
+                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    terms.put(num1, add);
+                }
             }
             checkLetter(arr[0], i);
         } else {
@@ -931,6 +995,34 @@ public class Parse {
 
         }
         return 0;
+    }
+
+    private void handleNumHypen(String term, int i) {
+        //term=term.substring(1);
+        if (term.contains(","))
+            term = OurReplace(term, ",", "");
+        double num = Double.parseDouble(term);
+        if (num < 1000000) {
+            if (terms.containsKey(num + " Dollars")) {
+                Integer[] tmp = terms.get(num + " Dollars"); //~~~~************~~~~~~~~~~
+                Integer[] add = {tmp[0] + 1, tmp[1]};
+                terms.put(num + " Dollars", add);
+            } else {
+                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                terms.put(num + " Dollars", add);
+            }
+        } else {
+            num = num / 1000000;
+            if (terms.containsKey(num + " M Dollars")) {
+                Integer[] arr = terms.get(num + " M Dollars"); //~~~~************~~~~~~~~~~
+                Integer[] add = {arr[0] + 1, arr[1]};
+                terms.put(num + " M Dollars", add);
+            } else {
+                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                terms.put(num + " M Dollars", add);
+            }
+
+        }
     }
 
     private int handleDateMonth(int i) {
@@ -1117,7 +1209,6 @@ public class Parse {
     private String addLetter(String numberS) {
         if (numberS.contains(",")) {
             numberS = OurReplace(numberS, ",", "");
-
         }
         double number;
         String numLet = "";

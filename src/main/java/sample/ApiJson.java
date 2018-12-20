@@ -254,10 +254,10 @@ public class ApiJson {
                 ArrayList<String> arrayListLine = mySplit(line, "*");
                 ArrayList<String> arrayListStart = mySplit(arrayListLine.get(0), ";");
                 String cityname = arrayListStart.get(0);
-                String country="";
-                String currency="";
-                String population="";
-                if(arrayListStart.size()>1) {
+                String country = "";
+                String currency = "";
+                String population = "";
+                if (arrayListStart.size() > 1) {
                     country = arrayListStart.get(1);
                     currency = arrayListStart.get(2);
                     population = arrayListStart.get(3);

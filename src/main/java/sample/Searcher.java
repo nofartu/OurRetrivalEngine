@@ -16,15 +16,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
+import static sample.ApiJson.cities;
 import static sample.Indexer.dictionary;
 import static sample.Indexer.docsCoprus;
 import static sample.ReadFile.mySplit;
+import static sample.ViewController.chosenCities;
 
 public class Searcher {
     private Parse parse;
@@ -32,6 +31,8 @@ public class Searcher {
     private HashMap<String, ArrayList<String>> wordAndLocationsSemantic;
     private HashMap<String, ArrayList<String[]>> docsContainsQuery;
     private HashMap<String, Integer> countWordsQuery;
+    private HashSet<String> combinedFilesWithCity;
+    private TreeMap<String, Double> rankedFiles;
     private String postPath;
     private boolean stem;
     private boolean semantic;
@@ -51,6 +52,7 @@ public class Searcher {
         wordAndLocations = new HashMap<>();
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
+        combinedFilesWithCity=new HashSet<>();
     }
 
     public void parseTheQuery(String query) {
@@ -143,6 +145,8 @@ public class Searcher {
         return null;
     }
 
+
+
     public void createCountWordsQuery(String query) {
         ArrayList<String> tmp = mySplit(query, " ");
         for (int i = 0; i < tmp.size(); i++) {
@@ -157,10 +161,24 @@ public class Searcher {
 
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
-        ranker.rankAll(docsContainsQuery,countWordsQuery,wordAndLocations);
+        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocations);
         System.out.println("i'm done");
-        
-        //ranker.rankBM25(docsContainsQuery, countWordsQuery, numOfDocs);
+    }
+    public City getAllCityPostings(String word) {
+        return cities.get(word);
+    }
+    public void withCities() {
+        HashMap<String, ArrayList<String>> files;
+        int size = chosenCities.size();
+        for (String city : chosenCities) {
+            files=getAllCityPostings(city).getLocations();
+            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()){
+                if(rankedFiles.containsKey(entry.getKey())){
+                    
+                }
+            }
+        }
+
     }
 
 

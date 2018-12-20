@@ -896,6 +896,14 @@ public class Parse {
                 Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
                 terms.put(num0, add);
             }
+            if (terms.containsKey(arr[1])) {
+                Integer[] tmp = terms.get(arr[1]); //~~~~************~~~~~~~~~~
+                Integer[] add = {tmp[0] + 1, tmp[1]};
+                terms.put(arr[1], add);
+            } else {
+                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                terms.put(arr[1], add);
+            }
         } else if (!a0 && a1) {
             arr[0] = arr[0].toLowerCase();
             if (terms.containsKey(arr[0] + "-" + num1)) {
@@ -914,9 +922,17 @@ public class Parse {
                 Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
                 terms.put(num1, add);
             }
+            if (terms.containsKey(arr[0])) {
+                Integer[] tmp = terms.get(arr[0]); //~~~~************~~~~~~~~~~
+                Integer[] add = {tmp[0] + 1, tmp[1]};
+                terms.put(arr[0], add);
+            } else {
+                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                terms.put(arr[0], add);
+            }
         } else {
             String toAdd = arr[0] + "-" + arr[1];
-            if (terms.containsKey(toAdd)) {
+            if (terms.containsKey(toAdd)) { //for the whole phrase
                 Integer[] tmp = terms.get(toAdd); //~~~~************~~~~~~~~~~
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(toAdd, add);
@@ -924,6 +940,23 @@ public class Parse {
                 Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
                 terms.put(toAdd, add);
             }
+            if (terms.containsKey(arr[0])) { //one of the word
+                Integer[] tmp = terms.get(arr[0]); //~~~~************~~~~~~~~~~
+                Integer[] add = {tmp[0] + 1, tmp[1]};
+                terms.put(arr[0], add);
+            } else {
+                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                terms.put(arr[0], add);
+            }
+            if (terms.containsKey(arr[1])) { //one of the word
+                Integer[] tmp = terms.get(arr[1]); //~~~~************~~~~~~~~~~
+                Integer[] add = {tmp[0] + 1, tmp[1]};
+                terms.put(arr[1], add);
+            } else {
+                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                terms.put(arr[1], add);
+            }
+
         }
         return 0;
     }
@@ -1194,30 +1227,6 @@ public class Parse {
         return end;
     }
 
-//
-//    private String delDelimiter(String term){
-//        if(term.contains("\\")||term.contains("\'")||term.contains("\\\"")||term.contains("$")||term.contains("/")||term.contains("!")||term.contains("?")||term.contains("@")
-//                ||term.contains("#")||term.contains("^")||term.contains("*")||term.contains("&")||term.contains("(")||term.contains(")")
-//                ||term.contains("[")||term.contains("]")||term.contains("{")||term.contains("}")||term.contains("|")||term.contains(".")
-//                ||term.contains(",")||term.contains("<")||term.contains(">")||term.contains(":")||term.contains(";")||term.contains("~")
-//                ||term.contains("`")||term.contains("-")||term.contains("+")||term.contains("=")||term.contains("_")||term.contains("�")
-//                ||term.contains("⪕")||term.contains("⪖")||term.contains("¥")||term.contains("°")){
-//            Iterator<Character> it = delimiters.iterator();
-//            while(it.hasNext()){
-//                Character chars=it.next();
-//                if(term.contains(chars+"")){
-//                    term=term.replace(chars+"", " ");
-//                }
-//            }
-//        }
-//
-//        return term;
-//    }
-//    private String removeDelimiter(String term){
-//        term=term.replaceAll("[\\\\.$|,|;|'|,%|\\-|`|~|!|@|#|^|&|*|(|)|\\[|\\]|{|}|+|=|_|\\\'|:|/|<|>|?|\\\"|\\.|�|⪕|⪖|¥|°|]"," ");
-//        return term;
-//    }
-
     private String removeDelimiter(String term) {
         String tmps = term;
         for (int i = 0; i < tmps.length(); i++) {
@@ -1230,10 +1239,8 @@ public class Parse {
                             tmps = tmps.substring(0, i);
                         }
                     } else if (delimiters.contains((tmps.charAt(i + 1)))) {
-                        //tmps = tmps.replace(tmps.charAt(i) + "", "");
                         tmps = OurReplace(tmps, tmps.charAt(i) + "", "");
                     } else {
-                        //tmps = tmps.replace(tmps.charAt(i) + "", " ");
                         tmps = OurReplace(tmps, tmps.charAt(i) + "", " ");
                     }
                 }
@@ -1275,7 +1282,7 @@ public class Parse {
         return sb.toString();
     }
 
-    public void addToCities2(String tmp, String docName, int locationInDoc, String bNoB) {
+    private void addToCities2(String tmp, String docName, int locationInDoc, String bNoB) {
         if (!docName.equals("")) {
             if (!Character.isDigit(tmp.charAt(0)) && tmp.charAt(0) != '<' && tmp.charAt(0) != '-' && tmp.charAt(0) != '\'' && tmp.charAt(0) != '[' && tmp.charAt(0) != '(' && !Character.isDigit(tmp.charAt(0))) {
                 String ci = tmp.toUpperCase();

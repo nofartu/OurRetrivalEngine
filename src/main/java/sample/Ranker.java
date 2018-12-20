@@ -38,7 +38,7 @@ public class Ranker {
 
     }
 
-    public TreeMap rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations) {
+    public TreeMap <String, Double> rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations) {
         rankBM25(docsContainsQuery, countWordsQuery);
         rankTfIdf(wordAndLocations);
         for (Map.Entry<String, Double[]> entry : allDocs.entrySet()) {

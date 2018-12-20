@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.*;
 
 import static sample.ApiJson.cities;
+import static sample.ApiJson.getCities;
 import static sample.Indexer.sort;
 
 
@@ -56,6 +57,7 @@ public class ViewController implements Observer {
     private TableView tableCity;
     private String info;
     private ReadFile readFile;
+    private ApiJson api;
     public Thread t;
     public static ArrayList<String> chosenCities = new ArrayList<>();
 
@@ -308,7 +310,7 @@ public class ViewController implements Observer {
                 Indexer indexer = new Indexer(b, path);
                 indexer.addToDict();
                 indexer.loadDocuments();
-                ApiJson api = new ApiJson();
+                api = new ApiJson();
                 api.loadCities(b, path);
                 btn_showDictionary.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
@@ -321,12 +323,13 @@ public class ViewController implements Observer {
                 Indexer indexer = new Indexer(b, path);
                 indexer.addToDict();
                 indexer.loadDocuments();
-                ApiJson api = new ApiJson();
+                api = new ApiJson();
                 api.loadCities(b, path);
                 btn_showDictionary.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         }
+        HashMap<String, City> c=getCities();
 
     }
 
@@ -421,7 +424,7 @@ public class ViewController implements Observer {
     }
 
     public void doIt() {
-        Searcher searcher = new Searcher(null, "C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine", "D:\\documents\\users\\nofartu\\Downloads\\post", false, new ApiJson(), false);
+        Searcher searcher = new Searcher(null, "C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine", "D:\\documents\\users\\nofartu\\Downloads\\post", false, api, false);
         searcher.parseTheQuery("human smuggling");
         searcher.createCountWordsQuery("human smuggling");
         searcher.createDocsContainsQuery();

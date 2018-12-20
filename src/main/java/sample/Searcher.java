@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static sample.ApiJson.cities;
+import static sample.ApiJson.getCities;
 import static sample.Indexer.dictionary;
 import static sample.Indexer.docsCoprus;
 import static sample.ReadFile.mySplit;
@@ -52,7 +53,8 @@ public class Searcher {
         wordAndLocations = new HashMap<>();
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
-        combinedFilesWithCity=new HashSet<>();
+        combinedFilesWithCity = new HashSet<>();
+        toDeleteLater();
     }
 
     public void parseTheQuery(String query) {
@@ -83,6 +85,9 @@ public class Searcher {
 
     }
 
+    private void toDeleteLater() {
+        chosenCities.add("PRAGUE");
+    }
 
     private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed) {
         HashMap<String, ArrayList<String>> wordAndLocationsTmp = new HashMap<>();
@@ -146,7 +151,6 @@ public class Searcher {
     }
 
 
-
     public void createCountWordsQuery(String query) {
         ArrayList<String> tmp = mySplit(query, " ");
         for (int i = 0; i < tmp.size(); i++) {
@@ -162,21 +166,34 @@ public class Searcher {
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
         rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocations);
-        System.out.println("i'm done");
+       withCities();
+       System.out.println("i'm done");
     }
-    public City getAllCityPostings(String word) {
-        return cities.get(word);
+
+    public HashMap<String, ArrayList<String>> getAllCityPostings(String word) {
+        HashMap<String, City> c=getCities();
+        return c.get(word).getLocations();
     }
+
     public void withCities() {
         HashMap<String, ArrayList<String>> files;
-        int size = chosenCities.size();
+        HashMap<String,Double> tmp=new HashMap<>();
+        tmp.putAll(rankedFiles);
+        // int size = chosenCities.size();
         for (String city : chosenCities) {
-            files=getAllCityPostings(city).getLocations();
-            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()){
-                if(rankedFiles.containsKey(entry.getKey())){
-
+            //for (String city : cities.keySet()) {
+            files = getAllCityPostings(city);
+            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()) {
+                if(entry.getKey().equals("FBIS3-9870"))
+                    System.out.println("hey123");
+                if (tmp.containsKey(entry.getKey())) {
+                    combinedFilesWithCity.add(entry.getKey());
                 }
             }
+        }
+        System.out.println("all the files that related");
+        for (String entry : combinedFilesWithCity) {
+            System.out.println(entry);
         }
 
     }

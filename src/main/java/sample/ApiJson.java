@@ -289,5 +289,9 @@ public class ApiJson {
         return keys;
     }
 
+    public static HashMap<String, City> getCities(){
+        return cities;
+    }
+
 }
 

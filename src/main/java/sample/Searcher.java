@@ -52,7 +52,7 @@ public class Searcher {
         wordAndLocations = new HashMap<>();
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
-        combinedFilesWithCity=new HashSet<>();
+        combinedFilesWithCity = new HashSet<>();
     }
 
     public void parseTheQuery(String query) {
@@ -146,7 +146,6 @@ public class Searcher {
     }
 
 
-
     public void createCountWordsQuery(String query) {
         ArrayList<String> tmp = mySplit(query, " ");
         for (int i = 0; i < tmp.size(); i++) {
@@ -164,16 +163,18 @@ public class Searcher {
         rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocations);
         System.out.println("i'm done");
     }
+
     public City getAllCityPostings(String word) {
         return cities.get(word);
     }
+
     public void withCities() {
         HashMap<String, ArrayList<String>> files;
         int size = chosenCities.size();
         for (String city : chosenCities) {
-            files=getAllCityPostings(city).getLocations();
-            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()){
-                if(rankedFiles.containsKey(entry.getKey())){
+            files = getAllCityPostings(city).getLocations();
+            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()) {
+                if (rankedFiles.containsKey(entry.getKey())) {
 
                 }
             }
@@ -246,6 +247,10 @@ public class Searcher {
             e.printStackTrace();
         }
         return stopwords;
+    }
+
+    public TreeMap<String, Double> getDocs() {
+        return rankedFiles;
     }
 
 }

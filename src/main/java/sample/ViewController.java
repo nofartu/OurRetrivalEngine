@@ -49,11 +49,13 @@ public class ViewController implements Observer {
     public javafx.scene.control.TextArea txt_Info;
     public javafx.scene.control.CheckBox check_stemm;
     public javafx.scene.control.CheckBox cb_choseCity;
+    public javafx.scene.control.CheckBox cb_semantic;
     public javafx.scene.control.ComboBox comboBox;
 
     private Stage primaryStage;
     private TableView table;
     private TableView tableCity;
+    private TableView tableQuery;
     private String info;
     private ReadFile readFile;
     public Thread t;
@@ -274,6 +276,61 @@ public class ViewController implements Observer {
         return data;
     }
 
+    public void showDocsQuery(TreeMap<String, Double> map) {
+        try {
+
+            tableQuery = new TableView();
+            Stage stage = new Stage();
+            Scene scene = new Scene(new Group());
+            stage.setTitle("Relevant documents");
+            stage.setWidth(450);
+            stage.setHeight(900);
+            final Label label = new Label("Relevant documents:");
+            label.setFont(new Font("Calibri Light", 22));
+            tableQuery.setEditable(false);
+
+            TableColumn Docs = new TableColumn("Documents");
+            Docs.setMinWidth(200);
+            Docs.setCellValueFactory(new PropertyValueFactory<DocShow, String>("docName"));
+
+
+            TableColumn button = new TableColumn("See entities");
+            button.setMinWidth(100);
+            button.setCellValueFactory(new PropertyValueFactory<DocShow, Button>("btn_Entities"));
+
+
+            //table.setItems(getData());
+            tableQuery.setItems(getDataQuery(map));
+            tableQuery.getColumns().addAll(Docs, button);
+            tableQuery.setMinHeight(800);
+            tableQuery.setMaxHeight(900);
+            tableQuery.setMinWidth(350);
+            tableQuery.setMaxWidth(450);
+
+            final VBox vbox = new VBox();
+            vbox.setSpacing(20);
+            vbox.setPadding(new Insets(10, 0, 0, 10));
+            vbox.getChildren().addAll(label, tableQuery);
+
+            ((Group) scene.getRoot()).getChildren().addAll(vbox);
+            stage.setScene(scene);
+            stage.show();
+
+
+        } catch (Exception e) {
+            System.out.println("not opening");
+        }
+    }
+
+    public ObservableList<DocShow> getDataQuery(TreeMap<String, Double> map) {
+        ObservableList<DocShow> data = FXCollections.observableArrayList();
+        Map<String, Double> set = map;
+        for (Map.Entry<String, Double> entry : set.entrySet()) {
+            data.add(new DocShow(entry.getKey()));
+        }
+        return data;
+    }
+
 //    private void SetStageCloseEvent(Stage primaryStage) {
 //        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 //            public void handle(WindowEvent windowEvent) {
@@ -420,12 +477,22 @@ public class ViewController implements Observer {
         return "";
     }
 
-    public void doIt() {
-        Searcher searcher = new Searcher(null, "C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine", "D:\\documents\\users\\nofartu\\Downloads\\post", false, new ApiJson(), false);
+
+    public void runQuery() {
+        String stopWords = txtfld_stopWords.getText();
+        String dirPath = txtfld_dirPath.getText();
+        boolean stem = check_stemm.isSelected();
+        boolean semantic=cb_semantic.isSelected();
+
+        Searcher searcher = new Searcher(null, stopWords, dirPath, stem, new ApiJson(), semantic);
+
         searcher.parseTheQuery("human smuggling");
         searcher.createCountWordsQuery("human smuggling");
         searcher.createDocsContainsQuery();
         searcher.sendToRanker();
+
+        showDocsQuery(searcher.getDocs());
+
     }
 
 }

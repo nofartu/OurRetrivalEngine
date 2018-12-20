@@ -1,6 +1,11 @@
 package sample;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader;
+import okhttp3.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,7 +44,7 @@ public class Searcher {
         parse = new Parse(stopWords, stem, apiJson);
         this.postPath = postPath;
         this.numOfDocs = docsCoprus.size();
-//        this.numOfDocs=472525;
+      // this.numOfDocs=472525;
         wordAndLocations = new HashMap<>();
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
@@ -111,7 +116,7 @@ public class Searcher {
 
     public void sendToRanker() {
         Ranker ranker = new Ranker();
-        ranker.rankBM25(docsContainsQuery, countWordsQuery, numOfDocs);
+        //ranker.rankBM25(docsContainsQuery, countWordsQuery, numOfDocs);
     }
 
 
@@ -136,6 +141,31 @@ public class Searcher {
             }
         }
 
+    }
+
+    public ArrayList<String> semantic(String word) {
+        ArrayList<String> semanticWords=new ArrayList<>();
+        try {
+            String urlLink = "https://api.datamuse.com/words?ml=" + word;
+            OkHttpClient client = new OkHttpClient();
+            HttpUrl.Builder urlBuilder = HttpUrl.parse(urlLink).newBuilder();
+            String url = urlBuilder.build().toString();
+            Request request = new Request.Builder().url(url).build();
+            Call call = client.newCall(request);
+            Response response = call.execute();
+            JsonParser parser = new JsonParser();
+            JsonElement ele = parser.parse(response.body().string());
+            JsonArray arr = ele.getAsJsonArray();
+            for (int i = 0; i < 12; i++) {
+                JsonObject o = (JsonObject) (arr.get(i));
+                String str = o.get("word").getAsString();
+               semanticWords.add(str);
+            }
+            return semanticWords;
+        } catch (Exception e) {
+
+        }
+        return null;
     }
 
     //create an Hash with all the stop words

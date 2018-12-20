@@ -11,14 +11,12 @@ public class Ranker {
         allDocs = new HashMap<>();
     }
 
-    public void rankBM25(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, int numOfDocs) {
+
+    public void rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, int numOfDocs) {
         double sum = 0;
         double k = 1.2, b = 0.75;
         double avdl = getAvdl();
-        int count = 0;
-        int count2 = 0;
         for (Map.Entry<String, ArrayList<String[]>> entry : docsContainsQuery.entrySet()) {
-
             for (String[] info : entry.getValue()) {
                 String key = info[0]; //word name
                 int cWQ = countWordsQuery.get(key);
@@ -29,10 +27,16 @@ public class Ranker {
                 sum = sum + tmp;
             }
             allDocs.put(entry.getKey(), sum);
-            // System.out.println("doc num: " + entry.getKey() + " and the bm25 is: " + sum);
             sum = 0;
         }
         getTop50();
+    }
+
+    public void rankBM25(){
+
+    }
+    public void rankTfIdf(){
+
     }
 
     private double getAvdl() {

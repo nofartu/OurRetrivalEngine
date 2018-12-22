@@ -75,7 +75,7 @@ public class ViewController implements Observer {
     public void setStage(Stage stage) {
         this.primaryStage = stage;
         //controller = new Controller(model);
-        txtfld_corpus.setText("D:\\documents\\users\\nofartu\\Downloads\\corpus\\corpus");
+        txtfld_corpus.setText("D:\\documents\\users\\mayamark\\Downloads\\corpus\\corpus");
         txtfld_stopWords.setText("C:\\Users\\mayamark\\IdeaProjects\\OurRetrivalEngine");
         txtfld_dirPath.setText("D:\\documents\\users\\mayamark\\Downloads\\post");
         txtfld_QueryBrowse.setText("C:\\Users\\mayamark\\IdeaProjects\\OurRetrivalEngine\\queries.txt");

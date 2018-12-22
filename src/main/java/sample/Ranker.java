@@ -76,8 +76,8 @@ public class Ranker {
 
     private double getAvdl() {
         int sum = 0;
-        for (int i = 0; i < docsCoprus.size(); i++) {
-            sum += docsCoprus.get(i).getSize();
+        for (Map.Entry<String, Documents> entry: docsCoprus.entrySet()) {
+            sum += entry.getValue().getSize();
         }
         int total = docsCoprus.size();
         if (total == 0) {

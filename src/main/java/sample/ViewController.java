@@ -348,7 +348,7 @@ public class ViewController implements Observer {
     }
 
 
-    public void showDocsQueries(Queue<Pair<String, TreeMap<String, Double>>> map) {
+    public void showDocsQueries() {
         try {
 
             tableQuery = new TableView();
@@ -375,7 +375,7 @@ public class ViewController implements Observer {
 
 
             //table.setItems(getData());
-            tableQuery.setItems(getDataQueries(map));
+            tableQuery.setItems(getDataQueries());
             tableQuery.getColumns().addAll(query, Docs, button);
             tableQuery.setMinHeight(800);
             tableQuery.setMaxHeight(900);
@@ -397,10 +397,11 @@ public class ViewController implements Observer {
         }
     }
 
-    public ObservableList<DocShow> getDataQueries(Queue<Pair<String, TreeMap<String, Double>>> map) {
+    public ObservableList<DocShow> getDataQueries() {
         ObservableList<DocShow> data = FXCollections.observableArrayList();
-        Queue<Pair<String, TreeMap<String, Double>>> set = map;
-        for (int i = 0; i < set.size(); i++) {
+        Queue<Pair<String, TreeMap<String, Double>>> set = new LinkedList<>();
+        set.addAll(docsToShow);
+        while (set.size() > 0) {
             Pair<String, TreeMap<String, Double>> it = set.poll();
             for (Map.Entry<String, Double> entry : it.getValue().entrySet()) {
                 data.add(new DocShow(entry.getKey(), it.getKey()));
@@ -620,15 +621,15 @@ public class ViewController implements Observer {
                 LinkedHashMap<String, String> queries = getTheQuery(txtfld_QueryBrowse.getText());
                 for (Map.Entry<String, String> entry : queries.entrySet()) {
                     String query = entry.getKey();
-                    System.out.println("the query is:"+query);
+                    System.out.println("the query is:" + query);
                     Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
                     searcher.doQuery(query);
                     collectedDocs(searcher.getDocs(), entry.getValue());
-
                 }
             }
-            showDocsQueries(docsToShow);
+            showDocsQueries();
             writeToDisk();
+            System.out.println("done");
         }
 
 
@@ -648,15 +649,16 @@ public class ViewController implements Observer {
         try {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("d:\\documents\\users\\mayamark\\Downloads\\qur\\results.txt", false), StandardCharsets.UTF_8));
             int count = 0;
-            Queue<Pair<String, TreeMap<String, Double>>> tmps = new LinkedList<>();
             StringBuilder writeIt = new StringBuilder("");
-            for (int i = 0; i < docsToShow.size(); i++) {
-                Pair<String, TreeMap<String, Double>> pair = docsToShow.poll();
-                tmps.add(pair);
+            Queue<Pair<String, TreeMap<String, Double>>> set = new LinkedList<>();
+            set.addAll(docsToShow);
+            while (set.size() > 0) {
+                Pair<String, TreeMap<String, Double>> pair = set.poll();
                 String num = pair.getKey();
                 for (Map.Entry<String, Double> entry : pair.getValue().entrySet()) {
+                    count++;
                     String docname = entry.getKey();
-                    writeIt.append(num + " 0 " + docname + " 0+\n");
+                    writeIt.append(num + " 0 " + docname + " 0 0 mt\n");
                 }
                 if (count % 50 == 0) {
                     bw.write(writeIt.toString());
@@ -667,7 +669,6 @@ public class ViewController implements Observer {
             bw.write(writeIt.toString());
             bw.flush();
             bw.close();
-            docsToShow = tmps;
         } catch (IOException e) {
             e.printStackTrace();
         }

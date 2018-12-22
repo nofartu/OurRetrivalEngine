@@ -90,8 +90,18 @@ public class Ranker {
          TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(finalScore));
          //finalScore = new TreeMap<>(new ValueComparator(finalScore));
          sorted.putAll(finalScore);
-         return sorted;
-
+        TreeMap<String, Double> finalsorted=new TreeMap<>();
+        int i=0;
+        for (Map.Entry<String, Double> entry : sorted.entrySet()) {
+            if(i>=50)
+                break;
+            else
+            {
+                finalsorted.put(entry.getKey(),entry.getValue());
+                i++;
+            }
+        }
+         return finalsorted;
     }
 
     class ValueComparator implements Comparator<String> {

@@ -1312,7 +1312,7 @@ public class Parse {
         return tmps;
     }
 
-    private static String OurReplace(String s, String target, String replacement) {
+    public static String OurReplace(String s, String target, String replacement) {
         StringBuilder sb = null;
         int start = 0;
         for (int i; (i = s.indexOf(target, start)) != -1; ) {

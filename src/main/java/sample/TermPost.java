@@ -1,6 +1,8 @@
 package sample;
 
 
+import javafx.util.Pair;
+
 import java.util.ArrayList;
 
 
@@ -81,12 +83,13 @@ public class TermPost implements Comparable<TermPost> {
         return this.termName.toLowerCase().compareTo(second.termName.toLowerCase());
     }
 
-    public ArrayList<String> docsApear(){
-        ArrayList<String> docs=new ArrayList<>();
+    public ArrayList<Pair<String, Integer>> docsApear(){
+        ArrayList<Pair<String, Integer>> docs=new ArrayList<>();
         ArrayList<String> posts = mySplit(post, " ");
         for(String s: posts){
             ArrayList<String> doc=mySplit(s, ":");
-            docs.add(doc.get(0));
+            int numOfOcur=Integer.parseInt(doc.get(1));
+            docs.add(new Pair<>(doc.get(0),numOfOcur));
         }
         return docs;
     }

@@ -15,7 +15,7 @@ public class Documents {
     private int numOfUniqe;
     private String origin;
     private int size;
-    private HashSet<String> entities;
+    private HashMap<String, Integer> entities;
 
     public Documents(String id, HashMap<String, Integer[]> termsMap) {
         idDoc = id;
@@ -24,7 +24,7 @@ public class Documents {
         numOfUniqe = 0;
         origin = "";
         size = 0;
-        entities = new HashSet<>();
+        entities = new HashMap<>();
     }
 
 
@@ -81,11 +81,17 @@ public class Documents {
         return size;
     }
 
-    public void addEnity(String entity) {
-        entities.add(entity);
+    public void addEnity(String entity, int numOfOcur) {
+        entities.put(entity, numOfOcur);
     }
 
-    public HashSet<String> getEntities() {
+    public HashMap<String, Integer> getEntities() {
         return entities;
+    }
+    public int getSizeOfEntity(){
+        return entities.size();
+    }
+    public void removeFromEntity(String name){
+        entities.remove(name);
     }
 }

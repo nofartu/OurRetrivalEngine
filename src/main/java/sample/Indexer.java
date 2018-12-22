@@ -239,10 +239,10 @@ public class Indexer {
                 String name = doc.getIdDoc();
                 int size = doc.getSize();
                 writeIt.append(name + ": " + maxTf + ";" + unique + ";" + size + ";" + origin + ";Entities");
-                Set<String> set = doc.getEntities();
+                HashMap<String, Integer> set = doc.getEntities();
                 if (set != null) {
-                    for (String entity : set) {
-                        writeIt.append(";" + entity);
+                    for (Map.Entry<String, Integer> entity : set.entrySet()) {
+                        writeIt.append(";" + entity.getKey() + ";" + entity.getValue());
                     }
                     writeIt.append("\n");
                 }
@@ -357,11 +357,21 @@ public class Indexer {
                             lineNumber++;
                         }
                         if (termToAdd.getName().equals(termToAdd.getName().toUpperCase()) && !isNum(termToAdd.getName()) && !Character.isDigit(termToAdd.getName().charAt(0))) {
-                            ArrayList<String> docs = termToAdd.docsApear();
-                            for (String doc : docs) {
-                                Documents doctmps = docsCoprus.get(doc);
-                                doctmps.addEnity(termToAdd.getName());
-                                docsCoprus.put(doc, doctmps);
+                            ArrayList<Pair<String, Integer>> docs = termToAdd.docsApear();
+                            for (Pair<String, Integer> doc : docs) {
+                                Documents doctmps = docsCoprus.get(doc.getKey());
+                                if (doctmps.getSizeOfEntity() < 5) {
+                                    doctmps.addEnity(termToAdd.getName(), doc.getValue());
+                                    docsCoprus.put(doc.getKey(), doctmps);
+                                } else {
+                                    for (Map.Entry<String, Integer> entry : doctmps.getEntities().entrySet()) {
+                                        if (entry.getValue() < doc.getValue()) {
+                                            doctmps.removeFromEntity(entry.getKey());
+                                            doctmps.addEnity(termToAdd.getName(), doc.getValue());
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                         }
                         hashTermToPost.remove(termToAdd);

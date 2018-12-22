@@ -14,18 +14,22 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static sample.ApiJson.cities;
 import static sample.Indexer.sort;
+import static sample.ReadFile.mySplit;
 
 
 public class ViewController implements Observer {
@@ -40,16 +44,20 @@ public class ViewController implements Observer {
     public javafx.scene.control.Button btn_showDictionary;
     public javafx.scene.control.Button btn_chooseCity;
     public javafx.scene.control.Button btn_loadDictionary;
+    public javafx.scene.control.Button btn_runQuery;
 
     @FXML
     public javafx.scene.control.TextField txtfld_corpus;
     public javafx.scene.control.TextField txtfld_stopWords;
     public javafx.scene.control.TextField txtfld_dirPath;
-    public javafx.scene.control.TextField txtfld_Query;
+    public javafx.scene.control.TextField txtfld_QueryHand;
+    public javafx.scene.control.TextField txtfld_QueryBrowse;
     public javafx.scene.control.TextArea txt_Info;
     public javafx.scene.control.CheckBox check_stemm;
     public javafx.scene.control.CheckBox cb_choseCity;
     public javafx.scene.control.CheckBox cb_semantic;
+    public javafx.scene.control.CheckBox cb_handQuery;
+    public javafx.scene.control.CheckBox cb_fileQuery;
     public javafx.scene.control.ComboBox comboBox;
 
     private Stage primaryStage;
@@ -61,21 +69,26 @@ public class ViewController implements Observer {
     private ApiJson api;
     public Thread t;
     public static ArrayList<String> chosenCities = new ArrayList<>();
+    private Queue<Pair<String, TreeMap<String, Double>>> docsToShow = new LinkedList<>();
 
 
     public void setStage(Stage stage) {
         this.primaryStage = stage;
         //controller = new Controller(model);
         txtfld_corpus.setText("D:\\documents\\users\\nofartu\\Downloads\\corpus\\corpus");
-        txtfld_stopWords.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine");
-        txtfld_dirPath.setText("D:\\documents\\users\\nofartu\\Downloads\\post");
+        txtfld_stopWords.setText("C:\\Users\\mayamark\\IdeaProjects\\OurRetrivalEngine");
+        txtfld_dirPath.setText("D:\\documents\\users\\mayamark\\Downloads\\post");
+        txtfld_QueryBrowse.setText("C:\\Users\\mayamark\\IdeaProjects\\OurRetrivalEngine\\queries.txt");
 
         comboBox.setDisable(true);
         txt_Info.setDisable(true);
         txt_Info.setVisible(false);
         btn_showDictionary.setDisable(true);
         btn_chooseCity.setDisable(true);
-
+        btn_browseQuery.setDisable(true);
+        btn_runQuery.setDisable(true);
+        txtfld_QueryHand.setDisable(true);
+        txtfld_QueryBrowse.setDisable(true);
     }
 
     public void startOperation() {
@@ -329,7 +342,69 @@ public class ViewController implements Observer {
         ObservableList<DocShow> data = FXCollections.observableArrayList();
         Map<String, Double> set = map;
         for (Map.Entry<String, Double> entry : set.entrySet()) {
-            data.add(new DocShow(entry.getKey()));
+            data.add(new DocShow(entry.getKey(), ""));
+        }
+        return data;
+    }
+
+
+    public void showDocsQueries(Queue<Pair<String, TreeMap<String, Double>>> map) {
+        try {
+
+            tableQuery = new TableView();
+            Stage stage = new Stage();
+            Scene scene = new Scene(new Group());
+            stage.setTitle("Relevant documents");
+            stage.setWidth(500);
+            stage.setHeight(900);
+            final Label label = new Label("Relevant documents:");
+            label.setFont(new Font("Calibri Light", 22));
+            tableQuery.setEditable(false);
+
+            TableColumn query = new TableColumn("Query number");
+            query.setMinWidth(100);
+            query.setCellValueFactory(new PropertyValueFactory<DocShow, String>("queryNum"));
+
+            TableColumn Docs = new TableColumn("Document number");
+            Docs.setMinWidth(130);
+            Docs.setCellValueFactory(new PropertyValueFactory<DocShow, String>("docName"));
+
+            TableColumn button = new TableColumn("Entities");
+            button.setMinWidth(100);
+            button.setCellValueFactory(new PropertyValueFactory<DocShow, Button>("btn_Entities"));
+
+
+            //table.setItems(getData());
+            tableQuery.setItems(getDataQueries(map));
+            tableQuery.getColumns().addAll(query, Docs, button);
+            tableQuery.setMinHeight(800);
+            tableQuery.setMaxHeight(900);
+            tableQuery.setMinWidth(350);
+            tableQuery.setMaxWidth(450);
+
+            final VBox vbox = new VBox();
+            vbox.setSpacing(20);
+            vbox.setPadding(new Insets(10, 0, 0, 10));
+            vbox.getChildren().addAll(label, tableQuery);
+
+            ((Group) scene.getRoot()).getChildren().addAll(vbox);
+            stage.setScene(scene);
+            stage.show();
+
+
+        } catch (Exception e) {
+            System.out.println("not opening");
+        }
+    }
+
+    public ObservableList<DocShow> getDataQueries(Queue<Pair<String, TreeMap<String, Double>>> map) {
+        ObservableList<DocShow> data = FXCollections.observableArrayList();
+        Queue<Pair<String, TreeMap<String, Double>>> set = map;
+        for (int i = 0; i < set.size(); i++) {
+            Pair<String, TreeMap<String, Double>> it = set.poll();
+            for (Map.Entry<String, Double> entry : it.getValue().entrySet()) {
+                data.add(new DocShow(entry.getKey(), it.getKey()));
+            }
         }
         return data;
     }
@@ -399,6 +474,43 @@ public class ViewController implements Observer {
 
     }
 
+
+    public void cb_HandOnOrOff() {
+        if (!cb_fileQuery.isSelected()) {
+            if (cb_handQuery.isSelected()) {
+                txtfld_QueryHand.setDisable(false);
+                btn_runQuery.setDisable(false);
+            } else if (!cb_handQuery.isSelected()) {
+                txtfld_QueryHand.setDisable(true);
+                btn_runQuery.setDisable(true);
+            }
+        } else {
+            if (cb_handQuery.isSelected()) {
+                cb_handQuery.setSelected(false);
+                showAlert("Wrong move", "You can only chose one of the option!", "If you wnat to change your selection, uncheck the other checkbox and then check this checkbox");
+            }
+        }
+    }
+
+    public void cb_BrowseOnOrOff() {
+        if (!cb_handQuery.isSelected()) {
+            if (cb_fileQuery.isSelected()) {
+                txtfld_QueryBrowse.setDisable(false);
+                btn_browseQuery.setDisable(false);
+                btn_runQuery.setDisable(false);
+            } else if (!cb_fileQuery.isSelected()) {
+                txtfld_QueryBrowse.setDisable(true);
+                btn_browseQuery.setDisable(true);
+                btn_runQuery.setDisable(true);
+            }
+        } else {
+            if (cb_fileQuery.isSelected()) {
+                cb_fileQuery.setSelected(false);
+                showAlert("Wrong move", "You can only chose one of the option!", "If you wnat to change your selection, uncheck the other checkbox and then check this checkbox");
+            }
+        }
+    }
+
     public void BrowseCorpus(ActionEvent actionEvent) {
         btn_browseCorpus.setDisable(true);
         DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -431,10 +543,10 @@ public class ViewController implements Observer {
 
     public void BrowseQuery(ActionEvent actionEvent) {
         btn_browseQuery.setDisable(true);
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File path = directoryChooser.showDialog(null);
+        FileChooser fileChooser = new FileChooser();
+        File path = fileChooser.showOpenDialog(null);
         if (path != null) {
-            txtfld_Query.setText(path.getAbsolutePath());
+            txtfld_QueryBrowse.setText(path.getAbsolutePath());
         }
         btn_browseQuery.setDisable(false);
     }
@@ -463,7 +575,8 @@ public class ViewController implements Observer {
             btn_chooseCity.setDisable(true);
     }
 
-    public String getTheQuery(String path) {
+    public LinkedHashMap<String, String> getTheQuery(String path) {
+        LinkedHashMap<String, String> queries = new LinkedHashMap<>();
         File file = new File(path);
         if (file.isFile()) {
             try {
@@ -471,31 +584,94 @@ public class ViewController implements Observer {
                 Elements docs = doc.select("top");
                 for (Element e : docs) {
                     String query = e.getElementsByTag("title").text();
-                    return query;
+                    String numQuery = e.getElementsByTag("num").text();
+                    if (!numQuery.equals("")) {
+                        ArrayList<String> split = mySplit(numQuery, " ");
+                        numQuery = split.get(1);
+                    }
+                    queries.put(query, numQuery);
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return "";
+        return queries;
     }
 
 
     public void runQuery() {
+        //checks for this!!!!!!!
         String stopWords = txtfld_stopWords.getText();
         String dirPath = txtfld_dirPath.getText();
         boolean stem = check_stemm.isSelected();
-        boolean semantic=cb_semantic.isSelected();
+        boolean semantic = cb_semantic.isSelected();
+        //Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
 
-        Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
+        if (cb_handQuery.isSelected()) {
+            if (!txtfld_QueryHand.getText().equals("")) {
+                Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
+                String query = txtfld_QueryHand.getText();
+                searcher.doQuery(query);
+                showDocsQuery(searcher.getDocs());
+            }
+        } else if (cb_fileQuery.isSelected()) {
+            if (!txtfld_QueryBrowse.getText().equals("")) {
+                LinkedHashMap<String, String> queries = getTheQuery(txtfld_QueryBrowse.getText());
+                for (Map.Entry<String, String> entry : queries.entrySet()) {
+                    String query = entry.getKey();
+                    System.out.println("the query is:"+query);
+                    Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
+                    searcher.doQuery(query);
+                    collectedDocs(searcher.getDocs(), entry.getValue());
 
-        searcher.parseTheQuery("human smuggling");
-        searcher.createCountWordsQuery("human smuggling");
-        searcher.createDocsContainsQuery();
-        searcher.sendToRanker();
+                }
+            }
+            showDocsQueries(docsToShow);
+            writeToDisk();
+        }
 
-        showDocsQuery(searcher.getDocs());
+
+//        searcher.parseTheQuery("human smuggling");
+//        searcher.createCountWordsQuery("human smuggling");
+//        searcher.createDocsContainsQuery();
+//        searcher.sendToRanker();
+//        showDocsQuery(searcher.getDocs());
 
     }
+
+    private void collectedDocs(TreeMap<String, Double> docs, String numQuery) {
+        docsToShow.add(new Pair<>(numQuery, docs));
+    }
+
+    private void writeToDisk() {
+        try {
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("d:\\documents\\users\\mayamark\\Downloads\\qur\\results.txt", false), StandardCharsets.UTF_8));
+            int count = 0;
+            Queue<Pair<String, TreeMap<String, Double>>> tmps = new LinkedList<>();
+            StringBuilder writeIt = new StringBuilder("");
+            for (int i = 0; i < docsToShow.size(); i++) {
+                Pair<String, TreeMap<String, Double>> pair = docsToShow.poll();
+                tmps.add(pair);
+                String num = pair.getKey();
+                for (Map.Entry<String, Double> entry : pair.getValue().entrySet()) {
+                    String docname = entry.getKey();
+                    writeIt.append(num + " 0 " + docname + " 0+\n");
+                }
+                if (count % 50 == 0) {
+                    bw.write(writeIt.toString());
+                    bw.flush();
+                    writeIt = new StringBuilder("");
+                }
+            }
+            bw.write(writeIt.toString());
+            bw.flush();
+            bw.close();
+            docsToShow = tmps;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

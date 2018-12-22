@@ -253,7 +253,7 @@ public class Parse {
         for (int j = i + 1; j < allWords.size() - 1; j++) {
             String termTmps = allWords.get(j);
             if (Character.isUpperCase(termTmps.charAt(0))) {
-                if (allWords.get(j).charAt(termTmps.length() - 1) == '.' || allWords.get(j).charAt(termTmps.length() - 1) == ',' || allWords.get(j).charAt(termTmps.length() - 1) == '"' || allWords.get(j).charAt(termTmps.length() - 1) == ')') {
+                if (allWords.get(j).charAt(termTmps.length() - 1) == '.' || allWords.get(j).charAt(termTmps.length() - 1) == ',' || allWords.get(j).charAt(termTmps.length() - 1) == '"' || allWords.get(j).charAt(termTmps.length() - 1) == ')'|| allWords.get(j).charAt(termTmps.length() - 1) == '?'|| allWords.get(j).charAt(termTmps.length() - 1) == '!') {
                     String tmpTerm = deleteSpares(termTmps);
                     if (termNo.length() == 0)
                         termNo = tmpTerm;

@@ -20,7 +20,7 @@ public class Indexer {
     private boolean stemming;
     private String pathPost;
     private File directory;
-    public static ArrayList<Documents> docsCoprus;
+    public static HashMap<String, Documents> docsCoprus;
     private HashMap<TermPost, List<Integer>> hashTermToPost;
     private PriorityQueue<TermPost> terms;
     private int numOfDoc;
@@ -34,7 +34,7 @@ public class Indexer {
         posting = new TreeMap<>(new Indexer.TreeCompare());
         stemming = isStem;
         this.pathPost = pathPost;
-        docsCoprus = new ArrayList<>();
+        docsCoprus = new HashMap<>();
         uniques = 0;
     }
 
@@ -162,7 +162,7 @@ public class Indexer {
         doc.setOrigin(doc.getOrigin());
         doc.setNumOfUniqe(min);
         doc.setSize(size);
-        docsCoprus.add(doc);
+        docsCoprus.put(doc.getIdDoc(), doc);
     }
 
     /**
@@ -231,19 +231,41 @@ public class Indexer {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathPost + "\\" + namedir + "\\Documents.txt", false), StandardCharsets.UTF_8));
             int count = 0;
             StringBuilder writeIt = new StringBuilder("");
-            for (int i = 0; i < docsCoprus.size(); i++) {
-                int maxTf = docsCoprus.get(i).getMax_tf();
-                int unique = docsCoprus.get(i).getNumOfUniqe();
-                String origin = docsCoprus.get(i).getOrigin();
-                String name = docsCoprus.get(i).getIdDoc();
-                int size = docsCoprus.get(i).getSize();
-                writeIt.append(name + ": " + maxTf + ";" + unique + ";" + size + ";" + origin + "\n");
+            for (Map.Entry<String, Documents> entry : docsCoprus.entrySet()) {
+                Documents doc = entry.getValue();
+                int maxTf = doc.getMax_tf();
+                int unique = doc.getNumOfUniqe();
+                String origin = doc.getOrigin();
+                String name = doc.getIdDoc();
+                int size = doc.getSize();
+                writeIt.append(name + ": " + maxTf + ";" + unique + ";" + size + ";" + origin + ";Entities");
+                Set<String> set = doc.getEntities();
+                if (set != null) {
+                    for (String entity : set) {
+                        writeIt.append(";" + entity);
+                    }
+                    writeIt.append("\n");
+                }
                 if (count % 10000 == 0) {
                     bw.write(writeIt.toString());
                     bw.flush();
                     writeIt = new StringBuilder("");
                 }
             }
+//            for (int i = 0; i < docsCoprus.size(); i++) {
+//                int maxTf = docsCoprus.get(i).getMax_tf();
+//                int unique = docsCoprus.get(i).getNumOfUniqe();
+//                String origin = docsCoprus.get(i).getOrigin();
+//                String name = docsCoprus.get(i).getIdDoc();
+//                int size = docsCoprus.get(i).getSize();
+//                writeIt.append(name + ": " + maxTf + ";" + unique + ";" + size + ";" + origin + "\n");
+//                if (count % 10000 == 0) {
+//                    bw.write(writeIt.toString());
+//                    bw.flush();
+//                    writeIt = new StringBuilder("");
+//                }
+//            }
+            //old(Down)
 //            for (Documents doc : docsCoprus) {//go through list of docs
 //                int maxTf = doc.getMax_tf();
 //                int unique = doc.getNumOfUniqe();
@@ -261,7 +283,7 @@ public class Indexer {
             bw.flush();
             bw.close();
             numOfDoc = docsCoprus.size();
-            docsCoprus = new ArrayList<>();
+            docsCoprus = new HashMap<>();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -333,8 +355,13 @@ public class Indexer {
                             //dictionary.remove(termToAdd.getName());
                             dictionary.put(termToAdd.getName(), arr); //updating the line number in the total post file and num of occurrence
                             lineNumber++;
-                            if (occurrence == 1) {
-                                uniques++;
+                        }
+                        if (termToAdd.getName().equals(termToAdd.getName().toUpperCase()) && !isNum(termToAdd.getName()) && !Character.isDigit(termToAdd.getName().charAt(0))) {
+                            ArrayList<String> docs = termToAdd.docsApear();
+                            for (String doc : docs) {
+                                Documents doctmps = docsCoprus.get(doc);
+                                doctmps.addEnity(termToAdd.getName());
+                                docsCoprus.put(doc, doctmps);
                             }
                         }
                         hashTermToPost.remove(termToAdd);
@@ -525,7 +552,7 @@ public class Indexer {
                 String information = arrayList.get(1);
                 ArrayList<String> arrayList1 = mySplit(information, ";");
                 String maxTf = arrayList1.get(0);
-                maxTf=maxTf.substring(1);
+                maxTf = maxTf.substring(1);
                 String unique = arrayList1.get(1);
                 String size = arrayList1.get(2);
                 String origin = "";
@@ -541,7 +568,7 @@ public class Indexer {
                 doc.setNumOfUniqe(uniqueNum);
                 doc.setOrigin(origin);
                 doc.setSize(sizeNum);
-                docsCoprus.add(doc);
+                docsCoprus.put(doc.getIdDoc(), doc);
             }
             br.close();
         } catch (IOException e) {
@@ -573,5 +600,15 @@ public class Indexer {
         return "Number of docs: " + numOfDoc + "\n" + "Number of unique: " + numOfUnique + "\n";
     }
 
-
+    private static boolean isNum(String s) {
+        if (s.contains(",")) {
+            s = s.replace(",", "");
+        }
+        try {
+            double d = Double.parseDouble(s);
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return true;
+    }
 }

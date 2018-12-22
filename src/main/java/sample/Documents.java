@@ -3,6 +3,7 @@ package sample;
 import javafx.util.Pair;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 
 
@@ -14,6 +15,7 @@ public class Documents {
     private int numOfUniqe;
     private String origin;
     private int size;
+    private HashSet<String> entities;
 
     public Documents(String id, HashMap<String, Integer[]> termsMap) {
         idDoc = id;
@@ -22,6 +24,7 @@ public class Documents {
         numOfUniqe = 0;
         origin = "";
         size = 0;
+        entities = new HashSet<>();
     }
 
 
@@ -76,5 +79,13 @@ public class Documents {
 
     public int getSize() {
         return size;
+    }
+
+    public void addEnity(String entity) {
+        entities.add(entity);
+    }
+
+    public HashSet<String> getEntities() {
+        return entities;
     }
 }

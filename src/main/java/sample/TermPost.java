@@ -81,6 +81,16 @@ public class TermPost implements Comparable<TermPost> {
         return this.termName.toLowerCase().compareTo(second.termName.toLowerCase());
     }
 
+    public ArrayList<String> docsApear(){
+        ArrayList<String> docs=new ArrayList<>();
+        ArrayList<String> posts = mySplit(post, " ");
+        for(String s: posts){
+            ArrayList<String> doc=mySplit(s, ":");
+            docs.add(doc.get(0));
+        }
+        return docs;
+    }
+
 //    public void setNumOfOccure(int num) {
 //        this.numOfOccure = numOfOccure + num;
 //    }

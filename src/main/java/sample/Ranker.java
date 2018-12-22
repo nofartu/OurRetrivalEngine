@@ -46,9 +46,9 @@ public class Ranker {
             finalScore.put(entry.getKey(), ranking[0] * 0.75 + ranking[1] * 0.25);
         }
         TreeMap<String,Double> sorted=getTop50();
-        for (Map.Entry<String, Double> entry : sorted.entrySet()) {
-            System.out.println(entry.getKey()+" and the rank is: "+entry.getValue());
-        }
+//        for (Map.Entry<String, Double> entry : sorted.entrySet()) {
+//            System.out.println(entry.getKey()+" and the rank is: "+entry.getValue());
+//        }
         return sorted;
     }
 

@@ -1312,7 +1312,7 @@ public class Parse {
         return tmps;
     }
 
-    private String OurReplace(String s, String target, String replacement) {
+    private static String OurReplace(String s, String target, String replacement) {
         StringBuilder sb = null;
         int start = 0;
         for (int i; (i = s.indexOf(target, start)) != -1; ) {
@@ -1326,7 +1326,7 @@ public class Parse {
         return sb.toString();
     }
 
-    private String OurReplace(String s, char[] targets, String replacement) {
+    private static String OurReplace(String s, char[] targets, String replacement) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char check = s.charAt(i);

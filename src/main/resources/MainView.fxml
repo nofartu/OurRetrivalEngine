@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="701.0" prefWidth="721.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ViewController">
+<AnchorPane prefHeight="701.0" prefWidth="721.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ViewController">
   <children>
     <TextField fx:id="txtfld_corpus" layoutX="147.0" layoutY="39.0" />
     <TextField fx:id="txtfld_stopWords" layoutX="147.0" layoutY="74.0" />
@@ -33,14 +33,16 @@
         <Font size="18.0" />
       </font>
     </Text>
-    <TextField fx:id="txtfld_corpus1" layoutX="221.0" layoutY="474.0" />
-    <Text layoutX="83.0" layoutY="489.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your query" wrappingWidth="101.99999903142452" />
-    <Button layoutX="396.0" layoutY="472.0" mnemonicParsing="false" onAction="#runQuery" text="Run" />
-    <TextField fx:id="txtfld_corpus2" layoutX="221.0" layoutY="514.0" />
+    <TextField fx:id="txtfld_QueryHand" layoutX="221.0" layoutY="474.0" />
+    <Text layoutX="81.0" layoutY="489.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your query" wrappingWidth="101.99999903142452" />
+    <Button fx:id="btn_runQuery" layoutX="528.0" layoutY="481.0" mnemonicParsing="false" onAction="#runQuery" prefHeight="59.0" prefWidth="84.0" text="Run" />
+    <TextField fx:id="txtfld_QueryBrowse" layoutX="221.0" layoutY="514.0" />
     <Text layoutX="79.0" layoutY="531.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Import you query file" wrappingWidth="115.728515625" />
     <Button fx:id="btn_browseQuery" layoutX="396.0" layoutY="514.0" mnemonicParsing="false" onAction="#BrowseQuery" text="Browse" />
     <CheckBox fx:id="cb_choseCity" layoutX="79.0" layoutY="581.0" mnemonicParsing="false" onAction="#checkCities" text="Limit search by cities: " />
     <Button id="btn_browseQuery" fx:id="btn_chooseCity" layoutX="233.0" layoutY="581.0" mnemonicParsing="false" onAction="#showCities" text="Choose city" />
       <CheckBox fx:id="cb_semantic" layoutX="80.0" layoutY="549.0" mnemonicParsing="false" text="Semantic " />
+      <CheckBox fx:id="cb_handQuery" layoutX="57.0" layoutY="476.0" mnemonicParsing="false" onAction="#cb_HandOnOrOff" />
+      <CheckBox fx:id="cb_fileQuery" layoutX="57.0" layoutY="518.0" mnemonicParsing="false" onAction="#cb_BrowseOnOrOff" />
   </children>
 </AnchorPane>

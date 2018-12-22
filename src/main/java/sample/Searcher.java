@@ -23,6 +23,7 @@ import static sample.ApiJson.cities;
 import static sample.ApiJson.getCities;
 import static sample.Indexer.dictionary;
 import static sample.Indexer.docsCoprus;
+import static sample.Parse.OurReplace;
 import static sample.ReadFile.mySplit;
 import static sample.ViewController.chosenCities;
 
@@ -58,7 +59,9 @@ public class Searcher {
     }
 
     public void parseTheQuery(String query) {
-        createCountWordsQuery(query);
+        if(query.equals("blood-alcohol fatalities"))
+            System.out.println("i'M HERE");
+       // createCountWordsQuery(query);
         HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
         if (semantic) {
             wordAndLocationsSemantic = doSemantic(queryParsed);
@@ -85,6 +88,12 @@ public class Searcher {
 
     }
 
+    public void doQuery(String query){
+        parseTheQuery(query);
+       // createCountWordsQuery(query);
+        createDocsContainsQuery();
+        sendToRanker();
+    }
 
     private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed) {
         HashMap<String, ArrayList<String>> wordAndLocationsTmp = new HashMap<>();
@@ -95,15 +104,17 @@ public class Searcher {
             if (dictionary.containsKey(keyLower)) {
                 if (!wordAndLocationsTmp.containsKey(key)) {
                     Integer[] fromDictionary = dictionary.get(keyLower);
-                    wordAndLocationsTmp.put(key, getAllPostings(fromDictionary[0]));
+                    wordAndLocationsTmp.put(keyLower, getAllPostings(fromDictionary[0]));
+                    countWordsQuery.put(keyLower,fromDictionary[0]);
                 }
             } else if (dictionary.containsKey(keyUpper)) {
                 if (!wordAndLocationsTmp.containsKey(key)) {
                     Integer[] fromDictionary = dictionary.get(keyUpper);
-                    wordAndLocationsTmp.put(key, getAllPostings(fromDictionary[0]));
+                    wordAndLocationsTmp.put(keyUpper, getAllPostings(fromDictionary[0]));
+                    countWordsQuery.put(keyUpper,fromDictionary[0]);
                 }
             } else {
-                System.out.println("we don't have this word in our dictionary");
+                System.out.println("2 we don't have this word in our dictionary "+key );
             }
         }
         return wordAndLocationsTmp;
@@ -147,18 +158,33 @@ public class Searcher {
         return null;
     }
 
-
-    public void createCountWordsQuery(String query) {
-        ArrayList<String> tmp = mySplit(query, " ");
-        for (int i = 0; i < tmp.size(); i++) {
-            String key = tmp.get(i);
-            if (!countWordsQuery.containsKey(key)) {
-                countWordsQuery.put(key, 1);
-            } else {
-                countWordsQuery.put(key, countWordsQuery.get(key) + 1);
-            }
-        }
-    }
+//    // TODO: 12/22/2018 we have a word that is not in the dictionary what to do"?
+//    public void createCountWordsQuery(String query) {
+//        query=OurReplace(query,"-"," ");
+//        ArrayList<String> tmp = mySplit(query, " ");
+//        for (int i = 0; i < tmp.size(); i++) {
+//            String key = tmp.get(i);
+//            String keyUp=key.toUpperCase();
+//            String keyLower=key.toLowerCase();
+//            if (dictionary.containsKey(keyLower)) {
+//                if (!countWordsQuery.containsKey(keyLower)) {
+//                    countWordsQuery.put(keyLower, 1);
+//                } else {
+//                    countWordsQuery.put(keyLower, countWordsQuery.get(keyLower) + 1);
+//                }
+//            }
+//            else if(dictionary.containsKey(keyUp)){
+//                if (!countWordsQuery.containsKey(keyUp)) {
+//                    countWordsQuery.put(keyUp, 1);
+//                } else {
+//                    countWordsQuery.put(keyUp, countWordsQuery.get(keyUp) + 1);
+//                }
+//            }
+//            else
+//                System.out.println("1 we have a word in the query that is not in the dictionary "+key );
+//
+//        }
+//    }
 
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
@@ -265,5 +291,6 @@ public class Searcher {
     public TreeMap<String, Double> getDocs() {
         return rankedFiles;
     }
+
 
 }

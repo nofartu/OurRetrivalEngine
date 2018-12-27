@@ -23,10 +23,12 @@ import static sample.ViewController.addingCitiesFromChoose;
 public class DocShow {
     private final SimpleStringProperty queryNum;
     private final SimpleStringProperty docName;
+    private String docNameS;
     private Button btn_Entities;
     public TableView tableQuery;
 
     public DocShow(String docName, String queryNum) {
+        docNameS=docName;
         this.docName = new SimpleStringProperty(docName);
         this.queryNum = new SimpleStringProperty(queryNum);
         this.btn_Entities = new Button("Show entities");
@@ -37,47 +39,50 @@ public class DocShow {
 
     private void showEntities() {
         try {
-
             tableQuery = new TableView();
             Stage stage = new Stage();
             Scene scene = new Scene(new Group());
-            stage.setTitle("Entities:");
-            stage.setWidth(450);
-            stage.setHeight(900);
+            stage.setTitle("Entities");
+            stage.setWidth(260);
+            stage.setHeight(300);
             final Label label = new Label("Entities in this document:");
             label.setFont(new Font("Calibri Light", 22));
             tableQuery.setEditable(false);
 
             TableColumn entity = new TableColumn("Entities");
-            entity.setMinWidth(100);
+            entity.setMinWidth(150);
             entity.setCellValueFactory(new PropertyValueFactory<EntityShow, String>("entityName"));
 
 
             //table.setItems(getData());
-            tableQuery.setItems(getDataQuery());
-            tableQuery.getColumns().addAll(entity);
-            tableQuery.setMinHeight(800);
-            tableQuery.setMaxHeight(900);
-            tableQuery.setMinWidth(350);
-            tableQuery.setMaxWidth(450);
+            Documents doc=docsCoprus.get(docNameS);
+            HashMap<String, Integer> entities = doc.getEntities();
+            if( entities.size()!=0) {
+                tableQuery.setItems(getData(entities));
+                tableQuery.getColumns().addAll(entity);
+                tableQuery.setMinHeight(150);
+                tableQuery.setMaxHeight(150);
+                tableQuery.setMinWidth(150);
+                tableQuery.setMaxWidth(200);
 
-            final VBox vbox = new VBox();
-            vbox.setSpacing(20);
-            vbox.setPadding(new Insets(10, 0, 0, 10));
-            vbox.getChildren().addAll(label, tableQuery);
+                final VBox vbox = new VBox();
+                vbox.setSpacing(20);
+                vbox.setPadding(new Insets(10, 0, 0, 10));
+                vbox.getChildren().addAll(label, tableQuery);
 
-            ((Group) scene.getRoot()).getChildren().addAll(vbox);
-            stage.setScene(scene);
-            stage.show();
-
+                ((Group) scene.getRoot()).getChildren().addAll(vbox);
+                stage.setScene(scene);
+                stage.show();
+            }else{
+                showAlert("No entities", "Attention!","There is no entities in this document");
+            }
 
         } catch (Exception e) {
             System.out.println("not opening");
         }
     }
 
-    private ObservableList<EntityShow> getDataQuery() {
-        HashMap<String, Integer> entities = docsCoprus.get(docName.toString()).getEntities();
+    private ObservableList<EntityShow> getData(HashMap<String, Integer> entities) {
         TreeMap<String, Integer> sorted=new TreeMap<>(new ValueComparator(entities));
         sorted.putAll(entities);
         ObservableList<EntityShow> data = FXCollections.observableArrayList();
@@ -85,6 +90,13 @@ public class DocShow {
             data.add(new EntityShow(entry.getKey()));
         }
         return data;
+    }
+    private void showAlert(String title, String header, String alertMessage) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setContentText(alertMessage);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.show();
     }
 
     public String getQueryNum() {

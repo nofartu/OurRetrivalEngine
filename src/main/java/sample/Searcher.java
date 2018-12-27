@@ -4,35 +4,32 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader;
 import okhttp3.*;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static sample.ApiJson.cities;
 import static sample.ApiJson.getCities;
 import static sample.Indexer.dictionary;
 import static sample.Indexer.docsCoprus;
-import static sample.Parse.OurReplace;
 import static sample.ReadFile.mySplit;
 import static sample.ViewController.chosenCities;
 
 public class Searcher {
     private Parse parse;
-    private HashMap<String, ArrayList<String>> wordAndLocations;
+    private HashMap<String, ArrayList<String>> wordAndLocationsQuery;
     private HashMap<String, ArrayList<String>> wordAndLocationsSemantic;
+    private HashMap<String, ArrayList<String>> wordAndLocationsDesc;
     private HashMap<String, ArrayList<String[]>> docsContainsQuery;
+    private HashMap<String, ArrayList<String[]>> docsContainsSemantic;
+    private HashMap<String, ArrayList<String[]>> docsContainsDesc;
     private HashMap<String, Integer> countWordsQuery;
+    private HashMap<String, Integer> countWordsSemantic;
+    private HashMap<String, Integer> countWordsDesc;
     private HashSet<String> combinedFilesWithCity;
     private TreeMap<String, Double> rankedFiles;
     private String postPath;
@@ -51,49 +48,58 @@ public class Searcher {
         this.postPath = postPath;
         this.numOfDocs = docsCoprus.size();
         // this.numOfDocs=472525;
-        wordAndLocations = new HashMap<>();
+        wordAndLocationsQuery = new HashMap<>();
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
         combinedFilesWithCity = new HashSet<>();
 
     }
 
-    public void parseTheQuery(String query) {
-       // createCountWordsQuery(query);
+    private void parseTheQuery(String query) {
+        // createCountWordsQuery(query);
         HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
         if (semantic) {
             wordAndLocationsSemantic = doSemantic(queryParsed);
         }
-        wordAndLocations = runQuery(queryParsed);
+        wordAndLocationsQuery = runQuery(queryParsed, 1);
 //        for (Map.Entry<String, Integer[]> entry : queryParsed.entrySet()) {
 //            String key = entry.getKey();
 //            String keyLower = key.toLowerCase();
 //            String keyUpper = key.toUpperCase();
 //            if (dictionary.containsKey(keyLower)) {
-//                if (!wordAndLocations.containsKey(key)) {
+//                if (!wordAndLocationsQuery.containsKey(key)) {
 //                    Integer[] fromDictionary = dictionary.get(keyLower);
-//                    wordAndLocations.put(key, getAllPostings(fromDictionary[0]));
+//                    wordAndLocationsQuery.put(key, getAllPostings(fromDictionary[0]));
 //                }
 //            } else if (dictionary.containsKey(keyUpper)) {
-//                if (!wordAndLocations.containsKey(key)) {
+//                if (!wordAndLocationsQuery.containsKey(key)) {
 //                    Integer[] fromDictionary = dictionary.get(keyUpper);
-//                    wordAndLocations.put(key, getAllPostings(fromDictionary[0]));
+//                    wordAndLocationsQuery.put(key, getAllPostings(fromDictionary[0]));
 //                }
 //            } else {
 //                System.out.println("we don't have this word in our dictionary");
 //            }
 //        }
-
     }
 
-    public void doQuery(String query){
+    private void parseTheDesc(String query){
+        HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
+        wordAndLocationsDesc=runQuery(queryParsed, 2);
+    }
+
+    public void doQuery(String query) {
         parseTheQuery(query);
-       // createCountWordsQuery(query);
-        createDocsContainsQuery();
+        //parseTheDesc(query); //NEW!!!!!
+        // createCountWordsQuery(query);
+        docsContainsQuery=createDocsContainsQuery(wordAndLocationsQuery);
+        docsContainsDesc=createDocsContainsQuery(wordAndLocationsDesc);
+        if(semantic)
+            docsContainsSemantic=createDocsContainsQuery(wordAndLocationsSemantic);
+
         sendToRanker();
     }
 
-    private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed) {
+    private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed, int who) { //who: 1 - query, 2 - description, 3 - semantic
         HashMap<String, ArrayList<String>> wordAndLocationsTmp = new HashMap<>();
         for (Map.Entry<String, Integer[]> entry : queryParsed.entrySet()) {
             String key = entry.getKey();
@@ -103,33 +109,48 @@ public class Searcher {
                 if (!wordAndLocationsTmp.containsKey(key)) {
                     Integer[] fromDictionary = dictionary.get(keyLower);
                     wordAndLocationsTmp.put(keyLower, getAllPostings(fromDictionary[0]));
-                    countWordsQuery.put(keyLower,fromDictionary[0]);
+                    insertToCountWords(who, keyLower, fromDictionary[0]);
+                    //countWordsQuery.put(keyLower, fromDictionary[0]);
                 }
             } else if (dictionary.containsKey(keyUpper)) {
                 if (!wordAndLocationsTmp.containsKey(key)) {
                     Integer[] fromDictionary = dictionary.get(keyUpper);
                     wordAndLocationsTmp.put(keyUpper, getAllPostings(fromDictionary[0]));
-                    countWordsQuery.put(keyUpper,fromDictionary[0]);
+                    insertToCountWords(who, keyUpper, fromDictionary[0]);
+                    //countWordsQuery.put(keyUpper, fromDictionary[0]);
                 }
             } else {
-                System.out.println("2 we don't have this word in our dictionary "+key );
+                System.out.println("2 we don't have this word in our dictionary " + key);
             }
         }
         return wordAndLocationsTmp;
     }
 
+    private void insertToCountWords(int who, String key, int value) {
+        if (who == 1)
+            countWordsQuery.put(key, value);
+        else if (who == 2)
+            countWordsDesc.put(key, value);
+        else if (who == 3)
+            countWordsSemantic.put(key, value);
+    }
+
     private HashMap<String, ArrayList<String>> doSemantic(HashMap<String, Integer[]> queryParsed) {
         HashMap<String, Integer[]> separateQuery = new HashMap<>();
+        parse.resetParse();
+        StringBuilder query = new StringBuilder("");
         for (Map.Entry<String, Integer[]> entry : queryParsed.entrySet()) {
             String key = entry.getKey();
             ArrayList<String> fromSemantic = semantic(key);
             if (fromSemantic != null) {
                 for (String s : fromSemantic) {
                     separateQuery.put(s, null);
+                    query.append(s + " ");
                 }
             }
         }
-        return runQuery(separateQuery);
+        HashMap<String, Integer[]> query2Parsed = parse.parsing(query.toString(), "");
+        return runQuery(query2Parsed, 3);
     }
 
     public ArrayList<String> getAllPostings(int lineNumber) {
@@ -186,9 +207,8 @@ public class Searcher {
 
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
-        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocations);
+        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery); //change
         withCities();
-        System.out.println("i'm done");
     }
 
     public HashMap<String, ArrayList<String>> getAllCityPostings(String word) {
@@ -205,14 +225,11 @@ public class Searcher {
             //for (String city : cities.keySet()) {
             files = getAllCityPostings(city);
             for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()) {
-                if (entry.getKey().equals("FBIS3-9870"))
-                    System.out.println("hey123");
                 if (tmp.containsKey(entry.getKey())) {
                     combinedFilesWithCity.add(entry.getKey());
                 }
             }
         }
-        System.out.println("all the files that related");
         for (String entry : combinedFilesWithCity) {
             System.out.println(entry);
         }
@@ -220,7 +237,8 @@ public class Searcher {
     }
 
 
-    public void createDocsContainsQuery() {
+    public HashMap<String, ArrayList<String[]>> createDocsContainsQuery(HashMap<String, ArrayList<String>> wordAndLocations) {
+        HashMap<String, ArrayList<String[]>> docsContainsTmp=new HashMap<>();
         for (Map.Entry<String, ArrayList<String>> entry : wordAndLocations.entrySet()) {
             ArrayList<String> tmp = entry.getValue();
             String keyWord = entry.getKey();
@@ -230,17 +248,17 @@ public class Searcher {
                 ArrayList<String> docAndTf = mySplit(tmp.get(i), ":");
                 String key = docAndTf.get(0);
                 ArrayList<String> tmp1 = mySplit(docAndTf.get(2), "/");
-                if (docsContainsQuery.containsKey(key)) {
+                if (docsContainsTmp.containsKey(key)) {
                     String[] strings = {keyWord, docAndTf.get(1), tmp1.get(1), df, tmp1.get(0)};
-                    docsContainsQuery.get(key).add(strings);
+                    docsContainsTmp.get(key).add(strings);
                 } else {
-                    docsContainsQuery.put(key, new ArrayList<>());
+                    docsContainsTmp.put(key, new ArrayList<>());
                     String[] strings = {keyWord, docAndTf.get(1), tmp1.get(1), df, tmp1.get(0)};
-                    docsContainsQuery.get(key).add(strings);
+                    docsContainsTmp.get(key).add(strings);
                 }
             }
         }
-
+        return docsContainsTmp;
     }
 
 

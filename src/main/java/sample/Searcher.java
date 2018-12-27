@@ -207,7 +207,7 @@ public class Searcher {
 
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
-        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery); //change
+        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery,docsContainsDesc,countWordsDesc,wordAndLocationsDesc,docsContainsSemantic,countWordsSemantic,wordAndLocationsSemantic); //change
         withCities();
     }
 

@@ -19,7 +19,7 @@ public class Ranker {
 
     public void rankBM25(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery) {
         double sum = 0;
-        double k = 1.2, b = 0.75;
+        double k = 0.6, b = 0.75;
         double avdl = getAvdl();
         for (Map.Entry<String, ArrayList<String[]>> entry : docsContainsQuery.entrySet()) {
             for (String[] info : entry.getValue()) {
@@ -28,7 +28,8 @@ public class Ranker {
                 int cWD = Integer.parseInt(info[1]); //word tf
                 int dLength = Integer.parseInt(info[2]); // |d|
                 int df = Integer.parseInt(info[3]); //df of word
-                double tmp = (double) cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
+               // double tmp = (double) cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
+                double tmp = Math.log10((numOfDocs-df+0.5)/(df+0.5))*((cWD*(k+1))/(cWD+k*(1-b+b*(dLength/avdl))));
                 sum = sum + tmp;
             }
 
@@ -47,12 +48,12 @@ public class Ranker {
 
     }
 
-    public TreeMap<String, Double> rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations) {
+    public TreeMap<String, Double> rankAll(HashMap<String, ArrayList<String[]>> containsQuery, HashMap<String, Integer> wordsQuery, HashMap<String, ArrayList<String>> wordAndLocationsQuery, HashMap<String, ArrayList<String[]>> docsContainsDesc, HashMap<String, Integer> countWordsDesc, HashMap<String, ArrayList<String>> wordAndLocationsDesc, HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations) {
         rankBM25(docsContainsQuery, countWordsQuery);
-        rankTfIdf(wordAndLocations);
+        rankTfIdfAndLocation(wordAndLocations);
         for (Map.Entry<String, Double[]> entry : allDocs.entrySet()) {
             Double[] ranking = entry.getValue();
-            finalScore.put(entry.getKey(), ranking[0] * 0.5 + ranking[1] * 0.25 + ranking[2] * 0.25);
+            finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
         }
         TreeMap<String, Double> sorted = getTop50();
 //        for (Map.Entry<String, Double> entry : sorted.entrySet()) {
@@ -61,7 +62,7 @@ public class Ranker {
         return sorted;
     }
 
-    public void rankTfIdf(HashMap<String, ArrayList<String>> wordAndLocations) {
+    public void rankTfIdfAndLocation(HashMap<String, ArrayList<String>> wordAndLocations) {
         for (Map.Entry<String, ArrayList<String>> entry : wordAndLocations.entrySet()) {
             String name = entry.getKey();
             int size = entry.getValue().size();

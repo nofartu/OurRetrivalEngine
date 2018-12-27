@@ -77,7 +77,7 @@ public class ViewController implements Observer {
         //controller = new Controller(model);
         txtfld_corpus.setText("d:\\documents\\users\\nofartu\\Downloads\\corpus\\corpus");
         txtfld_stopWords.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine");
-        txtfld_dirPath.setText("d:\\documents\\users\\nofartu\\Downloads\\post\\Stem");
+        txtfld_dirPath.setText("d:\\documents\\users\\nofartu\\Downloads\\post1");
         txtfld_QueryBrowse.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine\\queries.txt");
 
         comboBox.setDisable(true);
@@ -585,6 +585,7 @@ public class ViewController implements Observer {
                 Elements docs = doc.select("top");
                 for (Element e : docs) {
                     String query = e.getElementsByTag("title").text();
+                    String desc=e.getElementsByTag("desc").text();
                     String numQuery = e.getElementsByTag("num").text();
                     if (!numQuery.equals("")) {
                         ArrayList<String> split = mySplit(numQuery, " ");

@@ -28,24 +28,33 @@ public class Ranker {
                 int cWD = Integer.parseInt(info[1]); //word tf
                 int dLength = Integer.parseInt(info[2]); // |d|
                 int df = Integer.parseInt(info[3]); //df of word
-                double tmp =(double) cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
+                double tmp = (double) cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
                 sum = sum + tmp;
             }
-            Double[] d = {sum, 0.0};
+
+            Double[] d = {sum, 0.0, 0.0};
             allDocs.put(entry.getKey(), d);
             sum = 0;
         }
 
     }
 
-    public TreeMap <String, Double> rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations) {
+    public void rankByLocation(HashMap<String, ArrayList<String[]>> docsContainsQuery) {
+        for (Map.Entry<String, ArrayList<String[]>> entry : docsContainsQuery.entrySet()) {
+
+        }
+
+
+    }
+
+    public TreeMap<String, Double> rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations) {
         rankBM25(docsContainsQuery, countWordsQuery);
         rankTfIdf(wordAndLocations);
         for (Map.Entry<String, Double[]> entry : allDocs.entrySet()) {
             Double[] ranking = entry.getValue();
-            finalScore.put(entry.getKey(), ranking[0] * 0.75 + ranking[1] * 0.25);
+            finalScore.put(entry.getKey(), ranking[0] * 0.5 + ranking[1] * 0.25 + ranking[2] * 0.25);
         }
-        TreeMap<String,Double> sorted=getTop50();
+        TreeMap<String, Double> sorted = getTop50();
 //        for (Map.Entry<String, Double> entry : sorted.entrySet()) {
 //            System.out.println(entry.getKey()+" and the rank is: "+entry.getValue());
 //        }
@@ -64,11 +73,13 @@ public class Ranker {
                 ArrayList<String> key = mySplit(info, ":"); //word name
                 int cWD = Integer.parseInt(key.get(1)); //word tf
                 int dLength = Integer.parseInt(mySplit(key.get(2), "/").get(1)); // |d|
-                double tf = (double)cWD / dLength;
+                int location = Integer.parseInt(mySplit(key.get(2), "/").get(0));
+                double tf = (double) cWD / dLength;
                 double tfIdf = tf * idf;
                 // double tmp = cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
                 Double[] d = allDocs.get(key.get(0));
                 d[1] = tfIdf;
+                d[2] = (double) dLength - location; //location ranking
                 allDocs.put(name, d);
             }
         }
@@ -76,7 +87,7 @@ public class Ranker {
 
     private double getAvdl() {
         int sum = 0;
-        for (Map.Entry<String, Documents> entry: docsCoprus.entrySet()) {
+        for (Map.Entry<String, Documents> entry : docsCoprus.entrySet()) {
             sum += entry.getValue().getSize();
         }
         int total = docsCoprus.size();
@@ -87,21 +98,20 @@ public class Ranker {
     }
 
     public TreeMap<String, Double> getTop50() {
-         TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(finalScore));
-         //finalScore = new TreeMap<>(new ValueComparator(finalScore));
-         sorted.putAll(finalScore);
-        TreeMap<String, Double> finalsorted=new TreeMap<>();
-        int i=0;
+        TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(finalScore));
+        //finalScore = new TreeMap<>(new ValueComparator(finalScore));
+        sorted.putAll(finalScore);
+        TreeMap<String, Double> finalsorted = new TreeMap<>();
+        int i = 0;
         for (Map.Entry<String, Double> entry : sorted.entrySet()) {
-            if(i>=50)
+            if (i >= 50)
                 break;
-            else
-            {
-                finalsorted.put(entry.getKey(),entry.getValue());
+            else {
+                finalsorted.put(entry.getKey(), entry.getValue());
                 i++;
             }
         }
-         return finalsorted;
+        return finalsorted;
     }
 
     class ValueComparator implements Comparator<String> {

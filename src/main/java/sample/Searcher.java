@@ -59,8 +59,6 @@ public class Searcher {
     }
 
     public void parseTheQuery(String query) {
-        if(query.equals("blood-alcohol fatalities"))
-            System.out.println("i'M HERE");
        // createCountWordsQuery(query);
         HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
         if (semantic) {

@@ -75,10 +75,10 @@ public class ViewController implements Observer {
     public void setStage(Stage stage) {
         this.primaryStage = stage;
         //controller = new Controller(model);
-        txtfld_corpus.setText("D:\\documents\\users\\mayamark\\Downloads\\corpus\\corpus");
-        txtfld_stopWords.setText("C:\\Users\\mayamark\\IdeaProjects\\OurRetrivalEngine");
-        txtfld_dirPath.setText("D:\\documents\\users\\mayamark\\Downloads\\post");
-        txtfld_QueryBrowse.setText("C:\\Users\\mayamark\\IdeaProjects\\OurRetrivalEngine\\queries.txt");
+        txtfld_corpus.setText("d:\\documents\\users\\nofartu\\Downloads\\corpus\\corpus");
+        txtfld_stopWords.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine");
+        txtfld_dirPath.setText("d:\\documents\\users\\nofartu\\Downloads\\post\\Stem");
+        txtfld_QueryBrowse.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine\\queries.txt");
 
         comboBox.setDisable(true);
         txt_Info.setDisable(true);
@@ -647,7 +647,7 @@ public class ViewController implements Observer {
 
     private void writeToDisk() {
         try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("d:\\documents\\users\\mayamark\\Downloads\\qur\\results.txt", false), StandardCharsets.UTF_8));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\nofartu\\qrls\\results.txt", false), StandardCharsets.UTF_8));
             int count = 0;
             StringBuilder writeIt = new StringBuilder("");
             Queue<Pair<String, TreeMap<String, Double>>> set = new LinkedList<>();

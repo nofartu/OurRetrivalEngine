@@ -112,6 +112,8 @@ public class Parse {
     }
 
     public HashMap<String, Integer[]> parsing(String allText, String docName) {
+        char[] toChange = {';', '*', '(', ')', '[', ']', '{', '}', '~', '!', '\"', '?', '@', '^', '&', '<', '>', '=', '+', '_'};
+        allText = OurReplace(allText, toChange, " ");
         allWords = mySplit(allText, " ");
         int size = allWords.size();
         for (int i = 0; i < allWords.size(); i++) {
@@ -252,8 +254,8 @@ public class Parse {
         String termNo = "";
         for (int j = i + 1; j < allWords.size() - 1; j++) {
             String termTmps = allWords.get(j);
-            if (Character.isUpperCase(termTmps.charAt(0))) {
-                if (allWords.get(j).charAt(termTmps.length() - 1) == '.' || allWords.get(j).charAt(termTmps.length() - 1) == ',' || allWords.get(j).charAt(termTmps.length() - 1) == '"' || allWords.get(j).charAt(termTmps.length() - 1) == ')'|| allWords.get(j).charAt(termTmps.length() - 1) == '?'|| allWords.get(j).charAt(termTmps.length() - 1) == '!') {
+            if ((Character.isUpperCase(termTmps.charAt(0)))&& !termTmps.equalsIgnoreCase("mr") && !termTmps.equalsIgnoreCase("mrs") && !termTmps.equalsIgnoreCase("mr.") && !termTmps.equalsIgnoreCase("mrs.")) {
+                if (termTmps.charAt(termTmps.length() - 1) == '.' || termTmps.charAt(termTmps.length() - 1) == ',' || termTmps.charAt(termTmps.length() - 1) == '"' || termTmps.charAt(termTmps.length() - 1) == ')' || termTmps.charAt(termTmps.length() - 1) == '?' || termTmps.charAt(termTmps.length() - 1) == '!') {
                     String tmpTerm = deleteSpares(termTmps);
                     if (termNo.length() == 0)
                         termNo = tmpTerm;

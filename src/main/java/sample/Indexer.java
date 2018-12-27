@@ -566,10 +566,29 @@ public class Indexer {
                 String unique = arrayList1.get(1);
                 String size = arrayList1.get(2);
                 String origin = "";
+                boolean isCity = false;
                 if (arrayList1.size() > 3) {
-                    origin = arrayList1.get(3);
+                    if (!arrayList1.get(3).equals("Entities")) {
+                        origin = arrayList1.get(3);
+                        isCity = true;
+                    }
                 }
-
+                int j = 3;
+                if (isCity)
+                    j = 4;
+                String entity = arrayList1.get(j);
+                HashMap<String, Integer> entities = new HashMap<>();
+                int p = 0;
+                for (int m = j+1; m + 1 < arrayList1.size(); m++) {
+                    int num = 0;
+                    try {
+                        num = Integer.parseInt(arrayList1.get(m + 1));
+                    } catch (Exception e) {
+                        System.out.println("Error here");
+                    }
+                    entities.put(arrayList1.get(m), num);
+                    m++;
+                }
                 int maxTfNum = Integer.parseInt(maxTf);
                 int uniqueNum = Integer.parseInt(unique);
                 int sizeNum = Integer.parseInt(size);
@@ -578,6 +597,9 @@ public class Indexer {
                 doc.setNumOfUniqe(uniqueNum);
                 doc.setOrigin(origin);
                 doc.setSize(sizeNum);
+                for (Map.Entry<String, Integer> entry : entities.entrySet()) {
+                    doc.addEnity(entry.getKey(),entry.getValue());
+                }
                 docsCoprus.put(doc.getIdDoc(), doc);
             }
             br.close();

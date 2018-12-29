@@ -85,13 +85,19 @@ public class Documents {
         entities.put(entity, numOfOcur);
     }
 
+    public void setEntities(HashMap<String, Integer> entities) {
+        this.entities = entities;
+    }
+
     public HashMap<String, Integer> getEntities() {
         return entities;
     }
-    public int getSizeOfEntity(){
+
+    public int getSizeOfEntity() {
         return entities.size();
     }
-    public void removeFromEntity(String name){
+
+    public void removeFromEntity(String name) {
         entities.remove(name);
     }
 }

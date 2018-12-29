@@ -112,7 +112,7 @@ public class Parse {
     }
 
     public HashMap<String, Integer[]> parsing(String allText, String docName) {
-        char[] toChange = {';', '*', '(', ')', '[', ']', '{', '}', '~', '!', '\"', '?', '@', '^', '&', '<', '>', '=', '+', '_'};
+        char[] toChange = {';', '*', '(', ')', '[', ']', '{', '}', '~', '\"', '@', '^', '&', '<', '>', '=', '+', '_'};
         allText = OurReplace(allText, toChange, " ");
         allWords = mySplit(allText, " ");
         int size = allWords.size();
@@ -190,7 +190,7 @@ public class Parse {
         String upper = term.toUpperCase();
         String lower = term.toLowerCase();
         if (terms.containsKey(upper)) {
-            if (upper.charAt(0) == (term.charAt(0))) { //first letter is upper
+            if (Character.isUpperCase(term.charAt(0))) { //first letter is upper
                 Integer[] arr = terms.get(upper);
                 Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(upper, add); //~~~~************~~~~~~~~~~
@@ -205,11 +205,11 @@ public class Parse {
             Integer[] add = {arr[0] + 1, arr[1]};
             terms.put(lower, add);
         } else {
-            if (!term.equals(upper) && !term.equals(lower)) {
-                term = lower;
-            }
+//            if (!term.equals(upper) && !term.equals(lower)) {
+//                term = lower;
+//            }
             //first time First letter is upper - save all upper
-            if (term.charAt(0) == upper.charAt(0)) { //first letter upper
+            if (Character.isUpperCase(term.charAt(0))) { //first letter upper
                 Integer[] add = {1, i};
                 terms.put(upper, add);//~~~~************~~~~~~~~~~
             } else { //first letter not upper
@@ -248,15 +248,18 @@ public class Parse {
         return false;
     }
 
+    //Todo: replace the term.put with sending to check letter!!!!
     //rule - mr/mrs
     private int handleMrs(int i) {  //changed here!!!!!!!! --------!!!!!!!!!!!!
         String term = allWords.get(i);
+        term = term.toUpperCase();
         String termNo = "";
         for (int j = i + 1; j < allWords.size() - 1; j++) {
             String termTmps = allWords.get(j);
-            if ((Character.isUpperCase(termTmps.charAt(0)))&& !termTmps.equalsIgnoreCase("mr") && !termTmps.equalsIgnoreCase("mrs") && !termTmps.equalsIgnoreCase("mr.") && !termTmps.equalsIgnoreCase("mrs.")) {
+            if ((Character.isUpperCase(termTmps.charAt(0))) && !termTmps.equalsIgnoreCase("mr") && !termTmps.equalsIgnoreCase("mrs") && !termTmps.equalsIgnoreCase("mr.") && !termTmps.equalsIgnoreCase("mrs.")) {
                 if (termTmps.charAt(termTmps.length() - 1) == '.' || termTmps.charAt(termTmps.length() - 1) == ',' || termTmps.charAt(termTmps.length() - 1) == '"' || termTmps.charAt(termTmps.length() - 1) == ')' || termTmps.charAt(termTmps.length() - 1) == '?' || termTmps.charAt(termTmps.length() - 1) == '!') {
                     String tmpTerm = deleteSpares(termTmps);
+                    tmpTerm = tmpTerm.toUpperCase();
                     if (termNo.length() == 0)
                         termNo = tmpTerm;
                     else
@@ -283,6 +286,7 @@ public class Parse {
 
                     return j - i;
                 }
+                termTmps = termTmps.toUpperCase();
                 term = term + " " + termTmps;
                 if (termNo.length() == 0)
                     termNo = termTmps;

@@ -92,7 +92,7 @@ public class Searcher {
         //parseTheDesc(query); //NEW!!!!!
         // createCountWordsQuery(query);
         docsContainsQuery=createDocsContainsQuery(wordAndLocationsQuery);
-        docsContainsDesc=createDocsContainsQuery(wordAndLocationsDesc);
+        //docsContainsDesc=createDocsContainsQuery(wordAndLocationsDesc);
         if(semantic)
             docsContainsSemantic=createDocsContainsQuery(wordAndLocationsSemantic);
 
@@ -275,7 +275,7 @@ public class Searcher {
             JsonParser parser = new JsonParser();
             JsonElement ele = parser.parse(response.body().string());
             JsonArray arr = ele.getAsJsonArray();
-            for (int i = 0; i < 12; i++) {
+            for (int i = 0; i < 5; i++) {
                 JsonObject o = (JsonObject) (arr.get(i));
                 String str = o.get("word").getAsString();
                 semanticWords.add(str);

@@ -81,6 +81,10 @@ public class ReadFile {
                                 }
                                 fromParse = parse.parsing(toPars, docName);
                                 Documents d = new Documents(docName, fromParse);
+                                /////////////NEW
+                                HashMap<String, Integer> entity=handleEntities();
+                                d.setEntities(entity);
+                                //////////////// NEW
                                 if (!city.equals("")) {
                                     d.setOrigin(city);
                                 }
@@ -223,4 +227,23 @@ public class ReadFile {
         }
     }
 
+    private HashMap<String, Integer> handleEntities() {
+        HashMap<String, Integer> entities = new HashMap<>();
+        for (Map.Entry<String, Integer[]> entry : fromParse.entrySet()) {
+            if (!entry.getKey().equals("")&&Character.isUpperCase(entry.getKey().charAt(0))&&!entry.getKey().contains("-")) {
+                if (entities.size() < 5) {
+                    entities.put(entry.getKey(), entry.getValue()[0]);
+                } else {
+                    for (Map.Entry<String, Integer> entryEnt : entities.entrySet()) {
+                        if (entryEnt.getValue() < entry.getValue()[0]) {
+                            entities.remove(entryEnt.getKey());
+                            entities.put(entry.getKey(), entry.getValue()[0]);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return entities;
+    }
 }

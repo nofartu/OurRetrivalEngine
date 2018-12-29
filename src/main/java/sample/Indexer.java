@@ -152,12 +152,6 @@ public class Indexer {
 
     //adding to list of documents and for each doc the max tf, origin, num of unique
     private void addToCorpus(Documents doc, int max, int min, int size) {
-//        Documents d = new Documents(doc.getIdDoc(), null);
-//        d.setMax_tf(max);
-//        d.setOrigin(doc.getOrigin());
-//        d.setNumOfUniqe(min);
-//        d.setSize(size);
-//        docsCoprus.add(d);
         doc.setMax_tf(max);
         doc.setOrigin(doc.getOrigin());
         doc.setNumOfUniqe(min);
@@ -252,33 +246,6 @@ public class Indexer {
                     writeIt = new StringBuilder("");
                 }
             }
-//            for (int i = 0; i < docsCoprus.size(); i++) {
-//                int maxTf = docsCoprus.get(i).getMax_tf();
-//                int unique = docsCoprus.get(i).getNumOfUniqe();
-//                String origin = docsCoprus.get(i).getOrigin();
-//                String name = docsCoprus.get(i).getIdDoc();
-//                int size = docsCoprus.get(i).getSize();
-//                writeIt.append(name + ": " + maxTf + ";" + unique + ";" + size + ";" + origin + "\n");
-//                if (count % 10000 == 0) {
-//                    bw.write(writeIt.toString());
-//                    bw.flush();
-//                    writeIt = new StringBuilder("");
-//                }
-//            }
-            //old(Down)
-//            for (Documents doc : docsCoprus) {//go through list of docs
-//                int maxTf = doc.getMax_tf();
-//                int unique = doc.getNumOfUniqe();
-//                String origin = doc.getOrigin();
-//                String name = doc.getIdDoc();
-//                writeIt.append(name + ": " + maxTf + ";" + unique + ";" + origin + "\n");
-//                if (count % 10000 == 0) {
-//                    bw.write(writeIt.toString());
-//                    bw.flush();
-//                    writeIt = new StringBuilder("");
-//                }
-//            }
-
             bw.write(writeIt.toString());
             bw.flush();
             bw.close();
@@ -356,24 +323,24 @@ public class Indexer {
                             dictionary.put(termToAdd.getName(), arr); //updating the line number in the total post file and num of occurrence
                             lineNumber++;
                         }
-                        if (termToAdd.getName().equals(termToAdd.getName().toUpperCase()) && !isNum(termToAdd.getName()) && !Character.isDigit(termToAdd.getName().charAt(0))) {
-                            ArrayList<Pair<String, Integer>> docs = termToAdd.docsApear();
-                            for (Pair<String, Integer> doc : docs) {
-                                Documents doctmps = docsCoprus.get(doc.getKey());
-                                if (doctmps.getSizeOfEntity() < 5) {
-                                    doctmps.addEnity(termToAdd.getName(), doc.getValue());
-                                    docsCoprus.put(doc.getKey(), doctmps);
-                                } else {
-                                    for (Map.Entry<String, Integer> entry : doctmps.getEntities().entrySet()) {
-                                        if (entry.getValue() < doc.getValue()) {
-                                            doctmps.removeFromEntity(entry.getKey());
-                                            doctmps.addEnity(termToAdd.getName(), doc.getValue());
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+//                        if (termToAdd.getName().equals(termToAdd.getName().toUpperCase()) && !isNum(termToAdd.getName()) && !Character.isDigit(termToAdd.getName().charAt(0))) {
+//                            ArrayList<Pair<String, Integer>> docs = termToAdd.docsApear();
+//                            for (Pair<String, Integer> doc : docs) {
+//                                Documents doctmps = docsCoprus.get(doc.getKey());
+//                                if (doctmps.getSizeOfEntity() < 5) {
+//                                    doctmps.addEnity(termToAdd.getName(), doc.getValue());
+//                                    docsCoprus.put(doc.getKey(), doctmps);
+//                                } else {
+//                                    for (Map.Entry<String, Integer> entry : doctmps.getEntities().entrySet()) {
+//                                        if (entry.getValue() < doc.getValue()) {
+//                                            doctmps.removeFromEntity(entry.getKey());
+//                                            doctmps.addEnity(termToAdd.getName(), doc.getValue());
+//                                            break;
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
                         hashTermToPost.remove(termToAdd);
                     }
                     //if there is more than one term of the same kind in the queue
@@ -497,13 +464,6 @@ public class Indexer {
             //exist in upper case
             else if (hashTermToPost.containsKey(tmpUp)) {
                 List<Integer> tmps = hashTermToPost.get(tmpUp); //getting the value
-//                for (Map.Entry<TermPost, List<Integer>> entry : hashTermToPost.entrySet()) {
-//                    if (entry.getKey().getName().equals(tmpUp.getName())) {
-//                        tmpUp = entry.getKey(); //getting the key (in is object)
-//                        break;
-//                    }
-//                }
-//                tmpUp.addPost(term);
                 hashTermToPost.remove(tmpUp);
                 tmpUp.setName(termTmp);
                 //tmpUp.setNumOfOccure(num);

@@ -3,7 +3,6 @@ package sample;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -16,7 +15,6 @@ import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -304,6 +302,10 @@ public class ViewController implements Observer {
             final Label label = new Label("Relevant documents:");
             label.setFont(new Font("Calibri Light", 22));
             tableQuery.setEditable(false);
+            final Button btn_Save = new Button("Save");
+            btn_Save.setOnAction(event -> {
+                writeQueryToDisk();
+            });
 
             TableColumn Docs = new TableColumn("Documents");
             Docs.setMinWidth(200);
@@ -326,7 +328,7 @@ public class ViewController implements Observer {
             final VBox vbox = new VBox();
             vbox.setSpacing(20);
             vbox.setPadding(new Insets(10, 0, 0, 10));
-            vbox.getChildren().addAll(label, tableQuery);
+            vbox.getChildren().addAll(label, btn_Save, tableQuery);
 
             ((Group) scene.getRoot()).getChildren().addAll(vbox);
             stage.setScene(scene);
@@ -350,15 +352,19 @@ public class ViewController implements Observer {
 
     public void showDocsQueries() {
         try {
-
             tableQuery = new TableView();
             Stage stage = new Stage();
             Scene scene = new Scene(new Group());
             stage.setTitle("Relevant documents");
             stage.setWidth(500);
-            stage.setHeight(900);
+            stage.setHeight(950);
             final Label label = new Label("Relevant documents:");
             label.setFont(new Font("Calibri Light", 22));
+            final Button btn_Save = new Button("Save");
+            btn_Save.setOnAction(event -> {
+                writeQueryToDisk();
+            });
+            btn_Save.setMinWidth(100);
             tableQuery.setEditable(false);
 
             TableColumn query = new TableColumn("Query number");
@@ -385,7 +391,7 @@ public class ViewController implements Observer {
             final VBox vbox = new VBox();
             vbox.setSpacing(20);
             vbox.setPadding(new Insets(10, 0, 0, 10));
-            vbox.getChildren().addAll(label, tableQuery);
+            vbox.getChildren().addAll(label, btn_Save, tableQuery);
 
             ((Group) scene.getRoot()).getChildren().addAll(vbox);
             stage.setScene(scene);
@@ -585,7 +591,7 @@ public class ViewController implements Observer {
                 Elements docs = doc.select("top");
                 for (Element e : docs) {
                     String query = e.getElementsByTag("title").text();
-                    String desc=e.getElementsByTag("desc").text();
+                    String desc = e.getElementsByTag("desc").text();
                     String numQuery = e.getElementsByTag("num").text();
                     if (!numQuery.equals("")) {
                         ArrayList<String> split = mySplit(numQuery, " ");
@@ -629,7 +635,7 @@ public class ViewController implements Observer {
                 }
             }
             showDocsQueries();
-            writeToDisk();
+            //writeQueryToDisk();
             System.out.println("done");
         }
 
@@ -646,9 +652,15 @@ public class ViewController implements Observer {
         docsToShow.add(new Pair<>(numQuery, docs));
     }
 
-    private void writeToDisk() {
+    private void writeQueryToDisk() {
         try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\nofartu\\qrls\\results.txt", false), StandardCharsets.UTF_8));
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            File path = directoryChooser.showDialog(null);
+            String fullPath = "";
+            if (path != null) {
+                fullPath = path.getAbsolutePath();
+            }
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullPath + "\\results.txt", false), StandardCharsets.UTF_8));
             int count = 0;
             StringBuilder writeIt = new StringBuilder("");
             Queue<Pair<String, TreeMap<String, Double>>> set = new LinkedList<>();
@@ -670,6 +682,7 @@ public class ViewController implements Observer {
             bw.write(writeIt.toString());
             bw.flush();
             bw.close();
+            showAlert("Done", "Saveing finished!", "The file of query is ready!");
         } catch (IOException e) {
             e.printStackTrace();
         }

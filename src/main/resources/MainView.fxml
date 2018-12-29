@@ -42,5 +42,6 @@
       <CheckBox fx:id="cb_semantic" layoutX="40.0" layoutY="549.0" mnemonicParsing="false" text="Semantic " />
       <CheckBox fx:id="cb_handQuery" layoutX="17.0" layoutY="476.0" mnemonicParsing="false" onAction="#cb_HandOnOrOff" text="Enter your query" />
       <CheckBox fx:id="cb_fileQuery" layoutX="17.0" layoutY="518.0" mnemonicParsing="false" onAction="#cb_BrowseOnOrOff" text="Import your query file" />
+      <CheckBox fx:id="cb_desc" layoutX="157.0" layoutY="549.0" mnemonicParsing="false" text="Description" />
   </children>
 </AnchorPane>

@@ -54,6 +54,7 @@ public class ViewController implements Observer {
     public javafx.scene.control.CheckBox check_stemm;
     public javafx.scene.control.CheckBox cb_choseCity;
     public javafx.scene.control.CheckBox cb_semantic;
+    public javafx.scene.control.CheckBox cb_desc;
     public javafx.scene.control.CheckBox cb_handQuery;
     public javafx.scene.control.CheckBox cb_fileQuery;
     public javafx.scene.control.ComboBox comboBox;
@@ -608,7 +609,7 @@ public class ViewController implements Observer {
         boolean semantic = cb_semantic.isSelected();
         if (cb_handQuery.isSelected()) {
             if (!txtfld_QueryHand.getText().equals("")) {
-                Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
+                Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic,"",false);
                 String query = txtfld_QueryHand.getText();
                 searcher.doQuery(query);
                 collectedDocs(searcher.getDocs(), "100");
@@ -620,7 +621,7 @@ public class ViewController implements Observer {
                 for (Map.Entry<String, String[]> entry : queries.entrySet()) {
                     String query = entry.getKey();
                     System.out.println("the query is:" + query);
-                    Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
+                    Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic,entry.getValue()[1],cb_desc.isSelected());
                     searcher.doQuery(query);
                     collectedDocs(searcher.getDocs(), entry.getValue()[0]);
                 }

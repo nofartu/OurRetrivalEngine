@@ -33,11 +33,14 @@ public class Searcher {
     private HashSet<String> combinedFilesWithCity;
     private TreeMap<String, Double> rankedFiles;
     private String postPath;
+    private String description;
     private boolean stem;
     private boolean semantic;
+    private boolean desc;
+
     private int numOfDocs;
 
-    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson, boolean semantic) {
+    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson, boolean semantic,String description,boolean desc) {
         this.stem = stem;
         this.semantic = semantic;
         HashSet<String> stopWords = stopwords;
@@ -52,12 +55,14 @@ public class Searcher {
         countWordsQuery = new HashMap<>();
         countWordsSemantic = new HashMap<>();
         countWordsDesc = new HashMap<>();
-        combinedFilesWithCity = new HashSet<>();
+        this.combinedFilesWithCity = new HashSet<>();
+        this.description=description;
+        this.desc=desc;
 
     }
 
     private void parseTheQuery(String query) {
-        // createCountWordsQuery(query);
+
         HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
         if (semantic) {
             wordAndLocationsSemantic = doSemantic(queryParsed);
@@ -65,20 +70,20 @@ public class Searcher {
         wordAndLocationsQuery = runQuery(queryParsed, 1);
     }
 
-    private void parseTheDesc(String query) {
-        HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
+    private void parseTheDesc(String desc) {
+        HashMap<String, Integer[]> queryParsed = parse.parsing(desc, "");
         wordAndLocationsDesc = runQuery(queryParsed, 2);
     }
 
     public void doQuery(String query) {
         parseTheQuery(query);
-        //parseTheDesc(query); //NEW!!!!!
-        // createCountWordsQuery(query);
         docsContainsQuery = createDocsContainsQuery(wordAndLocationsQuery);
-        //docsContainsDesc=createDocsContainsQuery(wordAndLocationsDesc);
+        if(desc){
+            parseTheDesc(description); //NEW!!!!!
+            docsContainsDesc=createDocsContainsQuery(wordAndLocationsDesc);
+        }
         if (semantic)
             docsContainsSemantic = createDocsContainsQuery(wordAndLocationsSemantic);
-
         sendToRanker();
     }
 
@@ -163,7 +168,7 @@ public class Searcher {
 
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
-        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery, docsContainsDesc, countWordsDesc, wordAndLocationsDesc, docsContainsSemantic, countWordsSemantic, wordAndLocationsSemantic, semantic); //change
+        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery, docsContainsDesc, countWordsDesc, wordAndLocationsDesc,false, docsContainsSemantic, countWordsSemantic, wordAndLocationsSemantic, semantic); //change
         withCities();
     }
 
@@ -214,7 +219,6 @@ public class Searcher {
         }
         return docsContainsTmp;
     }
-
 
     private ArrayList<String> semantic(String word) {
         ArrayList<String> semanticWords = new ArrayList<>();

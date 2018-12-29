@@ -53,34 +53,64 @@ public class Ranker {
 
 
     public TreeMap<String, Double> rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations,
-                                           HashMap<String, ArrayList<String[]>> docsContainsDesc, HashMap<String, Integer> countWordsDesc, HashMap<String, ArrayList<String>> wordAndLocationsDesc,
+                                           HashMap<String, ArrayList<String[]>> docsContainsDesc, HashMap<String, Integer> countWordsDesc, HashMap<String, ArrayList<String>> wordAndLocationsDesc, boolean ifDesc,
                                            HashMap<String, ArrayList<String[]>> docsContainsSemantic, HashMap<String, Integer> countWordsSemantic, HashMap<String, ArrayList<String>> wordAndLocationsSemantic, boolean ifSemantic) {
         rankBM25(docsContainsQuery, countWordsQuery, 0);
         rankTfIdfAndLocation(wordAndLocations, 0);
+        if (ifDesc) {
+            rankBM25(docsContainsDesc, countWordsDesc, 1);
+            rankTfIdfAndLocation(wordAndLocationsDesc, 1);
+        }
         if (ifSemantic) {
             rankBM25(docsContainsSemantic, countWordsSemantic, 2);
             rankTfIdfAndLocation(wordAndLocationsSemantic, 2);
         }
         for (Map.Entry<String, Double[]> entry : allDocs.entrySet()) {
+            double semanticBM25 = 0;
+            double descBM25 = 0;
             Double[] ranking = entry.getValue();
             if (ifSemantic) { //calculate with semantic
-                try {
+                try { //0.8 regular, 0.2 semantic -180 returned  //0.5 reg ,0.5 sem - 148
                     Double[] semanticRank = allDocsSemantic.get(entry.getKey());
-                    finalScore.put(entry.getKey(), ranking[0] * 0.7 + semanticRank[0] * 0.3 /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+                    finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3)*0.8+(semanticRank[0]*0.7+semanticRank[1]*0.3)*0.2);
                 } catch (Exception e) {
-                    finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+                    finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3));
                 }
-            } else {
-                finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
             }
+            else if(ifDesc){
+                try {
+                    Double[] descRank = allDocsDesc.get(entry.getKey());
+                    finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3)*0.8+(descRank[0]*0.7+descRank[1]*0.3)*0.2);
+                } catch (Exception e) {
+                    finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3));
+                }
+            }
+            else{
+                finalScore.put(entry.getKey(), ranking[0]*0.7+ ranking[1] * 0.3);
+            }
+
+
+//                finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3)*0.8+);
+
+            //167 with and without stem
+            //finalScore.put(entry.getKey(), ranking[0]*0.7+ ranking[1] * 0.3 /*+ ranking[2] * 0.25  semanticBM25 * 0.15 * 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+            //167 without stem , 163 with stem
+            //finalScore.put(entry.getKey(), ranking[0]*0.7+ ranking[1] * 0.29 +ranking[2]*0.01 /*+ ranking[2] * 0.25  semanticBM25 * 0.15 * 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+//            else {
+//                try {
+//                    Double[] DescRank = allDocsDesc.get(entry.getKey());
+//                    finalScore.put(entry.getKey(), ranking[0] * 0.7 + DescRank[0] * 0.3 /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+//                } catch (Exception e) {
+//                    finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+//                }
+//                //finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+//            }
 
         }
 
 
         TreeMap<String, Double> sorted = getTop50();
-//        for (Map.Entry<String, Double> entry : sorted.entrySet()) {
-//            System.out.println(entry.getKey()+" and the rank is: "+entry.getValue());
-//        }
+
         return sorted;
     }
 
@@ -101,20 +131,20 @@ public class Ranker {
                 double tfIdf = tf * idf;
                 if (whichOne == 0) {
                     Double[] d = allDocs.get(key.get(0));
-                    d[1] = tfIdf;
-                    d[2] = (double) dLength - location; //location ranking
+                    d[1] = d[1]+tfIdf;
+                    d[2] =d[2]+ ((double) dLength - location)/avdl; //location ranking
                     allDocs.put(name, d);
                 }
                 if (whichOne == 1) {
                     Double[] d = allDocsDesc.get(key.get(0));
-                    d[1] = tfIdf;
-                    d[2] = (double) dLength - location; //location ranking
+                    d[1] = d[1]+tfIdf;
+                    d[2] = d[2]+((double) dLength - location)/avdl; //location ranking
                     allDocsDesc.put(name, d);
                 }
                 if (whichOne == 2) {
                     Double[] d = allDocsSemantic.get(key.get(0));
-                    d[1] = tfIdf;
-                    d[2] = (double) dLength - location; //location ranking
+                    d[1] = d[1]+tfIdf;
+                    d[2] = d[2]+((double) dLength - location)/avdl; //location ranking
                     allDocsSemantic.put(name, d);
                 }
 

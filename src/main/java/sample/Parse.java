@@ -247,7 +247,7 @@ public class Parse {
             return true;
         return false;
     }
-    
+
     //rule - mr/mrs
     private int handleMrs(int i) {  //changed here!!!!!!!! --------!!!!!!!!!!!!
         String term = allWords.get(i);

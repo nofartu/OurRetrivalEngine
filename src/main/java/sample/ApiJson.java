@@ -200,28 +200,32 @@ public class ApiJson {
             }
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathPost + "\\" + namedir + "\\Cities.txt", false), StandardCharsets.UTF_8));
             StringBuilder toWrite = new StringBuilder("");
-
-            HashSet<String> keys = getKeysByValue();
-            Iterator<String> it = keys.iterator();
-            while (it.hasNext()) {
+            //HashSet<String> keys = getKeysByValue();
+            //Iterator<String> it = keys.iterator();
+            for(Map.Entry<String, City> entry:cities.entrySet()) {
                 //for (Map.Entry<String, City> entry : cities.entrySet()) {
-                String key = it.next();
-                City value = cities.remove(key);
+                //String key = it.next();
+                City value = cities.get(entry.getKey());
                 count++;
                 //City value = entry.getValue();
                 String print = value.getCityname() + ";" + value.getCountry() + ";" + value.getCurrency() + ";" + value.getPopulation() + "*";
                 toWrite.append(print + " ");
-                String printadd = "";
+                StringBuilder printadd=new StringBuilder("");
+                //String printadd = "";
                 for (Map.Entry<String, ArrayList<String>> entryLocation : value.getLocations().entrySet()) {
                     String keyLoc = entryLocation.getKey();
                     ArrayList<String> ValueList = entryLocation.getValue();
-                    printadd += keyLoc + ";";
+                    printadd.append(keyLoc + ";");
+                    //printadd += keyLoc + ";";
                     for (String val : ValueList) {
-                        printadd += val + ",";
+                        printadd.append(val + ",");
+                        //printadd += val + ",";
                     }
-                    printadd += " ";
+                    printadd.append(" ");
+                    //printadd += " ";
                 }
                 toWrite.append(printadd + "\n");
+                printadd=new StringBuilder("");
                 if (count % 10 == 0) {
                     bw.write(toWrite.toString());
                     bw.flush();
@@ -233,13 +237,14 @@ public class ApiJson {
             bw.flush();
             bw.close();
             System.out.println(cities.size());
-            cities = new HashMap<>();
+//            cities = new HashMap<>();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void loadCities(boolean stemming, String pathPost) { //
+    //This function upload the cities to disk
+    public void loadCities(boolean stemming, String pathPost) {
         try {
             BufferedReader br = null;
             if (stemming)

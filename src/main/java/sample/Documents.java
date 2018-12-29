@@ -15,7 +15,7 @@ public class Documents {
     private int numOfUniqe;
     private String origin;
     private int size;
-    private HashMap<String, Integer> entities;
+    private HashMap<String, Double> entities;
 
     public Documents(String id, HashMap<String, Integer[]> termsMap) {
         idDoc = id;
@@ -81,15 +81,15 @@ public class Documents {
         return size;
     }
 
-    public void addEnity(String entity, int numOfOcur) {
-        entities.put(entity, numOfOcur);
+    public void addEnity(String entity, double dominance) {
+        entities.put(entity, dominance);
     }
 
-    public void setEntities(HashMap<String, Integer> entities) {
+    public void setEntities(HashMap<String, Double> entities) {
         this.entities = entities;
     }
 
-    public HashMap<String, Integer> getEntities() {
+    public HashMap<String, Double> getEntities() {
         return entities;
     }
 

@@ -176,6 +176,21 @@ public class ViewController implements Observer {
             File currentFile5 = new File(paths + "\\Documents.txt");
             currentFile5.delete();
             System.gc();
+            if(!cb_fileQuery.isDisabled()||!cb_handQuery.isDisabled()){
+                cb_handQuery.setDisable(true);
+                cb_fileQuery.setDisable(true);
+                cb_handQuery.setSelected(false);
+                cb_fileQuery.setSelected(false);
+                txtfld_QueryBrowse.setDisable(true);
+                txtfld_QueryHand.setDisable(true);
+                btn_runQuery.setDisable(true);
+                cb_choseCity.setDisable(true);
+                cb_choseCity.setSelected(false);
+                cb_semantic.setDisable(true);
+                cb_semantic.setSelected(false);
+                btn_browseQuery.setDisable(true);
+                btn_chooseCity.setDisable(true);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -310,7 +325,9 @@ public class ViewController implements Observer {
             label.setFont(new Font("Calibri Light", 22));
             final Button btn_Save = new Button("Save");
             btn_Save.setOnAction(event -> {
+                btn_Save.setDisable(true);
                 writeQueryToDisk();
+                btn_Save.setDisable(false);
             });
             btn_Save.setMinWidth(350);
             tableQuery.setEditable(false);
@@ -437,6 +454,25 @@ public class ViewController implements Observer {
 
     }
 
+
+    public void cb_StemOnOrOff() {
+        if (!cb_handQuery.isDisabled()||!cb_fileQuery.isDisabled()) {
+            showAlert("Attention", "You changed the Stem/No stem", "You must upload the dictionary again to run the query.");
+            cb_handQuery.setDisable(true);
+            cb_fileQuery.setDisable(true);
+            cb_handQuery.setSelected(false);
+            cb_fileQuery.setSelected(false);
+            txtfld_QueryBrowse.setDisable(true);
+            txtfld_QueryHand.setDisable(true);
+            btn_runQuery.setDisable(true);
+            cb_choseCity.setDisable(true);
+            cb_choseCity.setSelected(false);
+            cb_semantic.setDisable(true);
+            cb_semantic.setSelected(false);
+            btn_browseQuery.setDisable(true);
+            btn_chooseCity.setDisable(true);
+        }
+    }
 
     public void cb_HandOnOrOff() {
         if (!cb_fileQuery.isSelected()) {
@@ -612,30 +648,30 @@ public class ViewController implements Observer {
             String fullPath = "";
             if (path != null) {
                 fullPath = path.getAbsolutePath();
-            }
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullPath + "\\results.txt", false), StandardCharsets.UTF_8));
-            int count = 0;
-            StringBuilder writeIt = new StringBuilder("");
-            Queue<Pair<String, TreeMap<String, Double>>> set = new LinkedList<>();
-            set.addAll(docsToShow);
-            while (set.size() > 0) {
-                Pair<String, TreeMap<String, Double>> pair = set.poll();
-                String num = pair.getKey();
-                for (Map.Entry<String, Double> entry : pair.getValue().entrySet()) {
-                    count++;
-                    String docname = entry.getKey();
-                    writeIt.append(num + " 0 " + docname + " 0 0 mt\n");
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullPath + "\\results.txt", false), StandardCharsets.UTF_8));
+                int count = 0;
+                StringBuilder writeIt = new StringBuilder("");
+                Queue<Pair<String, TreeMap<String, Double>>> set = new LinkedList<>();
+                set.addAll(docsToShow);
+                while (set.size() > 0) {
+                    Pair<String, TreeMap<String, Double>> pair = set.poll();
+                    String num = pair.getKey();
+                    for (Map.Entry<String, Double> entry : pair.getValue().entrySet()) {
+                        count++;
+                        String docname = entry.getKey();
+                        writeIt.append(num + " 0 " + docname + " 0 0 mt\n");
+                    }
+                    if (count % 50 == 0) {
+                        bw.write(writeIt.toString());
+                        bw.flush();
+                        writeIt = new StringBuilder("");
+                    }
                 }
-                if (count % 50 == 0) {
-                    bw.write(writeIt.toString());
-                    bw.flush();
-                    writeIt = new StringBuilder("");
-                }
+                bw.write(writeIt.toString());
+                bw.flush();
+                bw.close();
+                showAlert("Done", "Saving finished!", "The file of queries is ready!");
             }
-            bw.write(writeIt.toString());
-            bw.flush();
-            bw.close();
-            showAlert("Done", "Saveing finished!", "The file of queries is ready!");
         } catch (IOException e) {
             e.printStackTrace();
         }

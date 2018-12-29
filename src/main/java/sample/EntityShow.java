@@ -4,9 +4,12 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class EntityShow {
     private final SimpleStringProperty entityName;
+    private final SimpleStringProperty entityRate;
 
-    public EntityShow(String entityName){
+
+    public EntityShow(String entityName, String entityRate) {
         this.entityName = new SimpleStringProperty(entityName);
+        this.entityRate = new SimpleStringProperty(entityRate);
     }
 
     public String getEntityName() {
@@ -19,5 +22,17 @@ public class EntityShow {
 
     public void setEntityName(String entityName) {
         this.entityName.set(entityName);
+    }
+
+    public String getEntityRate() {
+        return entityRate.get();
+    }
+
+    public SimpleStringProperty entityRateProperty() {
+        return entityRate;
+    }
+
+    public void setEntityRate(String entityRate) {
+        this.entityRate.set(entityRate);
     }
 }

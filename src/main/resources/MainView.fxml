@@ -9,40 +9,38 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="701.0" prefWidth="721.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ViewController">
+<AnchorPane prefHeight="701.0" prefWidth="721.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ViewController">
   <children>
-    <TextField fx:id="txtfld_corpus" layoutX="147.0" layoutY="39.0" />
-    <TextField fx:id="txtfld_stopWords" layoutX="147.0" layoutY="74.0" />
-    <TextField fx:id="txtfld_dirPath" layoutX="147.0" layoutY="108.0" />
-    <Text layoutX="14.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Path of corpus" wrappingWidth="83.728515625" />
-    <Text layoutX="14.0" layoutY="91.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Path of stop-words" />
+    <TextField fx:id="txtfld_corpus" layoutX="147.0" layoutY="39.0" prefHeight="25.0" prefWidth="276.0" />
+    <TextField fx:id="txtfld_stopWords" layoutX="147.0" layoutY="74.0" prefHeight="25.0" prefWidth="276.0" />
+    <TextField fx:id="txtfld_dirPath" layoutX="147.0" layoutY="108.0" prefHeight="25.0" prefWidth="276.0" />
+    <Text layoutX="11.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Path of corpus" wrappingWidth="83.728515625" />
+    <Text layoutX="11.0" layoutY="91.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Path of stop-words" />
     <Text layoutX="10.0" layoutY="127.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Path for saving postings" />
-    <CheckBox fx:id="check_stemm" layoutX="18.0" layoutY="167.0" mnemonicParsing="false" text="Stemming" />
+    <CheckBox fx:id="check_stemm" layoutX="18.0" layoutY="167.0" mnemonicParsing="false" onAction="#cb_StemOnOrOff" text="Stemming" />
     <Text layoutX="18.0" layoutY="237.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choose language" />
     <ComboBox fx:id="comboBox" layoutX="147.0" layoutY="220.0" prefWidth="150.0" />
     <Button fx:id="btn_showDictionary" layoutX="163.0" layoutY="292.0" mnemonicParsing="false" onAction="#showDictionary" text="Show Dictionary" />
     <Button fx:id="btn_loadDictionary" layoutX="134.0" layoutY="336.0" mnemonicParsing="false" onAction="#loadDictToMemory" text="Load Dictionary to Memory" />
-    <Button fx:id="btn_browseCorpus" layoutX="324.0" layoutY="39.0" mnemonicParsing="false" onAction="#BrowseCorpus" text="Browse" />
-    <Button fx:id="btn_browseStop" layoutX="324.0" layoutY="74.0" mnemonicParsing="false" onAction="#BrowseStop" text="Browse" />
-    <Button fx:id="btn_browseDir" layoutX="324.0" layoutY="110.0" mnemonicParsing="false" onAction="#BrowseDirPath" text="Browse" />
+    <Button fx:id="btn_browseCorpus" layoutX="435.0" layoutY="39.0" mnemonicParsing="false" onAction="#BrowseCorpus" text="Browse" />
+    <Button fx:id="btn_browseStop" layoutX="435.0" layoutY="74.0" mnemonicParsing="false" onAction="#BrowseStop" text="Browse" />
+    <Button fx:id="btn_browseDir" layoutX="435.0" layoutY="110.0" mnemonicParsing="false" onAction="#BrowseDirPath" text="Browse" />
     <Button fx:id="btn_startOperation" layoutX="523.0" layoutY="52.0" mnemonicParsing="false" onAction="#startOperation" text="Start creating Dictionary" />
     <Button fx:id="btn_resetAndDelete" layoutX="572.0" layoutY="98.0" mnemonicParsing="false" onAction="#reset" text="Reset" />
     <TextArea fx:id="txt_Info" layoutX="454.0" layoutY="220.0" prefHeight="140.0" prefWidth="236.0" />
-    <Text layoutX="163.0" layoutY="456.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Querys:" wrappingWidth="83.728515625">
+    <Text layoutX="208.0" layoutY="456.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Querys" wrappingWidth="83.728515625">
       <font>
         <Font size="18.0" />
       </font>
     </Text>
-    <TextField fx:id="txtfld_QueryHand" layoutX="221.0" layoutY="474.0" />
-    <Text layoutX="81.0" layoutY="489.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter your query" wrappingWidth="101.99999903142452" />
-    <Button fx:id="btn_runQuery" layoutX="528.0" layoutY="481.0" mnemonicParsing="false" onAction="#runQuery" prefHeight="59.0" prefWidth="84.0" text="Run" />
-    <TextField fx:id="txtfld_QueryBrowse" layoutX="221.0" layoutY="514.0" />
-    <Text layoutX="79.0" layoutY="531.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Import you query file" wrappingWidth="115.728515625" />
-    <Button fx:id="btn_browseQuery" layoutX="396.0" layoutY="514.0" mnemonicParsing="false" onAction="#BrowseQuery" text="Browse" />
-    <CheckBox fx:id="cb_choseCity" layoutX="79.0" layoutY="581.0" mnemonicParsing="false" onAction="#checkCities" text="Limit search by cities: " />
-    <Button id="btn_browseQuery" fx:id="btn_chooseCity" layoutX="233.0" layoutY="581.0" mnemonicParsing="false" onAction="#showCities" text="Choose city" />
-      <CheckBox fx:id="cb_semantic" layoutX="80.0" layoutY="549.0" mnemonicParsing="false" text="Semantic " />
-      <CheckBox fx:id="cb_handQuery" layoutX="57.0" layoutY="476.0" mnemonicParsing="false" onAction="#cb_HandOnOrOff" />
-      <CheckBox fx:id="cb_fileQuery" layoutX="57.0" layoutY="518.0" mnemonicParsing="false" onAction="#cb_BrowseOnOrOff" />
+    <TextField fx:id="txtfld_QueryHand" layoutX="160.0" layoutY="474.0" prefHeight="25.0" prefWidth="311.0" />
+    <Button fx:id="btn_runQuery" layoutX="566.0" layoutY="477.0" mnemonicParsing="false" onAction="#runQuery" prefHeight="59.0" prefWidth="84.0" text="Run" />
+    <TextField fx:id="txtfld_QueryBrowse" layoutX="160.0" layoutY="514.0" prefHeight="25.0" prefWidth="311.0" />
+    <Button fx:id="btn_browseQuery" layoutX="479.0" layoutY="514.0" mnemonicParsing="false" onAction="#BrowseQuery" text="Browse" />
+    <CheckBox fx:id="cb_choseCity" layoutX="39.0" layoutY="581.0" mnemonicParsing="false" onAction="#checkCities" text="Limit search by cities: " />
+    <Button id="btn_browseQuery" fx:id="btn_chooseCity" layoutX="193.0" layoutY="581.0" mnemonicParsing="false" onAction="#showCities" text="Choose city" />
+      <CheckBox fx:id="cb_semantic" layoutX="40.0" layoutY="549.0" mnemonicParsing="false" text="Semantic " />
+      <CheckBox fx:id="cb_handQuery" layoutX="17.0" layoutY="476.0" mnemonicParsing="false" onAction="#cb_HandOnOrOff" text="Enter your query" />
+      <CheckBox fx:id="cb_fileQuery" layoutX="17.0" layoutY="518.0" mnemonicParsing="false" onAction="#cb_BrowseOnOrOff" text="Import your query file" />
   </children>
 </AnchorPane>

@@ -28,12 +28,14 @@ public class DocShow {
     public TableView tableQuery;
 
     public DocShow(String docName, String queryNum) {
-        docNameS=docName;
+        docNameS = docName;
         this.docName = new SimpleStringProperty(docName);
         this.queryNum = new SimpleStringProperty(queryNum);
         this.btn_Entities = new Button("Show entities");
         btn_Entities.setOnAction(event -> {
+            btn_Entities.setDisable(true);
             showEntities();
+            btn_Entities.setDisable(false);
         });
     }
 
@@ -43,54 +45,57 @@ public class DocShow {
             Stage stage = new Stage();
             Scene scene = new Scene(new Group());
             stage.setTitle("Entities");
-            stage.setWidth(260);
+            stage.setWidth(350);
             stage.setHeight(300);
             final Label label = new Label("Entities in this document:");
-            label.setFont(new Font("Calibri Light", 22));
+            label.setFont(new Font("Calibri Light", 20));
             tableQuery.setEditable(false);
 
             TableColumn entity = new TableColumn("Entities");
             entity.setMinWidth(150);
             entity.setCellValueFactory(new PropertyValueFactory<EntityShow, String>("entityName"));
 
+            TableColumn rank = new TableColumn("Rank");
+            rank.setMinWidth(150);
+            rank.setCellValueFactory(new PropertyValueFactory<EntityShow, String>("entityRate"));
 
             //table.setItems(getData());
-            Documents doc=docsCoprus.get(docNameS);
-            HashMap<String, Integer> entities = doc.getEntities();
-            if( entities.size()!=0) {
+            Documents doc = docsCoprus.get(docNameS);
+            HashMap<String, Double> entities = doc.getEntities();
+            if (entities.size() != 0) {
                 tableQuery.setItems(getData(entities));
-                tableQuery.getColumns().addAll(entity);
+                tableQuery.getColumns().addAll(entity, rank);
                 tableQuery.setMinHeight(150);
                 tableQuery.setMaxHeight(150);
-                tableQuery.setMinWidth(150);
-                tableQuery.setMaxWidth(200);
+                tableQuery.setMinWidth(320);
+                tableQuery.setMaxWidth(320);
 
                 final VBox vbox = new VBox();
-                vbox.setSpacing(20);
+                vbox.setSpacing(10);
                 vbox.setPadding(new Insets(10, 0, 0, 10));
                 vbox.getChildren().addAll(label, tableQuery);
 
                 ((Group) scene.getRoot()).getChildren().addAll(vbox);
                 stage.setScene(scene);
                 stage.show();
-            }else{
-                showAlert("No entities", "Attention!","There is no entities in this document");
+            } else {
+                showAlert("No entities", "Attention!", "There is no entities in this document");
             }
-
         } catch (Exception e) {
             System.out.println("not opening");
         }
     }
 
-    private ObservableList<EntityShow> getData(HashMap<String, Integer> entities) {
-        TreeMap<String, Integer> sorted=new TreeMap<>(new ValueComparator(entities));
+    private ObservableList<EntityShow> getData(HashMap<String, Double> entities) {
+        TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(entities));
         sorted.putAll(entities);
         ObservableList<EntityShow> data = FXCollections.observableArrayList();
-        for (Map.Entry<String, Integer> entry : sorted.entrySet()) {
-            data.add(new EntityShow(entry.getKey()));
+        for (Map.Entry<String, Double> entry : sorted.entrySet()) {
+            data.add(new EntityShow(entry.getKey(), entry.getValue().toString()));
         }
         return data;
     }
+
     private void showAlert(String title, String header, String alertMessage) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(alertMessage);
@@ -133,9 +138,9 @@ public class DocShow {
 
     class ValueComparator implements Comparator<String> {
 
-        TreeMap<String, Integer> map = new TreeMap<>();
+        TreeMap<String, Double> map = new TreeMap<>();
 
-        public ValueComparator(HashMap<String, Integer> map) {
+        public ValueComparator(HashMap<String, Double> map) {
             this.map.putAll(map);
         }
 

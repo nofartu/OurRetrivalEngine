@@ -82,7 +82,7 @@ public class ReadFile {
                                 fromParse = parse.parsing(toPars, docName);
                                 Documents d = new Documents(docName, fromParse);
                                 /////////////NEW
-                                HashMap<String, Integer> entity=handleEntities();
+                                HashMap<String, Double> entity = handleEntities();
                                 d.setEntities(entity);
                                 //////////////// NEW
                                 if (!city.equals("")) {
@@ -227,17 +227,19 @@ public class ReadFile {
         }
     }
 
-    private HashMap<String, Integer> handleEntities() {
-        HashMap<String, Integer> entities = new HashMap<>();
+    private HashMap<String, Double> handleEntities() {
+        HashMap<String, Double> entities = new HashMap<>();
+        int size = fromParse.get("***+++***+++***")[0];
         for (Map.Entry<String, Integer[]> entry : fromParse.entrySet()) {
-            if (!entry.getKey().equals("")&&Character.isUpperCase(entry.getKey().charAt(0))&&!entry.getKey().contains("-")) {
+            if (!entry.getKey().equals("") && Character.isUpperCase(entry.getKey().charAt(0)) && !entry.getKey().contains("-")) {
                 if (entities.size() < 5) {
-                    entities.put(entry.getKey(), entry.getValue()[0]);
+                    entities.put(entry.getKey(), calcDominance(size, entry.getValue()[1], entry.getValue()[0]));
                 } else {
-                    for (Map.Entry<String, Integer> entryEnt : entities.entrySet()) {
-                        if (entryEnt.getValue() < entry.getValue()[0]) {
+                    for (Map.Entry<String, Double> entryEnt : entities.entrySet()) {
+                        double dom=calcDominance(size, entry.getValue()[1], entry.getValue()[0]);
+                        if (entryEnt.getValue() < dom) {
                             entities.remove(entryEnt.getKey());
-                            entities.put(entry.getKey(), entry.getValue()[0]);
+                            entities.put(entry.getKey(), dom);
                             break;
                         }
                     }
@@ -245,5 +247,11 @@ public class ReadFile {
             }
         }
         return entities;
+    }
+
+    private double calcDominance(int size, int location, int appear) {
+        double relativeLocation = (double) (location / size);
+        double rate = 0.6 * appear + 0.4 * relativeLocation;
+        return rate;
     }
 }

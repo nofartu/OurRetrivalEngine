@@ -4,6 +4,7 @@ package sample;
 import javafx.util.Pair;
 
 import java.io.*;
+import java.nio.DoubleBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -233,9 +234,9 @@ public class Indexer {
                 String name = doc.getIdDoc();
                 int size = doc.getSize();
                 writeIt.append(name + ": " + maxTf + ";" + unique + ";" + size + ";" + origin + ";Entities");
-                HashMap<String, Integer> set = doc.getEntities();
+                HashMap<String, Double> set = doc.getEntities();
                 if (set != null) {
-                    for (Map.Entry<String, Integer> entity : set.entrySet()) {
+                    for (Map.Entry<String, Double> entity : set.entrySet()) {
                         writeIt.append(";" + entity.getKey() + ";" + entity.getValue());
                     }
                     writeIt.append("\n");
@@ -250,7 +251,7 @@ public class Indexer {
             bw.flush();
             bw.close();
             numOfDoc = docsCoprus.size();
-            docsCoprus = new HashMap<>();
+//            docsCoprus = new HashMap<>();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -537,12 +538,12 @@ public class Indexer {
                 if (isCity)
                     j = 4;
                 String entity = arrayList1.get(j);
-                HashMap<String, Integer> entities = new HashMap<>();
+                HashMap<String, Double> entities = new HashMap<>();
                 int p = 0;
                 for (int m = j+1; m + 1 < arrayList1.size(); m++) {
-                    int num = 0;
+                    double num = 0;
                     try {
-                        num = Integer.parseInt(arrayList1.get(m + 1));
+                        num = Double.parseDouble(arrayList1.get(m + 1));
                     } catch (Exception e) {
                         System.out.println("Error here");
                     }
@@ -557,7 +558,7 @@ public class Indexer {
                 doc.setNumOfUniqe(uniqueNum);
                 doc.setOrigin(origin);
                 doc.setSize(sizeNum);
-                for (Map.Entry<String, Integer> entry : entities.entrySet()) {
+                for (Map.Entry<String, Double> entry : entities.entrySet()) {
                     doc.addEnity(entry.getKey(),entry.getValue());
                 }
                 docsCoprus.put(doc.getIdDoc(), doc);

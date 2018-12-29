@@ -312,7 +312,7 @@ public class ViewController implements Observer {
             btn_Save.setOnAction(event -> {
                 writeQueryToDisk();
             });
-            btn_Save.setMinWidth(300);
+            btn_Save.setMinWidth(350);
             tableQuery.setEditable(false);
 
             TableColumn query = new TableColumn("Query number");
@@ -538,8 +538,8 @@ public class ViewController implements Observer {
             btn_chooseCity.setDisable(true);
     }
 
-    public LinkedHashMap<String, String> getTheQuery(String path) {
-        LinkedHashMap<String, String> queries = new LinkedHashMap<>();
+    public LinkedHashMap<String, String[]> getTheQuery(String path) {
+        LinkedHashMap<String, String[]> queries = new LinkedHashMap<>();
         File file = new File(path);
         if (file.isFile()) {
             try {
@@ -553,8 +553,8 @@ public class ViewController implements Observer {
                         ArrayList<String> split = mySplit(numQuery, " ");
                         numQuery = split.get(1);
                     }
-                    queries.put(query, numQuery);
-
+                    String[] fromTags = {numQuery, desc}; //0 - num query, 1 - desc
+                    queries.put(query, fromTags);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -580,13 +580,13 @@ public class ViewController implements Observer {
             }
         } else if (cb_fileQuery.isSelected()) {
             if (!txtfld_QueryBrowse.getText().equals("")) {
-                LinkedHashMap<String, String> queries = getTheQuery(txtfld_QueryBrowse.getText());
-                for (Map.Entry<String, String> entry : queries.entrySet()) {
+                LinkedHashMap<String, String[]> queries = getTheQuery(txtfld_QueryBrowse.getText());
+                for (Map.Entry<String, String[]> entry : queries.entrySet()) {
                     String query = entry.getKey();
                     System.out.println("the query is:" + query);
                     Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
                     searcher.doQuery(query);
-                    collectedDocs(searcher.getDocs(), entry.getValue());
+                    collectedDocs(searcher.getDocs(), entry.getValue()[0]);
                 }
             }
             showDocsQueries();

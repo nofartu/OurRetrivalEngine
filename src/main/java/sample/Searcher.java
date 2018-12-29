@@ -51,6 +51,8 @@ public class Searcher {
         wordAndLocationsQuery = new HashMap<>();
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
+        countWordsSemantic = new HashMap<>();
+        countWordsDesc = new HashMap<>();
         combinedFilesWithCity = new HashSet<>();
 
     }
@@ -207,7 +209,7 @@ public class Searcher {
 
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
-        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery,docsContainsDesc,countWordsDesc,wordAndLocationsDesc,docsContainsSemantic,countWordsSemantic,wordAndLocationsSemantic); //change
+        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery,docsContainsDesc,countWordsDesc,wordAndLocationsDesc,docsContainsSemantic,countWordsSemantic,wordAndLocationsSemantic,semantic); //change
         withCities();
     }
 

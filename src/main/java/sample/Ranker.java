@@ -7,54 +7,81 @@ import static sample.ReadFile.mySplit;
 
 public class Ranker {
     HashMap<String, Double[]> allDocs;
+    HashMap<String, Double[]> allDocsDesc;
+    HashMap<String, Double[]> allDocsSemantic;
     HashMap<String, Double> finalScore;
+    double avdl;
+
     int numOfDocs;
 
     public Ranker(int numOfDocs) {
         this.numOfDocs = numOfDocs;
         allDocs = new HashMap<>();
+        allDocsDesc=new HashMap<>();
+        allDocsSemantic=new HashMap<>();
         finalScore = new HashMap<>();
+        avdl=getAvdl();
     }
 
 
-    public void rankBM25(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery) {
+    public void rankBM25(HashMap<String, ArrayList<String[]>> docsContains, HashMap<String, Integer> countWords, int whichOne) {
         double sum = 0;
         double k = 0.6, b = 0.75;
-        double avdl = getAvdl();
-        for (Map.Entry<String, ArrayList<String[]>> entry : docsContainsQuery.entrySet()) {
+        //double avdl = getAvdl();
+        for (Map.Entry<String, ArrayList<String[]>> entry : docsContains.entrySet()) {
             for (String[] info : entry.getValue()) {
                 String key = info[0]; //word name
-                int cWQ = countWordsQuery.get(key);
+                int cWQ = countWords.get(key);
                 int cWD = Integer.parseInt(info[1]); //word tf
                 int dLength = Integer.parseInt(info[2]); // |d|
                 int df = Integer.parseInt(info[3]); //df of word
-               // double tmp = (double) cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
-                double tmp = Math.log10((numOfDocs-df+0.5)/(df+0.5))*((cWD*(k+1))/(cWD+k*(1-b+b*(dLength/avdl))));
+                // double tmp = (double) cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
+                double tmp = Math.log10((numOfDocs - df + 0.5) / (df + 0.5)) * ((cWD * (k + 1)) / (cWD + k * (1 - b + b * (dLength / avdl))));
                 sum = sum + tmp;
             }
 
             Double[] d = {sum, 0.0, 0.0};
-            allDocs.put(entry.getKey(), d);
+            if (whichOne == 0)
+                allDocs.put(entry.getKey(), d);
+            if (whichOne == 1)
+                allDocsDesc.put(entry.getKey(), d);
+            if (whichOne == 2)
+                allDocsSemantic.put(entry.getKey(), d);
             sum = 0;
         }
-
     }
 
-    public void rankByLocation(HashMap<String, ArrayList<String[]>> docsContainsQuery) {
-        for (Map.Entry<String, ArrayList<String[]>> entry : docsContainsQuery.entrySet()) {
 
+    public TreeMap<String, Double> rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations,
+                                           HashMap<String, ArrayList<String[]>> docsContainsDesc, HashMap<String, Integer> countWordsDesc, HashMap<String, ArrayList<String>> wordAndLocationsDesc,
+                                           HashMap<String, ArrayList<String[]>> docsContainsSemantic, HashMap<String, Integer> countWordsSemantic, HashMap<String, ArrayList<String>> wordAndLocationsSemantic,boolean ifSemantic) {
+        rankBM25(docsContainsQuery, countWordsQuery, 0);
+        rankTfIdfAndLocation(wordAndLocations,0);
+        if(ifSemantic){
+            rankBM25(docsContainsSemantic, countWordsSemantic, 2);
+            rankTfIdfAndLocation(wordAndLocationsSemantic,2);
         }
-
-
-    }
-
-    public TreeMap<String, Double> rankAll(HashMap<String, ArrayList<String[]>> containsQuery, HashMap<String, Integer> wordsQuery, HashMap<String, ArrayList<String>> wordAndLocationsQuery, HashMap<String, ArrayList<String[]>> docsContainsDesc, HashMap<String, Integer> countWordsDesc, HashMap<String, ArrayList<String>> wordAndLocationsDesc, HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations) {
-        rankBM25(docsContainsQuery, countWordsQuery);
-        rankTfIdfAndLocation(wordAndLocations);
         for (Map.Entry<String, Double[]> entry : allDocs.entrySet()) {
             Double[] ranking = entry.getValue();
-            finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+            if(ifSemantic){ //calculate with semantic
+                try{
+                    Double[] semanticRank=allDocsSemantic.get(entry.getKey());
+                    finalScore.put(entry.getKey(), ranking[0]*0.7+semanticRank[0]*0.3 /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+                }catch(Exception e){
+                    finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+                }
+
+
+
+
+            }
+            else{
+                finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+            }
+
         }
+
+
         TreeMap<String, Double> sorted = getTop50();
 //        for (Map.Entry<String, Double> entry : sorted.entrySet()) {
 //            System.out.println(entry.getKey()+" and the rank is: "+entry.getValue());
@@ -62,7 +89,7 @@ public class Ranker {
         return sorted;
     }
 
-    public void rankTfIdfAndLocation(HashMap<String, ArrayList<String>> wordAndLocations) {
+    public void rankTfIdfAndLocation(HashMap<String, ArrayList<String>> wordAndLocations, int whichOne) {
         for (Map.Entry<String, ArrayList<String>> entry : wordAndLocations.entrySet()) {
             String name = entry.getKey();
             int size = entry.getValue().size();
@@ -77,11 +104,25 @@ public class Ranker {
                 int location = Integer.parseInt(mySplit(key.get(2), "/").get(0));
                 double tf = (double) cWD / dLength;
                 double tfIdf = tf * idf;
-                // double tmp = cWQ * (((k + 1) * cWD) / (cWD + k * (1 - b + b * (dLength / avdl)))) * Math.log10((numOfDocs + 1) / df);
-                Double[] d = allDocs.get(key.get(0));
-                d[1] = tfIdf;
-                d[2] = (double) dLength - location; //location ranking
-                allDocs.put(name, d);
+                if (whichOne == 0) {
+                    Double[] d = allDocs.get(key.get(0));
+                    d[1] = tfIdf;
+                    d[2] = (double) dLength - location; //location ranking
+                    allDocs.put(name, d);
+                }
+                if (whichOne == 1) {
+                    Double[] d = allDocsDesc.get(key.get(0));
+                    d[1] = tfIdf;
+                    d[2] = (double) dLength - location; //location ranking
+                    allDocsDesc.put(name, d);
+                }
+                if (whichOne == 2) {
+                    Double[] d = allDocsSemantic.get(key.get(0));
+                    d[1] = tfIdf;
+                    d[2] = (double) dLength - location; //location ranking
+                    allDocsSemantic.put(name, d);
+                }
+
             }
         }
     }

@@ -92,6 +92,7 @@ public class ViewController implements Observer {
         cb_fileQuery.setDisable(true);
         cb_semantic.setDisable(true);
         cb_choseCity.setDisable(true);
+        cb_desc.setDisable(true);
     }
 
     public void startOperation() {
@@ -423,6 +424,7 @@ public class ViewController implements Observer {
                 cb_fileQuery.setDisable(false);
                 cb_semantic.setDisable(false);
                 cb_choseCity.setDisable(false);
+                cb_desc.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         } else if (isStem) {
@@ -440,6 +442,7 @@ public class ViewController implements Observer {
                 cb_fileQuery.setDisable(false);
                 cb_semantic.setDisable(false);
                 cb_choseCity.setDisable(false);
+                cb_desc.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         }
@@ -470,6 +473,8 @@ public class ViewController implements Observer {
             cb_choseCity.setSelected(false);
             cb_semantic.setDisable(true);
             cb_semantic.setSelected(false);
+            cb_desc.setDisable(true);
+            cb_desc.setSelected(false);
             btn_browseQuery.setDisable(true);
             btn_chooseCity.setDisable(true);
         }

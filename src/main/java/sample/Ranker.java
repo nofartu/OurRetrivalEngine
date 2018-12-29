@@ -72,21 +72,19 @@ public class Ranker {
             if (ifSemantic) { //calculate with semantic
                 try { //0.8 regular, 0.2 semantic -180 returned  //0.5 reg ,0.5 sem - 148
                     Double[] semanticRank = allDocsSemantic.get(entry.getKey());
-                    finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3)*0.8+(semanticRank[0]*0.7+semanticRank[1]*0.3)*0.2);
+                    finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01) * 0.8 + (semanticRank[0] * 0.7 + semanticRank[1] * 0.3) * 0.2);
                 } catch (Exception e) {
-                    finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3));
+                    finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01));
                 }
-            }
-            else if(ifDesc){
+            } else if (ifDesc) {
                 try {
                     Double[] descRank = allDocsDesc.get(entry.getKey());
-                    finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3)*0.8+(descRank[0]*0.7+descRank[1]*0.3)*0.2);
+                    finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01) * 0.8 + (descRank[0] * 0.7 + descRank[1] * 0.3) * 0.2);
                 } catch (Exception e) {
-                    finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3));
+                    finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01));
                 }
-            }
-            else{
-                finalScore.put(entry.getKey(), ranking[0]*0.7+ ranking[1] * 0.3);
+            } else {
+                finalScore.put(entry.getKey(), ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01);
             }
 
 
@@ -131,20 +129,20 @@ public class Ranker {
                 double tfIdf = tf * idf;
                 if (whichOne == 0) {
                     Double[] d = allDocs.get(key.get(0));
-                    d[1] = d[1]+tfIdf;
-                    d[2] =d[2]+ ((double) dLength - location)/avdl; //location ranking
+                    d[1] = d[1] + tfIdf;
+                    d[2] = d[2] + ((double) dLength - location) / avdl; //location ranking
                     allDocs.put(name, d);
                 }
                 if (whichOne == 1) {
                     Double[] d = allDocsDesc.get(key.get(0));
-                    d[1] = d[1]+tfIdf;
-                    d[2] = d[2]+((double) dLength - location)/avdl; //location ranking
+                    d[1] = d[1] + tfIdf;
+                    d[2] = d[2] + ((double) dLength - location) / avdl; //location ranking
                     allDocsDesc.put(name, d);
                 }
                 if (whichOne == 2) {
                     Double[] d = allDocsSemantic.get(key.get(0));
-                    d[1] = d[1]+tfIdf;
-                    d[2] = d[2]+((double) dLength - location)/avdl; //location ranking
+                    d[1] = d[1] + tfIdf;
+                    d[2] = d[2] + ((double) dLength - location) / avdl; //location ranking
                     allDocsSemantic.put(name, d);
                 }
 

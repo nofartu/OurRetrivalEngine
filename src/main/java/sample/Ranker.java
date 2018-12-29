@@ -17,10 +17,10 @@ public class Ranker {
     public Ranker(int numOfDocs) {
         this.numOfDocs = numOfDocs;
         allDocs = new HashMap<>();
-        allDocsDesc=new HashMap<>();
-        allDocsSemantic=new HashMap<>();
+        allDocsDesc = new HashMap<>();
+        allDocsSemantic = new HashMap<>();
         finalScore = new HashMap<>();
-        avdl=getAvdl();
+        avdl = getAvdl();
     }
 
 
@@ -54,28 +54,23 @@ public class Ranker {
 
     public TreeMap<String, Double> rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations,
                                            HashMap<String, ArrayList<String[]>> docsContainsDesc, HashMap<String, Integer> countWordsDesc, HashMap<String, ArrayList<String>> wordAndLocationsDesc,
-                                           HashMap<String, ArrayList<String[]>> docsContainsSemantic, HashMap<String, Integer> countWordsSemantic, HashMap<String, ArrayList<String>> wordAndLocationsSemantic,boolean ifSemantic) {
+                                           HashMap<String, ArrayList<String[]>> docsContainsSemantic, HashMap<String, Integer> countWordsSemantic, HashMap<String, ArrayList<String>> wordAndLocationsSemantic, boolean ifSemantic) {
         rankBM25(docsContainsQuery, countWordsQuery, 0);
-        rankTfIdfAndLocation(wordAndLocations,0);
-        if(ifSemantic){
+        rankTfIdfAndLocation(wordAndLocations, 0);
+        if (ifSemantic) {
             rankBM25(docsContainsSemantic, countWordsSemantic, 2);
-            rankTfIdfAndLocation(wordAndLocationsSemantic,2);
+            rankTfIdfAndLocation(wordAndLocationsSemantic, 2);
         }
         for (Map.Entry<String, Double[]> entry : allDocs.entrySet()) {
             Double[] ranking = entry.getValue();
-            if(ifSemantic){ //calculate with semantic
-                try{
-                    Double[] semanticRank=allDocsSemantic.get(entry.getKey());
-                    finalScore.put(entry.getKey(), ranking[0]*0.7+semanticRank[0]*0.3 /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
-                }catch(Exception e){
+            if (ifSemantic) { //calculate with semantic
+                try {
+                    Double[] semanticRank = allDocsSemantic.get(entry.getKey());
+                    finalScore.put(entry.getKey(), ranking[0] * 0.7 + semanticRank[0] * 0.3 /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
+                } catch (Exception e) {
                     finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
                 }
-
-
-
-
-            }
-            else{
+            } else {
                 finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
             }
 

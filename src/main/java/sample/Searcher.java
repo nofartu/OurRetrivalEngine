@@ -47,7 +47,6 @@ public class Searcher {
         parse = new Parse(stopWords, stem, apiJson);
         this.postPath = postPath;
         this.numOfDocs = docsCoprus.size();
-        // this.numOfDocs=472525;
         wordAndLocationsQuery = new HashMap<>();
         docsContainsQuery = new HashMap<>();
         countWordsQuery = new HashMap<>();
@@ -64,39 +63,21 @@ public class Searcher {
             wordAndLocationsSemantic = doSemantic(queryParsed);
         }
         wordAndLocationsQuery = runQuery(queryParsed, 1);
-//        for (Map.Entry<String, Integer[]> entry : queryParsed.entrySet()) {
-//            String key = entry.getKey();
-//            String keyLower = key.toLowerCase();
-//            String keyUpper = key.toUpperCase();
-//            if (dictionary.containsKey(keyLower)) {
-//                if (!wordAndLocationsQuery.containsKey(key)) {
-//                    Integer[] fromDictionary = dictionary.get(keyLower);
-//                    wordAndLocationsQuery.put(key, getAllPostings(fromDictionary[0]));
-//                }
-//            } else if (dictionary.containsKey(keyUpper)) {
-//                if (!wordAndLocationsQuery.containsKey(key)) {
-//                    Integer[] fromDictionary = dictionary.get(keyUpper);
-//                    wordAndLocationsQuery.put(key, getAllPostings(fromDictionary[0]));
-//                }
-//            } else {
-//                System.out.println("we don't have this word in our dictionary");
-//            }
-//        }
     }
 
-    private void parseTheDesc(String query){
+    private void parseTheDesc(String query) {
         HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
-        wordAndLocationsDesc=runQuery(queryParsed, 2);
+        wordAndLocationsDesc = runQuery(queryParsed, 2);
     }
 
     public void doQuery(String query) {
         parseTheQuery(query);
         //parseTheDesc(query); //NEW!!!!!
         // createCountWordsQuery(query);
-        docsContainsQuery=createDocsContainsQuery(wordAndLocationsQuery);
+        docsContainsQuery = createDocsContainsQuery(wordAndLocationsQuery);
         //docsContainsDesc=createDocsContainsQuery(wordAndLocationsDesc);
-        if(semantic)
-            docsContainsSemantic=createDocsContainsQuery(wordAndLocationsSemantic);
+        if (semantic)
+            docsContainsSemantic = createDocsContainsQuery(wordAndLocationsSemantic);
 
         sendToRanker();
     }
@@ -179,37 +160,10 @@ public class Searcher {
         return null;
     }
 
-//    // TODO: 12/22/2018 we have a word that is not in the dictionary what to do"?
-//    public void createCountWordsQuery(String query) {
-//        query=OurReplace(query,"-"," ");
-//        ArrayList<String> tmp = mySplit(query, " ");
-//        for (int i = 0; i < tmp.size(); i++) {
-//            String key = tmp.get(i);
-//            String keyUp=key.toUpperCase();
-//            String keyLower=key.toLowerCase();
-//            if (dictionary.containsKey(keyLower)) {
-//                if (!countWordsQuery.containsKey(keyLower)) {
-//                    countWordsQuery.put(keyLower, 1);
-//                } else {
-//                    countWordsQuery.put(keyLower, countWordsQuery.get(keyLower) + 1);
-//                }
-//            }
-//            else if(dictionary.containsKey(keyUp)){
-//                if (!countWordsQuery.containsKey(keyUp)) {
-//                    countWordsQuery.put(keyUp, 1);
-//                } else {
-//                    countWordsQuery.put(keyUp, countWordsQuery.get(keyUp) + 1);
-//                }
-//            }
-//            else
-//                System.out.println("1 we have a word in the query that is not in the dictionary "+key );
-//
-//        }
-//    }
 
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs);
-        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery,docsContainsDesc,countWordsDesc,wordAndLocationsDesc,docsContainsSemantic,countWordsSemantic,wordAndLocationsSemantic,semantic); //change
+        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery, docsContainsDesc, countWordsDesc, wordAndLocationsDesc, docsContainsSemantic, countWordsSemantic, wordAndLocationsSemantic, semantic); //change
         withCities();
     }
 
@@ -235,12 +189,10 @@ public class Searcher {
         for (String entry : combinedFilesWithCity) {
             System.out.println(entry);
         }
-
     }
 
-
     public HashMap<String, ArrayList<String[]>> createDocsContainsQuery(HashMap<String, ArrayList<String>> wordAndLocations) {
-        HashMap<String, ArrayList<String[]>> docsContainsTmp=new HashMap<>();
+        HashMap<String, ArrayList<String[]>> docsContainsTmp = new HashMap<>();
         for (Map.Entry<String, ArrayList<String>> entry : wordAndLocations.entrySet()) {
             ArrayList<String> tmp = entry.getValue();
             String keyWord = entry.getKey();

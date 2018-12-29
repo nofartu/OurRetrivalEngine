@@ -247,8 +247,7 @@ public class Parse {
             return true;
         return false;
     }
-
-    //Todo: replace the term.put with sending to check letter!!!!
+    
     //rule - mr/mrs
     private int handleMrs(int i) {  //changed here!!!!!!!! --------!!!!!!!!!!!!
         String term = allWords.get(i);

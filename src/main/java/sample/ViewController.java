@@ -87,6 +87,10 @@ public class ViewController implements Observer {
         btn_runQuery.setDisable(true);
         txtfld_QueryHand.setDisable(true);
         txtfld_QueryBrowse.setDisable(true);
+        cb_handQuery.setDisable(true);
+        cb_fileQuery.setDisable(true);
+        cb_semantic.setDisable(true);
+        cb_choseCity.setDisable(true);
     }
 
     public void startOperation() {
@@ -128,6 +132,10 @@ public class ViewController implements Observer {
             //do the func
         }
         btn_showDictionary.setDisable(false);
+        cb_handQuery.setDisable(false);
+        cb_fileQuery.setDisable(false);
+        cb_semantic.setDisable(false);
+        cb_choseCity.setDisable(false);
     }
 
     private void controlAll(boolean what) {
@@ -222,7 +230,7 @@ public class ViewController implements Observer {
     }
 
 
-    public ObservableList<TermShow> getData() {
+    private ObservableList<TermShow> getData() {
         ObservableList<TermShow> data = FXCollections.observableArrayList();
         TreeMap<String, Integer[]> dictionary = sort(); //check not calling before the stating
         for (Map.Entry<String, Integer[]> entry : dictionary.entrySet()) {
@@ -280,7 +288,7 @@ public class ViewController implements Observer {
         }
     }
 
-    public ObservableList<CityShow> getDataCities() {
+    private ObservableList<CityShow> getDataCities() {
         ObservableList<CityShow> data = FXCollections.observableArrayList();
         TreeMap<String, City> sets = new TreeMap<>();
         sets.putAll(cities);
@@ -290,67 +298,7 @@ public class ViewController implements Observer {
         return data;
     }
 
-    public void showDocsQuery(TreeMap<String, Double> map) {
-        try {
-
-            tableQuery = new TableView();
-            Stage stage = new Stage();
-            Scene scene = new Scene(new Group());
-            stage.setTitle("Relevant documents");
-            stage.setWidth(450);
-            stage.setHeight(900);
-            final Label label = new Label("Relevant documents:");
-            label.setFont(new Font("Calibri Light", 22));
-            tableQuery.setEditable(false);
-            final Button btn_Save = new Button("Save");
-            btn_Save.setOnAction(event -> {
-                writeQueryToDisk();
-            });
-
-            TableColumn Docs = new TableColumn("Documents");
-            Docs.setMinWidth(200);
-            Docs.setCellValueFactory(new PropertyValueFactory<DocShow, String>("docName"));
-
-
-            TableColumn button = new TableColumn("Entities");
-            button.setMinWidth(100);
-            button.setCellValueFactory(new PropertyValueFactory<DocShow, Button>("btn_Entities"));
-
-
-            //table.setItems(getData());
-            tableQuery.setItems(getDataQuery(map));
-            tableQuery.getColumns().addAll(Docs, button);
-            tableQuery.setMinHeight(800);
-            tableQuery.setMaxHeight(900);
-            tableQuery.setMinWidth(350);
-            tableQuery.setMaxWidth(450);
-
-            final VBox vbox = new VBox();
-            vbox.setSpacing(20);
-            vbox.setPadding(new Insets(10, 0, 0, 10));
-            vbox.getChildren().addAll(label, btn_Save, tableQuery);
-
-            ((Group) scene.getRoot()).getChildren().addAll(vbox);
-            stage.setScene(scene);
-            stage.show();
-
-
-        } catch (Exception e) {
-            System.out.println("not opening");
-        }
-    }
-
-    public ObservableList<DocShow> getDataQuery(TreeMap<String, Double> map) {
-        ObservableList<DocShow> data = FXCollections.observableArrayList();
-        Map<String, Double> set = map;
-        for (Map.Entry<String, Double> entry : set.entrySet()) {
-            data.add(new DocShow(entry.getKey(), ""));
-        }
-        return data;
-    }
-
-
-    public void showDocsQueries() {
+    private void showDocsQueries() {
         try {
             tableQuery = new TableView();
             Stage stage = new Stage();
@@ -364,7 +312,7 @@ public class ViewController implements Observer {
             btn_Save.setOnAction(event -> {
                 writeQueryToDisk();
             });
-            btn_Save.setMinWidth(100);
+            btn_Save.setMinWidth(300);
             tableQuery.setEditable(false);
 
             TableColumn query = new TableColumn("Query number");
@@ -403,7 +351,7 @@ public class ViewController implements Observer {
         }
     }
 
-    public ObservableList<DocShow> getDataQueries() {
+    private ObservableList<DocShow> getDataQueries() {
         ObservableList<DocShow> data = FXCollections.observableArrayList();
         Queue<Pair<String, TreeMap<String, Double>>> set = new LinkedList<>();
         set.addAll(docsToShow);
@@ -453,6 +401,10 @@ public class ViewController implements Observer {
                 api = new ApiJson();
                 api.loadCities(b, path);
                 btn_showDictionary.setDisable(false);
+                cb_handQuery.setDisable(false);
+                cb_fileQuery.setDisable(false);
+                cb_semantic.setDisable(false);
+                cb_choseCity.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         } else if (isStem) {
@@ -466,6 +418,10 @@ public class ViewController implements Observer {
                 api = new ApiJson();
                 api.loadCities(b, path);
                 btn_showDictionary.setDisable(false);
+                cb_handQuery.setDisable(false);
+                cb_fileQuery.setDisable(false);
+                cb_semantic.setDisable(false);
+                cb_choseCity.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         }
@@ -614,14 +570,13 @@ public class ViewController implements Observer {
         String dirPath = txtfld_dirPath.getText();
         boolean stem = check_stemm.isSelected();
         boolean semantic = cb_semantic.isSelected();
-        //Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
-
         if (cb_handQuery.isSelected()) {
             if (!txtfld_QueryHand.getText().equals("")) {
                 Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic);
                 String query = txtfld_QueryHand.getText();
                 searcher.doQuery(query);
-                showDocsQuery(searcher.getDocs());
+                collectedDocs(searcher.getDocs(), "100");
+                showDocsQueries();
             }
         } else if (cb_fileQuery.isSelected()) {
             if (!txtfld_QueryBrowse.getText().equals("")) {
@@ -635,8 +590,6 @@ public class ViewController implements Observer {
                 }
             }
             showDocsQueries();
-            //writeQueryToDisk();
-            System.out.println("done");
         }
 
 
@@ -682,7 +635,7 @@ public class ViewController implements Observer {
             bw.write(writeIt.toString());
             bw.flush();
             bw.close();
-            showAlert("Done", "Saveing finished!", "The file of query is ready!");
+            showAlert("Done", "Saveing finished!", "The file of queries is ready!");
         } catch (IOException e) {
             e.printStackTrace();
         }

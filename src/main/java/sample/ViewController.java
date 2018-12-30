@@ -57,7 +57,6 @@ public class ViewController implements Observer {
     public javafx.scene.control.CheckBox check_stemm;
     public javafx.scene.control.CheckBox cb_choseCity;
     public javafx.scene.control.CheckBox cb_semantic;
-    public javafx.scene.control.CheckBox cb_desc;
     public javafx.scene.control.CheckBox cb_handQuery;
     public javafx.scene.control.CheckBox cb_fileQuery;
     public javafx.scene.control.ComboBox comboBox;
@@ -97,7 +96,6 @@ public class ViewController implements Observer {
         cb_fileQuery.setDisable(true);
         cb_semantic.setDisable(true);
         cb_choseCity.setDisable(true);
-        cb_desc.setDisable(true);
     }
 
     public void startOperation() {
@@ -437,7 +435,6 @@ public class ViewController implements Observer {
                 cb_fileQuery.setDisable(false);
                 cb_semantic.setDisable(false);
                 cb_choseCity.setDisable(false);
-                cb_desc.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         } else if (isStem) {
@@ -455,7 +452,6 @@ public class ViewController implements Observer {
                 cb_fileQuery.setDisable(false);
                 cb_semantic.setDisable(false);
                 cb_choseCity.setDisable(false);
-                cb_desc.setDisable(false);
                 showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         }
@@ -486,8 +482,6 @@ public class ViewController implements Observer {
             cb_choseCity.setSelected(false);
             cb_semantic.setDisable(true);
             cb_semantic.setSelected(false);
-            cb_desc.setDisable(true);
-            cb_desc.setSelected(false);
             btn_browseQuery.setDisable(true);
             btn_chooseCity.setDisable(true);
         }
@@ -627,7 +621,7 @@ public class ViewController implements Observer {
         boolean semantic = cb_semantic.isSelected();
         if (cb_handQuery.isSelected()) {
             if (!txtfld_QueryHand.getText().equals("")) {
-                Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic, "", false, cb_choseCity.isSelected());
+                Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic, "", cb_choseCity.isSelected());
                 String query = txtfld_QueryHand.getText();
                 searcher.doQuery(query);
                 collectedDocs(searcher.getDocs(), "100");
@@ -639,7 +633,7 @@ public class ViewController implements Observer {
                 for (Map.Entry<String, String[]> entry : queries.entrySet()) {
                     String query = entry.getKey();
                     System.out.println("the query is:" + query);
-                    Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic, entry.getValue()[1], cb_desc.isSelected(), cb_choseCity.isSelected());
+                    Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic, entry.getValue()[1], cb_choseCity.isSelected());
                     searcher.doQuery(query);
                     collectedDocs(searcher.getDocs(), entry.getValue()[0]);
                 }

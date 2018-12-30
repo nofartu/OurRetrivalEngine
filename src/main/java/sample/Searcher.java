@@ -78,10 +78,10 @@ public class Searcher {
     public void doQuery(String query) {
         parseTheQuery(query);
         docsContainsQuery = createDocsContainsQuery(wordAndLocationsQuery);
-        if(desc){
+       // if(desc){
             parseTheDesc(description); //NEW!!!!!
             docsContainsDesc=createDocsContainsQuery(wordAndLocationsDesc);
-        }
+      //  }
         if (semantic)
             docsContainsSemantic = createDocsContainsQuery(wordAndLocationsSemantic);
         sendToRanker();

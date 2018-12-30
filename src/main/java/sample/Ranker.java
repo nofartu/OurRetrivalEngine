@@ -26,7 +26,7 @@ public class Ranker {
 
     public void rankBM25(HashMap<String, ArrayList<String[]>> docsContains, HashMap<String, Integer> countWords, int whichOne) {
         double sum = 0;
-        double k = 0.6, b = 0.75;
+        double k = 1.2, b = 0.75;
         //double avdl = getAvdl();
         for (Map.Entry<String, ArrayList<String[]>> entry : docsContains.entrySet()) {
             for (String[] info : entry.getValue()) {
@@ -57,10 +57,8 @@ public class Ranker {
                                            HashMap<String, ArrayList<String[]>> docsContainsSemantic, HashMap<String, Integer> countWordsSemantic, HashMap<String, ArrayList<String>> wordAndLocationsSemantic, boolean ifSemantic) {
         rankBM25(docsContainsQuery, countWordsQuery, 0);
         rankTfIdfAndLocation(wordAndLocations, 0);
-        if (ifDesc) {
-            rankBM25(docsContainsDesc, countWordsDesc, 1);
-            rankTfIdfAndLocation(wordAndLocationsDesc, 1);
-        }
+        rankBM25(docsContainsDesc, countWordsDesc, 1);
+        rankTfIdfAndLocation(wordAndLocationsDesc, 1);
         if (ifSemantic) {
             rankBM25(docsContainsSemantic, countWordsSemantic, 2);
             rankTfIdfAndLocation(wordAndLocationsSemantic, 2);
@@ -72,38 +70,29 @@ public class Ranker {
             if (ifSemantic) { //calculate with semantic
                 try { //0.8 regular, 0.2 semantic -180 returned  //0.5 reg ,0.5 sem - 148
                     Double[] semanticRank = allDocsSemantic.get(entry.getKey());
-                    finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01) * 0.8 + (semanticRank[0] * 0.7 + semanticRank[1] * 0.3) * 0.2);
+                    try {
+                        Double[] descRank = allDocsDesc.get(entry.getKey());
+                        finalScore.put(entry.getKey(), ((ranking[0] * 0.98 + (ranking[1] / ranking[3]) * 0.01 + ranking[2] * 0.01) * 0.8 + (descRank[0] * 0.99 + descRank[2] * 0.01) * 0.2) * 0.8 + (semanticRank[0] * 0.99 + semanticRank[2] * 0.01) * 0.2);
+                    } catch (Exception e1) {
+                        finalScore.put(entry.getKey(), (ranking[0] * 0.98 + (ranking[1] / ranking[3]) * 0.01 + ranking[2] * 0.01) * 0.8 + (semanticRank[0] * 0.99 + semanticRank[2] * 0.01) * 0.2);
+                    }
+                    // finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01) * 0.8 + (semanticRank[0] * 0.7 + semanticRank[1] * 0.3) * 0.2);
                 } catch (Exception e) {
-                    finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01));
-                }
-            } else if (ifDesc) {
-                try {
-                    Double[] descRank = allDocsDesc.get(entry.getKey());
-                    finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01) * 0.8 + (descRank[0] * 0.7 + descRank[1] * 0.3) * 0.2);
-                } catch (Exception e) {
-                    finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01));
+                    try {
+                        Double[] descRank = allDocsDesc.get(entry.getKey());
+                        finalScore.put(entry.getKey(), (ranking[0] * 0.98 + (ranking[1] / ranking[3]) * 0.01 + ranking[2] * 0.01) * 0.8 + (descRank[0] * 0.99 + descRank[2] * 0.01) * 0.2);
+                    } catch (Exception e1) {
+                        finalScore.put(entry.getKey(), (ranking[0] * 0.98 + (ranking[1] / ranking[3]) * 0.01 + ranking[2] * 0.01));
+                    }
                 }
             } else {
-                finalScore.put(entry.getKey(), ranking[0] * 0.7 + (ranking[1] / ranking[3]) * 0.29 + ranking[2] * 0.01);
+                try {
+                    Double[] descRank = allDocsDesc.get(entry.getKey());
+                    finalScore.put(entry.getKey(), (ranking[0] * 0.98 + (ranking[1] / ranking[3]) * 0.01 + ranking[2] * 0.01 /** 0.7 + (ranking[1] / ranking[3]) * 0.29 + ranking[2] * 0.01*/) * 0.8 + (descRank[0] * 0.99 + descRank[2] * 0.01 /** 0.7 + (descRank[1] / descRank[3]) * 0.29 + descRank[2] * 0.01*/) * 0.2);
+                } catch (Exception e1) {
+                    finalScore.put(entry.getKey(), (ranking[0] * 0.98 + (ranking[1] / ranking[3]) * 0.01 + ranking[2] * 0.01));
+                }
             }
-
-
-//                finalScore.put(entry.getKey(), (ranking[0]*0.7+ ranking[1] * 0.3)*0.8+);
-
-            //167 with and without stem
-            //finalScore.put(entry.getKey(), ranking[0]*0.7+ ranking[1] * 0.3 /*+ ranking[2] * 0.25  semanticBM25 * 0.15 * 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
-            //167 without stem , 163 with stem
-            //finalScore.put(entry.getKey(), ranking[0]*0.7+ ranking[1] * 0.29 +ranking[2]*0.01 /*+ ranking[2] * 0.25  semanticBM25 * 0.15 * 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
-//            else {
-//                try {
-//                    Double[] DescRank = allDocsDesc.get(entry.getKey());
-//                    finalScore.put(entry.getKey(), ranking[0] * 0.7 + DescRank[0] * 0.3 /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
-//                } catch (Exception e) {
-//                    finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
-//                }
-//                //finalScore.put(entry.getKey(), ranking[0] /** 0.05 + ranking[1] * 0.05 + ranking[2] * 0.98*/);//0- bm25, 1- tfidf, 2- location in doc
-//            }
-
         }
 
 

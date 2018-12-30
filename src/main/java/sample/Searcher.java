@@ -36,12 +36,11 @@ public class Searcher {
     private String description;
     private boolean stem;
     private boolean semantic;
-    private boolean desc;
     private boolean isCity;
 
     private int numOfDocs;
 
-    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson, boolean semantic, String description, boolean desc, boolean isCity) {
+    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson, boolean semantic, String description, boolean isCity) {
         this.stem = stem;
         this.semantic = semantic;
         HashSet<String> stopWords = stopwords;
@@ -63,7 +62,6 @@ public class Searcher {
         rankedFiles = new TreeMap<>();
         combinedFilesWithCity = new TreeMap<>();
         this.description = description;
-        this.desc = desc;
         this.isCity = isCity;
 
     }
@@ -85,10 +83,8 @@ public class Searcher {
     public void doQuery(String query) {
         parseTheQuery(query);
         docsContainsQuery = createDocsContainsQuery(wordAndLocationsQuery);
-        // if(desc){
         parseTheDesc(description); //NEW!!!!!
         docsContainsDesc = createDocsContainsQuery(wordAndLocationsDesc);
-        //  }
         if (semantic)
             docsContainsSemantic = createDocsContainsQuery(wordAndLocationsSemantic);
         sendToRanker();
@@ -96,7 +92,7 @@ public class Searcher {
 
     private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed, int who) { //who: 1 - query, 2 - description, 3 - semantic
         HashMap<String, ArrayList<String>> wordAndLocationsTmp = new HashMap<>();
-        TreeMap<Integer, String> invertedLoc = new TreeMap<Integer, String>();
+        TreeMap<Integer, String> invertedLoc = new TreeMap<>();
         for (Map.Entry<String, Integer[]> entry : queryParsed.entrySet()) {
             String key = entry.getKey();
             String keyLower = key.toLowerCase();
@@ -166,7 +162,9 @@ public class Searcher {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(namePost), "UTF-8"));
             int count = 0;
-            int next = lineNumbers.firstKey();
+            int next = 0;
+            if (!lineNumbers.isEmpty())
+                next = lineNumbers.firstKey();
             String name = lineNumbers.get(next);
             while (!lineNumbers.isEmpty()) {
                 line = reader.readLine();
@@ -197,29 +195,6 @@ public class Searcher {
 
         return wordAndLocationsTmp;
     }
-
-//    public ArrayList<String> getAllPostings(int lineNumber) {
-//        String line = "";
-//        String namePost = "";
-//        String post = "";
-//        if (stem)
-//            namePost = "Stem\\postFileWithStem";
-//        else
-//            namePost = "WithoutStem\\postFileWithoutStem";
-//        try (Stream<String> lines = Files.lines(Paths.get(postPath + "\\" + namePost + ".txt"))) {
-//            line = lines.skip(lineNumber).findFirst().get();
-//            TermPost term = new TermPost(line);
-//            post = term.getPost();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        if (!post.equals("")) {
-//            ArrayList<String> arr = mySplit(post, " ");
-//            return arr;
-//
-//        }
-//        return null;
-//    }
 
 
     public void sendToRanker() {

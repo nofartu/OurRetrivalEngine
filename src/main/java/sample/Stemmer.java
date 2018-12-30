@@ -15,6 +15,9 @@ public class Stemmer {
             snowballStemmer.setCurrent(s);
             snowballStemmer.stem();
             String newStem = snowballStemmer.getCurrent();
+            if(!newStem.equals("")&&Character.isUpperCase(newStem.charAt(0))){
+                newStem=newStem.toUpperCase();
+            }
             if (allStems.containsKey(newStem)) {
                 int counter = allStems.get(newStem)[0];
                 Integer[] tmp = tokens.get(s);

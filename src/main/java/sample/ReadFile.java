@@ -107,7 +107,7 @@ public class ReadFile {
                 indexer.addDocument(dirDocuments);
                 dirDocuments = new ArrayList<>();  //should delete all the dir array
                 ///////////////////////////////
-                if (count % 15 == 0 || count == size) {
+                if (count % 33 == 0 || count == size) {
                     // indexer.addDocument(dirDocuments);
                     //  dirDocuments = new ArrayList<>();  //should delete all the dir array
                     indexer.writeToDisk();

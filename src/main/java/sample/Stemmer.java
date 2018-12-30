@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Stemmer {
 
-    SnowballStemmer snowballStemmer = new englishStemmer();
+    private SnowballStemmer snowballStemmer = new englishStemmer();
 
     public HashMap<String, Integer[]> stemming(HashMap<String, Integer[]> tokens) {
         HashMap<String, Integer[]> allStems = new HashMap<>();

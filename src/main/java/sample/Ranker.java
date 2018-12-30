@@ -40,7 +40,7 @@ public class Ranker {
                 sum = sum + tmp;
             }
 
-            Double[] d = {sum, 0.0, 0.0};
+            Double[] d = {sum, 0.0, 0.0, 0.0};
             if (whichOne == 0)
                 allDocs.put(entry.getKey(), d);
             if (whichOne == 1)
@@ -84,7 +84,7 @@ public class Ranker {
                     finalScore.put(entry.getKey(), (ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01));
                 }
             } else {
-                finalScore.put(entry.getKey(), ranking[0] * 0.7 + ranking[1] * 0.29 + ranking[2] * 0.01);
+                finalScore.put(entry.getKey(), ranking[0] * 0.7 + (ranking[1] / ranking[3]) * 0.29 + ranking[2] * 0.01);
             }
 
 
@@ -130,20 +130,24 @@ public class Ranker {
                 if (whichOne == 0) {
                     Double[] d = allDocs.get(key.get(0));
                     d[1] = d[1] + tfIdf;
-                    d[2] = d[2] + ((double) dLength - location) / avdl; //location ranking
-                    allDocs.put(name, d);
+                    d[3] = d[3] + Math.sqrt(Math.pow(tfIdf, 2) * wordAndLocations.size());
+                    double calc = (double) (dLength - location) / avdl;
+                    d[2] = d[2] + (double) (calc / wordAndLocations.size()); //location ranking
+                    allDocs.put(key.get(0), d);
                 }
                 if (whichOne == 1) {
                     Double[] d = allDocsDesc.get(key.get(0));
                     d[1] = d[1] + tfIdf;
-                    d[2] = d[2] + ((double) dLength - location) / avdl; //location ranking
-                    allDocsDesc.put(name, d);
+                    double calc = (double) (dLength - location) / avdl;
+                    d[2] = d[2] + (double) (calc / wordAndLocations.size()); //location ranking
+                    allDocsDesc.put(key.get(0), d);
                 }
                 if (whichOne == 2) {
                     Double[] d = allDocsSemantic.get(key.get(0));
                     d[1] = d[1] + tfIdf;
-                    d[2] = d[2] + ((double) dLength - location) / avdl; //location ranking
-                    allDocsSemantic.put(name, d);
+                    double calc = (double) (dLength - location) / avdl;
+                    d[2] = d[2] + (double) (calc / wordAndLocations.size()); //location ranking
+                    allDocsSemantic.put(key.get(0), d);
                 }
 
             }

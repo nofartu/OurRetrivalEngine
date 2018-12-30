@@ -78,9 +78,9 @@ public class ViewController implements Observer {
         this.primaryStage = stage;
         //controller = new Controller(model);
         txtfld_corpus.setText("d:\\documents\\users\\nofartu\\Downloads\\corpus\\corpus");
-        txtfld_stopWords.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine");
-        txtfld_dirPath.setText("d:\\documents\\users\\nofartu\\Downloads\\post1");
-        txtfld_QueryBrowse.setText("C:\\Users\\nofartu\\IdeaProjects\\OurRetrivalEngine\\queries.txt");
+        txtfld_stopWords.setText("d:\\documents\\users\\nofartu\\Downloads\\OurRetrivalEngine1\\OurRetrivalEngine1");
+        txtfld_dirPath.setText("D:\\documents\\users\\nofartu\\Downloads\\newPostNewEntity\\newPostNewEntity");
+        txtfld_QueryBrowse.setText("d:\\documents\\users\\nofartu\\Downloads\\OurRetrivalEngine1\\OurRetrivalEngine1\\queries.txt");
 
         comboBox.setDisable(true);
         txt_Info.setDisable(true);

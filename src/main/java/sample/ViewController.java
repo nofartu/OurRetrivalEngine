@@ -70,7 +70,7 @@ public class ViewController implements Observer {
     private ApiJson api;
     public Thread t;
     public static ArrayList<String> chosenCities = new ArrayList<>();
-    private Queue<Pair<String, TreeMap<String, Double>>> docsToShow = new LinkedList<>();
+    private Queue<Pair<String, TreeMap<String, Double>>> docsToShow;
 
 
     public void setStage(Stage stage) {
@@ -373,6 +373,7 @@ public class ViewController implements Observer {
 
             ((Group) scene.getRoot()).getChildren().addAll(vbox);
             stage.setScene(scene);
+            SetStageCloseEventAfterQuery(stage);
             stage.show();
 
 
@@ -413,6 +414,28 @@ public class ViewController implements Observer {
                 txt_Cities.setText(setTxt());
                 txt_Cities.setDisable(false);
                 txt_Cities.setVisible(true);
+            }
+        });
+    }
+
+    private void SetStageCloseEventAfterQuery(Stage primaryStage) {
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent windowEvent) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Exit");
+                alert.setHeaderText("Exiting");
+                alert.setContentText("Are you sure you done?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK) {
+                    //model.stopServers();
+                    // ... user chose OK
+                    // Close program
+                } else {
+                    // ... user chose CANCEL or closed the dialog
+                    windowEvent.consume();
+                }
+                txt_Cities.setText("");
+                chosenCities = new ArrayList<>();
             }
         });
     }
@@ -462,6 +485,11 @@ public class ViewController implements Observer {
         chosenCities.add(cityname);
     }
 
+    public static void removingCitiesFromChoose(String cityname) {
+        if(chosenCities.contains(cityname))
+            chosenCities.remove(cityname);
+    }
+
     @Override
     public void update(Observable o, Object arg) {
 
@@ -484,6 +512,10 @@ public class ViewController implements Observer {
             cb_semantic.setSelected(false);
             btn_browseQuery.setDisable(true);
             btn_chooseCity.setDisable(true);
+            txt_Cities.setText("");
+            chosenCities = new ArrayList<>();
+            txt_Cities.setDisable(true);
+            txt_Cities.setVisible(false);
         }
     }
 
@@ -615,6 +647,7 @@ public class ViewController implements Observer {
 
     public void runQuery() {
         //checks for this!!!!!!!
+        docsToShow = new LinkedList<>();
         String stopWords = txtfld_stopWords.getText();
         String dirPath = txtfld_dirPath.getText();
         boolean stem = check_stemm.isSelected();

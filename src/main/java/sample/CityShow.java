@@ -6,17 +6,22 @@ import javafx.scene.control.CheckBox;
 import java.util.ArrayList;
 
 import static sample.ViewController.addingCitiesFromChoose;
+import static sample.ViewController.removingCitiesFromChoose;
 
 public class CityShow {
     private final SimpleStringProperty cityName;
     private CheckBox cb_request;
 
-    public CityShow(String cityName){
+    public CityShow(String cityName) {
 
-        this.cityName=new SimpleStringProperty(cityName);
-        this.cb_request=new CheckBox();
+        this.cityName = new SimpleStringProperty(cityName);
+        this.cb_request = new CheckBox();
         cb_request.setOnAction(event -> {
-            addingCitiesFromChoose(cityName);
+            if (cb_request.isSelected())
+                addingCitiesFromChoose(cityName);
+            if (!cb_request.isSelected()) {
+                removingCitiesFromChoose(cityName);
+            }
         });
     }
 
@@ -43,7 +48,6 @@ public class CityShow {
     public void setCb_request(CheckBox cb_request) {
         this.cb_request = cb_request;
     }
-
 
 
 }

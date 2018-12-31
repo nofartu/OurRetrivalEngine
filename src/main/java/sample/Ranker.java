@@ -159,7 +159,7 @@ public class Ranker {
         TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(finalScore));
         //finalScore = new TreeMap<>(new ValueComparator(finalScore));
         sorted.putAll(finalScore);
-        TreeMap<String, Double> finalsorted = new TreeMap<>();
+        TreeMap<String, Double> finalsorted = new TreeMap<>(new ValueComparator(sorted));
         int i = 0;
         for (Map.Entry<String, Double> entry : sorted.entrySet()) {
             if (i >= 50)
@@ -177,6 +177,9 @@ public class Ranker {
         TreeMap<String, Double> map = new TreeMap<>();
 
         public ValueComparator(HashMap<String, Double> map) {
+            this.map.putAll(map);
+        }
+        public ValueComparator(TreeMap<String, Double> map) {
             this.map.putAll(map);
         }
 

@@ -2,8 +2,10 @@ package sample;
 
 import java.util.*;
 
+import static sample.ApiJson.getCities;
 import static sample.Indexer.docsCoprus;
 import static sample.ReadFile.mySplit;
+import static sample.ViewController.chosenCities;
 
 public class Ranker {
     private HashMap<String, Double[]> allDocs;
@@ -12,14 +14,16 @@ public class Ranker {
     private HashMap<String, Double> finalScore;
     private double avdl;
     private int numOfDocs;
+    private boolean isCity;
 
-    public Ranker(int numOfDocs) {
+    public Ranker(int numOfDocs, boolean isCity) {
         this.numOfDocs = numOfDocs;
         allDocs = new HashMap<>();
         allDocsDesc = new HashMap<>();
         allDocsSemantic = new HashMap<>();
         finalScore = new HashMap<>();
         avdl = getAvdl();
+        this.isCity = isCity;
     }
 
 
@@ -52,7 +56,7 @@ public class Ranker {
 
 
     public TreeMap<String, Double> rankAll(HashMap<String, ArrayList<String[]>> docsContainsQuery, HashMap<String, Integer> countWordsQuery, HashMap<String, ArrayList<String>> wordAndLocations,
-                                           HashMap<String, ArrayList<String[]>> docsContainsDesc, HashMap<String, Integer> countWordsDesc, HashMap<String, ArrayList<String>> wordAndLocationsDesc, boolean ifDesc,
+                                           HashMap<String, ArrayList<String[]>> docsContainsDesc, HashMap<String, Integer> countWordsDesc, HashMap<String, ArrayList<String>> wordAndLocationsDesc,
                                            HashMap<String, ArrayList<String[]>> docsContainsSemantic, HashMap<String, Integer> countWordsSemantic, HashMap<String, ArrayList<String>> wordAndLocationsSemantic, boolean ifSemantic) {
         rankBM25(docsContainsQuery, countWordsQuery, 0);
         rankTfIdfAndLocation(wordAndLocations, 0);
@@ -154,10 +158,15 @@ public class Ranker {
         return sum / total;
     }
 
+
     private TreeMap<String, Double> getTop50() {
+
         TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(finalScore));
-        //finalScore = new TreeMap<>(new ValueComparator(finalScore));
-        sorted.putAll(finalScore);
+        if (isCity) {
+            sorted.putAll(withCities());
+        } else {
+            sorted.putAll(finalScore);
+        }
         TreeMap<String, Double> finalsorted = new TreeMap<>(new ValueComparator(sorted));
         int i = 0;
         for (Map.Entry<String, Double> entry : sorted.entrySet()) {
@@ -171,6 +180,29 @@ public class Ranker {
         return finalsorted;
     }
 
+    private TreeMap<String, Double> withCities() {
+        TreeMap<String, Double> combinedFilesWithCity = new TreeMap<>();
+        HashMap<String, ArrayList<String>> files;
+        HashMap<String, Double> tmp = new HashMap<>();
+        tmp.putAll(finalScore);
+        // int size = chosenCities.size();
+        for (String city : chosenCities) {
+            //for (String city : cities.keySet()) {
+            files = getAllCityPostings(city);
+            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()) {
+                if (tmp.containsKey(entry.getKey())) {
+                    combinedFilesWithCity.put(entry.getKey(), tmp.get(entry.getKey()));
+                }
+            }
+        }
+        return combinedFilesWithCity;
+    }
+
+    private HashMap<String, ArrayList<String>> getAllCityPostings(String word) {
+        HashMap<String, City> c = getCities();
+        return c.get(word).getLocations();
+    }
+
     class ValueComparator implements Comparator<String> {
 
         TreeMap<String, Double> map = new TreeMap<>();
@@ -178,6 +210,7 @@ public class Ranker {
         public ValueComparator(HashMap<String, Double> map) {
             this.map.putAll(map);
         }
+
         public ValueComparator(TreeMap<String, Double> map) {
             this.map.putAll(map);
         }

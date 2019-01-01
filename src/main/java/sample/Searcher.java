@@ -198,33 +198,33 @@ public class Searcher {
 
 
     public void sendToRanker() {
-        Ranker ranker = new Ranker(numOfDocs);
-        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery, docsContainsDesc, countWordsDesc, wordAndLocationsDesc, false, docsContainsSemantic, countWordsSemantic, wordAndLocationsSemantic, semantic); //change
-        if (isCity)
-            withCities();
+        Ranker ranker = new Ranker(numOfDocs, isCity);
+        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery, docsContainsDesc, countWordsDesc, wordAndLocationsDesc, docsContainsSemantic, countWordsSemantic, wordAndLocationsSemantic, semantic); //change
+//        if (isCity)
+//            withCities();
     }
 
-    public HashMap<String, ArrayList<String>> getAllCityPostings(String word) {
-        HashMap<String, City> c = getCities();
-        return c.get(word).getLocations();
-    }
+//    public HashMap<String, ArrayList<String>> getAllCityPostings(String word) {
+//        HashMap<String, City> c = getCities();
+//        return c.get(word).getLocations();
+//    }
 
-    public void withCities() {
-        HashMap<String, ArrayList<String>> files;
-        HashMap<String, Double> tmp = new HashMap<>();
-        tmp.putAll(rankedFiles);
-        // int size = chosenCities.size();
-        for (String city : chosenCities) {
-            //for (String city : cities.keySet()) {
-            files = getAllCityPostings(city);
-            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()) {
-                if (tmp.containsKey(entry.getKey())) {
-                    combinedFilesWithCity.put(entry.getKey(), tmp.get(entry.getKey()));
-                }
-            }
-        }
-        rankedFiles = combinedFilesWithCity;
-    }
+//    public void withCities() {
+//        HashMap<String, ArrayList<String>> files;
+//        HashMap<String, Double> tmp = new HashMap<>();
+//        tmp.putAll(rankedFiles);
+//        // int size = chosenCities.size();
+//        for (String city : chosenCities) {
+//            //for (String city : cities.keySet()) {
+//            files = getAllCityPostings(city);
+//            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()) {
+//                if (tmp.containsKey(entry.getKey())) {
+//                    combinedFilesWithCity.put(entry.getKey(), tmp.get(entry.getKey()));
+//                }
+//            }
+//        }
+//        rankedFiles = combinedFilesWithCity;
+//    }
 
     public HashMap<String, ArrayList<String[]>> createDocsContainsQuery(HashMap<String, ArrayList<String>> wordAndLocations) {
         HashMap<String, ArrayList<String[]>> docsContainsTmp = new HashMap<>();

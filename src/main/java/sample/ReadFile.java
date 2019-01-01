@@ -81,21 +81,13 @@ public class ReadFile {
                                 }
                                 fromParse = parse.parsing(toPars, docName);
                                 Documents d = new Documents(docName, fromParse);
-                                /////////////NEW
                                 HashMap<String, Double> entity = handleEntities();
                                 d.setEntities(entity);
-                                //////////////// NEW
                                 if (!city.equals("")) {
                                     d.setOrigin(city);
                                 }
                                 dirDocuments.add(d);
                                 parse.resetParse();
-//                                //////////////////////////////
-//                                indexer.addDocument(dirDocuments);
-//                                dirDocuments = new ArrayList<>();  //should delete all the dir array
-//                                ///////////////////////////////
-
-
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -103,13 +95,9 @@ public class ReadFile {
                     }
                     count++;
                 }
-                //////////////////////////////
                 indexer.addDocument(dirDocuments);
                 dirDocuments = new ArrayList<>();  //should delete all the dir array
-                ///////////////////////////////
                 if (count % 33 == 0 || count == size) {
-                    // indexer.addDocument(dirDocuments);
-                    //  dirDocuments = new ArrayList<>();  //should delete all the dir array
                     indexer.writeToDisk();
                 }
             }
@@ -118,10 +106,6 @@ public class ReadFile {
         apiJson.writeCityToDisk(isStem, pathPost);
         indexer.writeDocsToDisk();
         writeLanguagesToDisk();
-//
-//        System.out.println("num of languages " + languages.size());
-//        Date date1 = new Date();
-//        System.out.println("Finish time: " + dateFormat.format(date1));
 
         return indexer.information();
 
@@ -154,7 +138,7 @@ public class ReadFile {
         }
     }
 
-    public HashSet<String> getLanguages() {
+    public static HashSet<String> getLanguages() {
         return languages;
     }
 

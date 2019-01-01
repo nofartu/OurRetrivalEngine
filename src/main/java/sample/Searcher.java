@@ -40,13 +40,13 @@ public class Searcher {
 
     private int numOfDocs;
 
-    public Searcher(HashSet<String> stopwords, String stopwordsPath, String postPath, boolean stem, ApiJson apiJson, boolean semantic, String description, boolean isCity) {
+    public Searcher(String stopwordsPath, String postPath, boolean stem, ApiJson apiJson, boolean semantic, String description, boolean isCity) {
         this.stem = stem;
         this.semantic = semantic;
-        HashSet<String> stopWords = stopwords;
-        if (stopwords == null) {
-            stopWords = createHashStopWords(stopwordsPath);
-        }
+        HashSet<String> stopWords = createHashStopWords(stopwordsPath);
+       // if (stopwords == null) {
+       //     stopWords = createHashStopWords(stopwordsPath);
+       // }
         parse = new Parse(stopWords, stem, apiJson);
         this.postPath = postPath;
         this.numOfDocs = docsCoprus.size();
@@ -83,8 +83,10 @@ public class Searcher {
     public void doQuery(String query) {
         parseTheQuery(query);
         docsContainsQuery = createDocsContainsQuery(wordAndLocationsQuery);
+        parse.resetParse();
         parseTheDesc(description); //NEW!!!!!
         docsContainsDesc = createDocsContainsQuery(wordAndLocationsDesc);
+        parse.resetParse();
         if (semantic)
             docsContainsSemantic = createDocsContainsQuery(wordAndLocationsSemantic);
         sendToRanker();

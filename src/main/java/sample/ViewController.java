@@ -29,6 +29,7 @@ import java.util.*;
 
 import static sample.ApiJson.cities;
 import static sample.Indexer.sort;
+import static sample.ReadFile.getLanguages;
 import static sample.ReadFile.loadLanguages;
 import static sample.ReadFile.mySplit;
 
@@ -359,7 +360,6 @@ public class ViewController implements Observer {
             button.setCellValueFactory(new PropertyValueFactory<DocShow, Button>("btn_Entities"));
 
 
-            //table.setItems(getData());
             tableQuery.setItems(getDataQueries());
             tableQuery.getColumns().addAll(query, Docs, button);
             tableQuery.setMinHeight(800);
@@ -449,39 +449,14 @@ public class ViewController implements Observer {
                 showAlert("Bad request", "There is no file to load", "Check it again");
             else {
                 uploading(path);
-//                boolean b = check_stemm.isSelected();
-//                Indexer indexer = new Indexer(b, path);
-//                indexer.addToDict();
-//                indexer.loadDocuments();
-//                api = new ApiJson();
-//                api.loadCities(b, path);
-//                btn_showDictionary.setDisable(false);
-//                cb_handQuery.setDisable(false);
-//                cb_fileQuery.setDisable(false);
-//                cb_semantic.setDisable(false);
-//                cb_choseCity.setDisable(false);
-//                showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         } else if (isStem) {
             if (!new File(path + "\\Stem\\dictionaryStem.txt").exists())
                 showAlert("Bad request", "There is no file to load", "Check it again");
             else {
                 uploading(path);
-//                boolean b = check_stemm.isSelected();
-//                Indexer indexer = new Indexer(b, path);
-//                indexer.addToDict();
-//                indexer.loadDocuments();
-//                api = new ApiJson();
-//                api.loadCities(b, path);
-//                btn_showDictionary.setDisable(false);
-//                cb_handQuery.setDisable(false);
-//                cb_fileQuery.setDisable(false);
-//                cb_semantic.setDisable(false);
-//                cb_choseCity.setDisable(false);
-//                showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         }
-
     }
 
     private void uploading(String path) {
@@ -491,12 +466,14 @@ public class ViewController implements Observer {
         indexer.loadDocuments();
         api = new ApiJson();
         api.loadCities(b, path);
-        loadLanguages(b,path);
+        loadLanguages(b, path);
         btn_showDictionary.setDisable(false);
         cb_handQuery.setDisable(false);
         cb_fileQuery.setDisable(false);
         cb_semantic.setDisable(false);
         cb_choseCity.setDisable(false);
+        comboBox.setDisable(false);
+        setData();
         showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
     }
 
@@ -622,10 +599,9 @@ public class ViewController implements Observer {
         alert.show();
     }
 
-    public void setData() {
+    private void setData() {
 
-        HashSet<String> languages = readFile.getLanguages();
-
+        HashSet<String> languages = getLanguages();
         comboBox.getItems().addAll(languages);
 
     }
@@ -637,7 +613,7 @@ public class ViewController implements Observer {
             btn_chooseCity.setDisable(true);
     }
 
-    public LinkedHashMap<String, String[]> getTheQuery(String path) {
+    private LinkedHashMap<String, String[]> getTheQuery(String path) {
         LinkedHashMap<String, String[]> queries = new LinkedHashMap<>();
         File file = new File(path);
         if (file.isFile()) {
@@ -662,9 +638,7 @@ public class ViewController implements Observer {
         return queries;
     }
 
-
     public void runQuery() {
-        //checks for this!!!!!!!
         docsToShow = new LinkedList<>();
         String stopWords = System.getProperty("user.dir");
         //String stopWords = txtfld_stopWords.getText();
@@ -673,11 +647,14 @@ public class ViewController implements Observer {
         boolean semantic = cb_semantic.isSelected();
         if (cb_handQuery.isSelected()) {
             if (!txtfld_QueryHand.getText().equals("")) {
-                Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic, "", cb_choseCity.isSelected());
+                Searcher searcher = new Searcher(stopWords, dirPath, stem, api, semantic, "", cb_choseCity.isSelected());
                 String query = txtfld_QueryHand.getText();
                 searcher.doQuery(query);
                 collectedDocs(searcher.getDocs(), "100");
-                showDocsQueries();
+                if (searcher.getDocs().size() == 0)
+                    showAlert("Attention!", "There is no documents for your query", "Please try another query.");
+                else
+                    showDocsQueries();
             }
         } else if (cb_fileQuery.isSelected()) {
             if (!txtfld_QueryBrowse.getText().equals("")) {
@@ -685,21 +662,16 @@ public class ViewController implements Observer {
                 for (Map.Entry<String, String[]> entry : queries.entrySet()) {
                     String query = entry.getKey();
                     System.out.println("the query is:" + query);
-                    Searcher searcher = new Searcher(null, stopWords, dirPath, stem, api, semantic, entry.getValue()[1], cb_choseCity.isSelected());
+                    Searcher searcher = new Searcher(stopWords, dirPath, stem, api, semantic, entry.getValue()[1], cb_choseCity.isSelected());
                     searcher.doQuery(query);
-                    collectedDocs(searcher.getDocs(), entry.getValue()[0]);
+                    if (searcher.getDocs().size() == 0)
+                        showAlert("Attention!", "There is no documents for your query", "Please try another query.");
+                    else
+                        collectedDocs(searcher.getDocs(), entry.getValue()[0]);
                 }
             }
             showDocsQueries();
         }
-
-
-//        searcher.parseTheQuery("human smuggling");
-//        searcher.createCountWordsQuery("human smuggling");
-//        searcher.createDocsContainsQuery();
-//        searcher.sendToRanker();
-//        showDocsQuery(searcher.getDocs());
-
     }
 
     private void collectedDocs(TreeMap<String, Double> docs, String numQuery) {

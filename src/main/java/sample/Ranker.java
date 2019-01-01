@@ -97,10 +97,8 @@ public class Ranker {
                 }
             }
         }
-
-
-        TreeMap<String, Double> sorted = getTop50();
-
+        TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(finalScore));
+        sorted.putAll(getTop50());
         return sorted;
     }
 
@@ -219,6 +217,8 @@ public class Ranker {
         public int compare(String s1, String s2) {
             if (map.get(s1) >= map.get(s2)) {
                 return -1;
+            } else if (map.get(s1).equals(map.get(s2))) {
+                return 0;
             } else {
                 return 1;
             }

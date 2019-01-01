@@ -6,13 +6,12 @@ import static sample.Indexer.docsCoprus;
 import static sample.ReadFile.mySplit;
 
 public class Ranker {
-    HashMap<String, Double[]> allDocs;
-    HashMap<String, Double[]> allDocsDesc;
-    HashMap<String, Double[]> allDocsSemantic;
-    HashMap<String, Double> finalScore;
-    double avdl;
-
-    int numOfDocs;
+    private HashMap<String, Double[]> allDocs;
+    private HashMap<String, Double[]> allDocsDesc;
+    private HashMap<String, Double[]> allDocsSemantic;
+    private HashMap<String, Double> finalScore;
+    private double avdl;
+    private int numOfDocs;
 
     public Ranker(int numOfDocs) {
         this.numOfDocs = numOfDocs;
@@ -24,7 +23,7 @@ public class Ranker {
     }
 
 
-    public void rankBM25(HashMap<String, ArrayList<String[]>> docsContains, HashMap<String, Integer> countWords, int whichOne) {
+    private void rankBM25(HashMap<String, ArrayList<String[]>> docsContains, HashMap<String, Integer> countWords, int whichOne) {
         double sum = 0;
         double k = 1.2, b = 0.75;
         //double avdl = getAvdl();
@@ -101,7 +100,7 @@ public class Ranker {
         return sorted;
     }
 
-    public void rankTfIdfAndLocation(HashMap<String, ArrayList<String>> wordAndLocations, int whichOne) {
+    private void rankTfIdfAndLocation(HashMap<String, ArrayList<String>> wordAndLocations, int whichOne) {
         for (Map.Entry<String, ArrayList<String>> entry : wordAndLocations.entrySet()) {
             String name = entry.getKey();
             int size = entry.getValue().size();
@@ -155,7 +154,7 @@ public class Ranker {
         return sum / total;
     }
 
-    public TreeMap<String, Double> getTop50() {
+    private TreeMap<String, Double> getTop50() {
         TreeMap<String, Double> sorted = new TreeMap<>(new ValueComparator(finalScore));
         //finalScore = new TreeMap<>(new ValueComparator(finalScore));
         sorted.putAll(finalScore);

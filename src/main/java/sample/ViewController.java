@@ -486,7 +486,7 @@ public class ViewController implements Observer {
     }
 
     public static void removingCitiesFromChoose(String cityname) {
-        if(chosenCities.contains(cityname))
+        if (chosenCities.contains(cityname))
             chosenCities.remove(cityname);
     }
 
@@ -648,7 +648,8 @@ public class ViewController implements Observer {
     public void runQuery() {
         //checks for this!!!!!!!
         docsToShow = new LinkedList<>();
-        String stopWords = txtfld_stopWords.getText();
+        String stopWords = System.getProperty("user.dir");
+        //String stopWords = txtfld_stopWords.getText();
         String dirPath = txtfld_dirPath.getText();
         boolean stem = check_stemm.isSelected();
         boolean semantic = cb_semantic.isSelected();

@@ -29,6 +29,7 @@ import java.util.*;
 
 import static sample.ApiJson.cities;
 import static sample.Indexer.sort;
+import static sample.ReadFile.loadLanguages;
 import static sample.ReadFile.mySplit;
 
 
@@ -447,38 +448,56 @@ public class ViewController implements Observer {
             if (!new File(path + "\\WithoutStem\\dictionaryNoStem.txt").exists())
                 showAlert("Bad request", "There is no file to load", "Check it again");
             else {
-                boolean b = check_stemm.isSelected();
-                Indexer indexer = new Indexer(b, path);
-                indexer.addToDict();
-                indexer.loadDocuments();
-                api = new ApiJson();
-                api.loadCities(b, path);
-                btn_showDictionary.setDisable(false);
-                cb_handQuery.setDisable(false);
-                cb_fileQuery.setDisable(false);
-                cb_semantic.setDisable(false);
-                cb_choseCity.setDisable(false);
-                showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
+                uploading(path);
+//                boolean b = check_stemm.isSelected();
+//                Indexer indexer = new Indexer(b, path);
+//                indexer.addToDict();
+//                indexer.loadDocuments();
+//                api = new ApiJson();
+//                api.loadCities(b, path);
+//                btn_showDictionary.setDisable(false);
+//                cb_handQuery.setDisable(false);
+//                cb_fileQuery.setDisable(false);
+//                cb_semantic.setDisable(false);
+//                cb_choseCity.setDisable(false);
+//                showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         } else if (isStem) {
             if (!new File(path + "\\Stem\\dictionaryStem.txt").exists())
                 showAlert("Bad request", "There is no file to load", "Check it again");
             else {
-                boolean b = check_stemm.isSelected();
-                Indexer indexer = new Indexer(b, path);
-                indexer.addToDict();
-                indexer.loadDocuments();
-                api = new ApiJson();
-                api.loadCities(b, path);
-                btn_showDictionary.setDisable(false);
-                cb_handQuery.setDisable(false);
-                cb_fileQuery.setDisable(false);
-                cb_semantic.setDisable(false);
-                cb_choseCity.setDisable(false);
-                showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
+                uploading(path);
+//                boolean b = check_stemm.isSelected();
+//                Indexer indexer = new Indexer(b, path);
+//                indexer.addToDict();
+//                indexer.loadDocuments();
+//                api = new ApiJson();
+//                api.loadCities(b, path);
+//                btn_showDictionary.setDisable(false);
+//                cb_handQuery.setDisable(false);
+//                cb_fileQuery.setDisable(false);
+//                cb_semantic.setDisable(false);
+//                cb_choseCity.setDisable(false);
+//                showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
             }
         }
 
+    }
+
+    private void uploading(String path) {
+        boolean b = check_stemm.isSelected();
+        Indexer indexer = new Indexer(b, path);
+        indexer.addToDict();
+        indexer.loadDocuments();
+        api = new ApiJson();
+        api.loadCities(b, path);
+        loadLanguages(b,path);
+        btn_showDictionary.setDisable(false);
+        cb_handQuery.setDisable(false);
+        cb_fileQuery.setDisable(false);
+        cb_semantic.setDisable(false);
+        cb_choseCity.setDisable(false);
+        showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
     }
 
     public static void addingCitiesFromChoose(String cityname) {
@@ -607,8 +626,7 @@ public class ViewController implements Observer {
 
         HashSet<String> languages = readFile.getLanguages();
 
-        comboBox.getItems().addAll(languages
-        );
+        comboBox.getItems().addAll(languages);
 
     }
 

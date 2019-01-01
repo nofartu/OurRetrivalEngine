@@ -24,7 +24,7 @@ public class ReadFile {
     private ApiJson apiJson;
     private String corpusPath;
     private boolean isStem;
-    private HashSet<String> languages;
+    private static HashSet<String> languages;
     private String pathPost;
     private Parse parse;
 
@@ -117,6 +117,7 @@ public class ReadFile {
         indexer.mergePost();
         apiJson.writeCityToDisk(isStem, pathPost);
         indexer.writeDocsToDisk();
+        writeLanguagesToDisk();
 //
 //        System.out.println("num of languages " + languages.size());
 //        Date date1 = new Date();
@@ -155,6 +156,52 @@ public class ReadFile {
 
     public HashSet<String> getLanguages() {
         return languages;
+    }
+
+    private void writeLanguagesToDisk() {
+        try {
+            String namedir = "";
+            if (isStem) {
+                namedir = "Stem";
+            } else {
+                namedir = "WithoutStem";
+            }
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathPost + "\\" + namedir + "\\Languages.txt", false), StandardCharsets.UTF_8));
+            int count = 0;
+            StringBuilder writeIt = new StringBuilder("");
+            for (String lan : languages) {
+                writeIt.append(lan + "\n");
+                if (count % 50 == 0) {
+                    bw.write(writeIt.toString());
+                    bw.flush();
+                    writeIt = new StringBuilder("");
+                }
+                count++;
+            }
+            bw.write(writeIt.toString());
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadLanguages(boolean isStem, String pathPost) {
+        languages = new HashSet<>();
+        try {
+            BufferedReader br = null;
+            if (isStem)
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(pathPost + "\\Stem\\Languages.txt"), StandardCharsets.UTF_8));
+            else
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(pathPost + "\\WithoutStem\\Languages.txt"), StandardCharsets.UTF_8));
+            String line;
+            while ((line = br.readLine()) != null) {
+                languages.add(line);
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String findAndAddCity(String docName, String text, ApiJson apiJson) throws Exception {
@@ -236,7 +283,7 @@ public class ReadFile {
                     entities.put(entry.getKey(), calcDominance(size, entry.getValue()[1], entry.getValue()[0]));
                 } else {
                     for (Map.Entry<String, Double> entryEnt : entities.entrySet()) {
-                        double dom=calcDominance(size, entry.getValue()[1], entry.getValue()[0]);
+                        double dom = calcDominance(size, entry.getValue()[1], entry.getValue()[0]);
                         if (entryEnt.getValue() < dom) {
                             entities.remove(entryEnt.getKey());
                             entities.put(entry.getKey(), dom);

@@ -20,6 +20,9 @@ import java.util.TreeMap;
 import static sample.Indexer.docsCoprus;
 import static sample.ViewController.addingCitiesFromChoose;
 
+/**
+ * Class that support the show of the results of docs and queries.
+ */
 public class DocShow {
     private final SimpleStringProperty queryNum;
     private final SimpleStringProperty docName;
@@ -39,6 +42,9 @@ public class DocShow {
         });
     }
 
+    /**
+     * show the entities of each doc
+     */
     private void showEntities() {
         try {
             tableQuery = new TableView();

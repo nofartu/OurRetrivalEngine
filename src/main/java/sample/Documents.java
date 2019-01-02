@@ -15,7 +15,7 @@ public class Documents {
     private int numOfUniqe;
     private String origin;
     private int size;
-    private HashMap<String, Double> entities;
+    private HashMap<String, Double> entities; // <- Entities of each document
 
     public Documents(String id, HashMap<String, Integer[]> termsMap) {
         idDoc = id;

@@ -147,7 +147,6 @@ public class Indexer {
             addToCorpus(doc, max, min, size); //adding to the corpus of docs
 
         }
-        //   writeToDisk();
     }
 
 
@@ -174,12 +173,10 @@ public class Indexer {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathPost + "\\PostingDirectory\\postFile" + postingNumber + ".txt", false), StandardCharsets.UTF_8));
             postingNumber++;
             int count = 0;
-            //for (Map.Entry<String, List<String>> entry : posting.entrySet()) { //go through the docs terms
-            while (posting.size() > 0) {
+            while (posting.size() > 0) {//go through the docs terms
                 String key = posting.firstKey();
                 List<String> value = posting.remove(key);
                 count++;
-                //String key = entry.getKey();
                 String keyUpper = key.toUpperCase();
                 String keyLower = key.toLowerCase();
                 if (!dictionary.containsKey(key)) {
@@ -201,7 +198,6 @@ public class Indexer {
                 }
 
             }
-            //}
             bw.write(toWrite.toString());
             bw.flush();
             bw.close();
@@ -251,7 +247,6 @@ public class Indexer {
             bw.flush();
             bw.close();
             numOfDoc = docsCoprus.size();
-//            docsCoprus = new HashMap<>();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -318,30 +313,10 @@ public class Indexer {
 
                         if (dictionary.containsKey(termToAdd.getName())) {
                             int occurrence = dictionary.get(termToAdd.getName())[1];
-                            //int occurrence = termToAdd.getNumOfOccure();
                             Integer[] arr = {lineNumber, occurrence};
-                            //dictionary.remove(termToAdd.getName());
                             dictionary.put(termToAdd.getName(), arr); //updating the line number in the total post file and num of occurrence
                             lineNumber++;
                         }
-//                        if (termToAdd.getName().equals(termToAdd.getName().toUpperCase()) && !isNum(termToAdd.getName()) && !Character.isDigit(termToAdd.getName().charAt(0))) {
-//                            ArrayList<Pair<String, Integer>> docs = termToAdd.docsApear();
-//                            for (Pair<String, Integer> doc : docs) {
-//                                Documents doctmps = docsCoprus.get(doc.getKey());
-//                                if (doctmps.getSizeOfEntity() < 5) {
-//                                    doctmps.addEnity(termToAdd.getName(), doc.getValue());
-//                                    docsCoprus.put(doc.getKey(), doctmps);
-//                                } else {
-//                                    for (Map.Entry<String, Integer> entry : doctmps.getEntities().entrySet()) {
-//                                        if (entry.getValue() < doc.getValue()) {
-//                                            doctmps.removeFromEntity(entry.getKey());
-//                                            doctmps.addEnity(termToAdd.getName(), doc.getValue());
-//                                            break;
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
                         hashTermToPost.remove(termToAdd);
                     }
                     //if there is more than one term of the same kind in the queue
@@ -360,7 +335,6 @@ public class Indexer {
                         String line = brs[index].readLine();
                         if (line != null) {
                             TermPost term = new TermPost(line);
-//                        terms.add(term);
                             addToQueue(term);
                             addingHash(term, index);
                         }
@@ -398,7 +372,6 @@ public class Indexer {
         if (directory.exists())
             directory.delete();
 
-        //System.out.println("The dictionary size is: " + dictionary.size());
         writeDictionaryToDisk();
 
     }
@@ -457,7 +430,6 @@ public class Indexer {
             TermPost tmpLow = new TermPost(term.getName().toLowerCase(), "");
             TermPost tmpUp = new TermPost(term.getName().toUpperCase(), "");
             String termTmp = term.getName().toLowerCase();
-            //int num=term.getNumOfOccure();
             //exist in lower case
             if (hashTermToPost.containsKey(tmpLow)) {
                 term.setName(termTmp);
@@ -467,7 +439,6 @@ public class Indexer {
                 List<Integer> tmps = hashTermToPost.get(tmpUp); //getting the value
                 hashTermToPost.remove(tmpUp);
                 tmpUp.setName(termTmp);
-                //tmpUp.setNumOfOccure(num);
                 hashTermToPost.put(tmpUp, tmps); //put in lower
             } else {
                 hashTermToPost.put(term, new LinkedList<>());
@@ -540,7 +511,7 @@ public class Indexer {
                 String entity = arrayList1.get(j);
                 HashMap<String, Double> entities = new HashMap<>();
                 int p = 0;
-                for (int m = j+1; m + 1 < arrayList1.size(); m++) {
+                for (int m = j + 1; m + 1 < arrayList1.size(); m++) {
                     double num = 0;
                     try {
                         num = Double.parseDouble(arrayList1.get(m + 1));
@@ -559,7 +530,7 @@ public class Indexer {
                 doc.setOrigin(origin);
                 doc.setSize(sizeNum);
                 for (Map.Entry<String, Double> entry : entities.entrySet()) {
-                    doc.addEnity(entry.getKey(),entry.getValue());
+                    doc.addEnity(entry.getKey(), entry.getValue());
                 }
                 docsCoprus.put(doc.getIdDoc(), doc);
             }
@@ -593,15 +564,15 @@ public class Indexer {
         return "Number of docs: " + numOfDoc + "\n" + "Number of unique: " + numOfUnique + "\n";
     }
 
-    private static boolean isNum(String s) {
-        if (s.contains(",")) {
-            s = s.replace(",", "");
-        }
-        try {
-            double d = Double.parseDouble(s);
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-        return true;
-    }
+//    private static boolean isNum(String s) {
+//        if (s.contains(",")) {
+//            s = s.replace(",", "");
+//        }
+//        try {
+//            double d = Double.parseDouble(s);
+//        } catch (NumberFormatException ex) {
+//            return false;
+//        }
+//        return true;
+//    }
 }

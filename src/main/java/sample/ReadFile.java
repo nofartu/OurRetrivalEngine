@@ -65,10 +65,8 @@ public class ReadFile {
                 for (File file3 : file2.listFiles()) {
                     if (file3.isFile()) {
                         try {
-                            //Document doc = Jsoup.parse(new String(Files.readAllBytes(file3.toPath())), "", Parser.xmlParser());
                             Document doc = Jsoup.parse(file3, "UTF-8");
                             Elements docs = doc.select("DOC");
-                            //Elements docs = doc.getElementsByTag("DOC");
                             for (Element e : docs) {
                                 String toPars = e.getElementsByTag("TEXT").text();
                                 String docName = e.getElementsByTag("DOCNO").text();
@@ -111,6 +109,10 @@ public class ReadFile {
 
     }
 
+    /**
+     * adds Language that appear between the <FP 105></FP>
+     * @param text
+     */
     private void addLanguage(String text) {
         String ans = "";
         int i = 0;
@@ -138,10 +140,17 @@ public class ReadFile {
         }
     }
 
+    /**
+     * gets the languges
+     * @return languages
+     */
     public static HashSet<String> getLanguages() {
         return languages;
     }
 
+    /**
+     * write to disk the languages
+     */
     private void writeLanguagesToDisk() {
         try {
             String namedir = "";
@@ -189,7 +198,6 @@ public class ReadFile {
     }
 
     private String findAndAddCity(String docName, String text, ApiJson apiJson) throws Exception {
-
         String ans = "";
         int i = 0;
         int location = text.indexOf("<f p=\"104\"");
@@ -258,6 +266,10 @@ public class ReadFile {
         }
     }
 
+    /**
+     * Handles the entities per document.
+     * @return
+     */
     private HashMap<String, Double> handleEntities() {
         HashMap<String, Double> entities = new HashMap<>();
         int size = fromParse.get("***+++***+++***")[0];
@@ -280,6 +292,14 @@ public class ReadFile {
         return entities;
     }
 
+    /**
+     * The calculation of the dominance:
+     * 0.6 * number of appearance + 0.4 * (location in text/size of text)
+     * @param size
+     * @param location
+     * @param appear
+     * @return
+     */
     private double calcDominance(int size, int location, int appear) {
         double relativeLocation = (double) (location / size);
         double rate = 0.6 * appear + 0.4 * relativeLocation;

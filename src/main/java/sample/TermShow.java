@@ -4,7 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 
 /**
- * Serves the viewController
+ * Serves the TableView
  */
 public class TermShow {
     private final SimpleStringProperty termName;

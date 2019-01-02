@@ -53,7 +53,7 @@ public class View extends Application {
                 alert.setContentText("Are you sure you want to quit?");
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.OK) {
-                    if (viewControllr.t!=null && viewControllr.t.isAlive()) {
+                    if (viewControllr.t != null && viewControllr.t.isAlive()) {
                         viewControllr.t.interrupt();
                     }
                     //model.stopServers();
@@ -68,19 +68,9 @@ public class View extends Application {
     }
 
     public static void main(String[] args) throws Exception {
-
         System.out.println("start");
-
         launch(args);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-        //       System.out.println(searcher.getAllPostings(45000));
-
-        Date date2 = new Date();
-        System.out.println("End time:" + dateFormat.format(date2));
-
         System.out.println("end");
-        //exit(0);
     }
 
 

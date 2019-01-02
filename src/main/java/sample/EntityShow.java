@@ -2,6 +2,9 @@ package sample;
 
 import javafx.beans.property.SimpleStringProperty;
 
+/**
+ * Class that support the show of Entities in tableView
+ */
 public class EntityShow {
     private final SimpleStringProperty entityName;
     private final SimpleStringProperty entityRate;

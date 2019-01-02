@@ -77,12 +77,6 @@ public class ViewController implements Observer {
 
     public void setStage(Stage stage) {
         this.primaryStage = stage;
-        //controller = new Controller(model);
-        txtfld_corpus.setText("d:\\documents\\users\\nofartu\\Downloads\\corpus\\corpus");
-        txtfld_stopWords.setText("d:\\documents\\users\\nofartu\\Downloads\\OurRetrivalEngine1\\OurRetrivalEngine1");
-        txtfld_dirPath.setText("d:\\documents\\users\\nofartu\\Downloads\\newNEWPost\\newNEWPost");
-        txtfld_QueryBrowse.setText("d:\\documents\\users\\nofartu\\Downloads\\OurRetrivalEngine1\\OurRetrivalEngine1\\queries.txt");
-
         comboBox.setDisable(true);
         txt_Info.setDisable(true);
         txt_Info.setVisible(false);
@@ -100,6 +94,10 @@ public class ViewController implements Observer {
         cb_choseCity.setDisable(true);
     }
 
+
+    /**
+     * Create the indexer
+     */
     public void startOperation() {
         String corpus = txtfld_corpus.getText();
         String stopWords = txtfld_stopWords.getText();
@@ -110,10 +108,8 @@ public class ViewController implements Observer {
         if (txtfld_corpus.getText().isEmpty() || txtfld_stopWords.getText().isEmpty() || txtfld_dirPath.getText().isEmpty()) {
             showAlert("Warning", "path can not be null", "please select a path using the browse button and press Start creating Dictionary again");
         } else {
-            //controller.startOperation(txtfld_corpus.getText(),txtfld_stopWords.getText(),txtfld_dirPath.getText(),stemm);
             long start = System.currentTimeMillis();
             try {
-
                 readFile = new ReadFile(corpus, stopWords, dirPath, stemm);
                 t = new Thread(() -> {
                     info = readFile.reading();
@@ -127,7 +123,7 @@ public class ViewController implements Observer {
                     System.out.println("Problem thread");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("problem with read file");
             }
             long end = System.currentTimeMillis();
             comboBox.setDisable(false);
@@ -136,7 +132,6 @@ public class ViewController implements Observer {
             String finalInfo = info + "Finish time: " + time + "s \n";
             showAlert("Finished!", "The process ended successfully", "Information appears on the right side below");
             showResults(finalInfo);
-            //do the func
         }
         btn_showDictionary.setDisable(false);
         cb_handQuery.setDisable(false);
@@ -161,6 +156,9 @@ public class ViewController implements Observer {
         txt_Info.setText("Information:\n" + finalInfo);
     }
 
+    /**
+     * Resets the file that we save
+     */
     public void reset() {
         String path = txtfld_dirPath.getText();
         try {
@@ -170,7 +168,7 @@ public class ViewController implements Observer {
             } else {
                 paths += "\\WithoutStem";
             }
-            File currentFile = new File(paths + "\\cities.txt");
+            File currentFile = new File(paths + "\\Cities.txt");
             currentFile.delete();
             File currentFile1 = new File(paths + "\\dictionaryStem.txt");
             currentFile1.delete();
@@ -182,6 +180,8 @@ public class ViewController implements Observer {
             currentFile4.delete();
             File currentFile5 = new File(paths + "\\Documents.txt");
             currentFile5.delete();
+            File currentFile6 = new File(paths + "\\Languages.txt");
+            currentFile6.delete();
             System.gc();
             if (!cb_fileQuery.isDisabled() || !cb_handQuery.isDisabled()) {
                 cb_handQuery.setDisable(true);
@@ -198,7 +198,6 @@ public class ViewController implements Observer {
                 btn_browseQuery.setDisable(true);
                 btn_chooseCity.setDisable(true);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -212,6 +211,9 @@ public class ViewController implements Observer {
     }
 
 
+    /**
+     * shows the dictionary
+     */
     public void showDictionary() {
         try {
             table = new TableView();
@@ -232,7 +234,6 @@ public class ViewController implements Observer {
             value.setMinWidth(200);
             value.setCellValueFactory(new PropertyValueFactory<TermShow, String>("value"));
 
-            //table.setItems(getData());
             table.setItems(getData());
             table.getColumns().addAll(termName, value);
             table.setMinHeight(800);
@@ -247,10 +248,9 @@ public class ViewController implements Observer {
             stage.show();
 
         } catch (Exception e) {
-            //System.out.println("not opening");
+            //System.out.println();
         }
     }
-
 
     private ObservableList<TermShow> getData() {
         ObservableList<TermShow> data = FXCollections.observableArrayList();
@@ -263,7 +263,7 @@ public class ViewController implements Observer {
         return data;
     }
 
-
+    //show the cities for the user to choose city if he want
     public void showCities() {
         try {
 
@@ -309,6 +309,7 @@ public class ViewController implements Observer {
         }
     }
 
+    //writes the chosen city
     private String setTxt() {
         String s = "Chosen cities: \n";
         for (String city : chosenCities)
@@ -316,7 +317,6 @@ public class ViewController implements Observer {
         s += "\n";
         return s;
     }
-
 
     private ObservableList<CityShow> getDataCities() {
         ObservableList<CityShow> data = FXCollections.observableArrayList();
@@ -328,6 +328,7 @@ public class ViewController implements Observer {
         return data;
     }
 
+    //shows the results of the query
     private void showDocsQueries() {
         try {
             tableQuery = new TableView();
@@ -396,6 +397,12 @@ public class ViewController implements Observer {
         return data;
     }
 
+    /**
+     * Inform the user that his cities are saved.
+     * updates the text filed of the chosen city.
+     *
+     * @param primaryStage
+     */
     private void SetStageCloseEvent(Stage primaryStage) {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent windowEvent) {
@@ -419,6 +426,12 @@ public class ViewController implements Observer {
         });
     }
 
+    /**
+     * wait for the users confirmation of exiting the show of the results.
+     * Reset the chosen city after the this iteration.
+     *
+     * @param primaryStage
+     */
     private void SetStageCloseEventAfterQuery(Stage primaryStage) {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent windowEvent) {
@@ -441,6 +454,9 @@ public class ViewController implements Observer {
         });
     }
 
+    /**
+     * Loads the dictionary (all the indexes that we created and need for this query) to the memory
+     */
     public void loadDictToMemory() {
         String path = txtfld_dirPath.getText();
         boolean isStem = check_stemm.isSelected();
@@ -459,6 +475,11 @@ public class ViewController implements Observer {
         }
     }
 
+    /**
+     * help function for the load dictionaries
+     *
+     * @param path
+     */
     private void uploading(String path) {
         boolean b = check_stemm.isSelected();
         Indexer indexer = new Indexer(b, path);
@@ -477,10 +498,20 @@ public class ViewController implements Observer {
         showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
     }
 
+    /**
+     * add the chosen city to the chosen cities (array list)
+     *
+     * @param cityname
+     */
     public static void addingCitiesFromChoose(String cityname) {
         chosenCities.add(cityname);
     }
 
+    /**
+     * for case that the user chose a city and regret it. remove the city from the list
+     *
+     * @param cityname
+     */
     public static void removingCitiesFromChoose(String cityname) {
         if (chosenCities.contains(cityname))
             chosenCities.remove(cityname);
@@ -491,7 +522,10 @@ public class ViewController implements Observer {
 
     }
 
-
+    /**
+     * Handle the situation when user loaded a dictionary (let's say without stem) and then check the stem check box (let's say now it is selected).
+     * He will not be able to run the query without loading the dictionary again.
+     */
     public void cb_StemOnOrOff() {
         if (!cb_handQuery.isDisabled() || !cb_fileQuery.isDisabled()) {
             showAlert("Attention", "You changed the Stem/No stem", "You must upload the dictionary again to run the query.");
@@ -515,6 +549,10 @@ public class ViewController implements Observer {
         }
     }
 
+    /**
+     * The following two function are to not let the user to run both hand query and browse query. he can choose one of them
+     * and if he regerts he can uncheck the selected check box and select the other one.
+     */
     public void cb_HandOnOrOff() {
         if (!cb_fileQuery.isSelected()) {
             if (cb_handQuery.isSelected()) {
@@ -551,6 +589,9 @@ public class ViewController implements Observer {
         }
     }
 
+    /**
+     * The following 4 function are the browse function for the corpus, stop words, saving directory and query browsing.
+     */
     public void BrowseCorpus(ActionEvent actionEvent) {
         btn_browseCorpus.setDisable(true);
         DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -599,13 +640,13 @@ public class ViewController implements Observer {
         alert.show();
     }
 
+    //sets the Languages
     private void setData() {
-
         HashSet<String> languages = getLanguages();
         comboBox.getItems().addAll(languages);
-
     }
 
+    //checks if city is chosen. if soo it will un disable the button to chose the city
     public void checkCities() {
         if (cb_choseCity.isSelected())
             btn_chooseCity.setDisable(false);
@@ -613,6 +654,11 @@ public class ViewController implements Observer {
             btn_chooseCity.setDisable(true);
     }
 
+    /**
+     * parse the file of query
+     * @param path
+     * @return
+     */
     private LinkedHashMap<String, String[]> getTheQuery(String path) {
         LinkedHashMap<String, String[]> queries = new LinkedHashMap<>();
         File file = new File(path);
@@ -638,6 +684,10 @@ public class ViewController implements Observer {
         return queries;
     }
 
+    /**
+     * operates the moment when the use clicks the "RUN" button.
+     *
+     */
     public void runQuery() {
         docsToShow = new LinkedList<>();
         String stopWords = System.getProperty("user.dir");
@@ -645,7 +695,7 @@ public class ViewController implements Observer {
         String dirPath = txtfld_dirPath.getText();
         boolean stem = check_stemm.isSelected();
         boolean semantic = cb_semantic.isSelected();
-        if (cb_handQuery.isSelected()) {
+        if (cb_handQuery.isSelected()) { //for hand query (One query)
             if (!txtfld_QueryHand.getText().equals("")) {
                 Searcher searcher = new Searcher(stopWords, dirPath, stem, api, semantic, "", cb_choseCity.isSelected());
                 String query = txtfld_QueryHand.getText();
@@ -654,12 +704,12 @@ public class ViewController implements Observer {
                 if (searcher.getDocs().size() == 0)
                     showAlert("Attention!", "There is no documents for your query", "Please try another query.");
                 else
-                    showDocsQueries();
+                    showDocsQueries(); //show the results
             }
-        } else if (cb_fileQuery.isSelected()) {
+        } else if (cb_fileQuery.isSelected()) { //for list of queries
             if (!txtfld_QueryBrowse.getText().equals("")) {
                 LinkedHashMap<String, String[]> queries = getTheQuery(txtfld_QueryBrowse.getText());
-                for (Map.Entry<String, String[]> entry : queries.entrySet()) {
+                for (Map.Entry<String, String[]> entry : queries.entrySet()) { //go through the queries and operates all the steps per query.
                     String query = entry.getKey();
                     System.out.println("the query is:" + query);
                     Searcher searcher = new Searcher(stopWords, dirPath, stem, api, semantic, entry.getValue()[1], cb_choseCity.isSelected());
@@ -667,17 +717,25 @@ public class ViewController implements Observer {
                     if (searcher.getDocs().size() == 0)
                         showAlert("Attention!", "There is no documents for your query", "Please try another query.");
                     else
-                        collectedDocs(searcher.getDocs(), entry.getValue()[0]);
+                        collectedDocs(searcher.getDocs(), entry.getValue()[0]); //collect all the answers of the queries and prepare it to showing results!
                 }
             }
-            showDocsQueries();
+            showDocsQueries(); //show the results
         }
     }
 
+    /**
+     * collects all the doc for showing!
+     * @param docs
+     * @param numQuery
+     */
     private void collectedDocs(TreeMap<String, Double> docs, String numQuery) {
         docsToShow.add(new Pair<>(numQuery, docs));
     }
 
+    /**
+     * writes the queries to disk in the treceval format.
+     */
     private void writeQueryToDisk() {
         try {
             DirectoryChooser directoryChooser = new DirectoryChooser();

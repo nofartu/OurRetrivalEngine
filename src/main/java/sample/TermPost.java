@@ -8,6 +8,10 @@ import java.util.ArrayList;
 
 import static sample.ReadFile.mySplit;
 
+/**
+ * handles the term and it posting.
+ *
+ */
 public class TermPost implements Comparable<TermPost> {
 
     private String termName;
@@ -43,23 +47,26 @@ public class TermPost implements Comparable<TermPost> {
         this.termName = name;
     }
 
+    //Add post to the post the the term already have and updates the df.
     public void addPost(TermPost termPost) {
         post = post + termPost.post;
-        //setNumOfOccure(termPost.getNumOfOccure());
         updateDf();
     }
 
+    //convert the term and the post to line that can be written to disk
     public String convertToLine() {
         return this.termName + "*;~ " + this.post + " df:" + numOfDocuments;
     }
 
+    //updates the df by the posting
     public void updateDf() {
         int charStar = post.indexOf("*;~");
         String itsPost = post.substring(charStar + 4);
         ArrayList<String> posts = mySplit(itsPost, " ");
         numOfDocuments = posts.size();
     }
-    public String getPost(){
+
+    public String getPost() {
         return this.post;
     }
 
@@ -83,40 +90,15 @@ public class TermPost implements Comparable<TermPost> {
         return this.termName.toLowerCase().compareTo(second.termName.toLowerCase());
     }
 
-    public ArrayList<Pair<String, Integer>> docsApear(){
-        ArrayList<Pair<String, Integer>> docs=new ArrayList<>();
+    public ArrayList<Pair<String, Integer>> docsApear() {
+        ArrayList<Pair<String, Integer>> docs = new ArrayList<>();
         ArrayList<String> posts = mySplit(post, " ");
-        for(String s: posts){
-            ArrayList<String> doc=mySplit(s, ":");
-            int numOfOcur=Integer.parseInt(doc.get(1));
-            docs.add(new Pair<>(doc.get(0),numOfOcur));
+        for (String s : posts) {
+            ArrayList<String> doc = mySplit(s, ":");
+            int numOfOcur = Integer.parseInt(doc.get(1));
+            docs.add(new Pair<>(doc.get(0), numOfOcur));
         }
         return docs;
     }
 
-//    public void setNumOfOccure(int num) {
-//        this.numOfOccure = numOfOccure + num;
-//    }
-//
-//    public int getNumOfOccure() {
-//        return numOfOccure;
-//    }
-
-//    private static String[] mySplit(String str, String regex) {
-//        Vector<String> result = new Vector<String>();
-//        int start = 0;
-//        int pos = str.indexOf(regex);
-//        while (pos >= start) {
-//            if (pos > start) {
-//                result.add(str.substring(start, pos));
-//            }
-//            start = pos + regex.length();
-//            //result.add(regex);
-//            pos = str.indexOf(regex, start);
-//        }
-//        if (start < str.length()) {
-//            result.add(str.substring(start));
-//        }
-//        return result.toArray(new String[0]);
-//    }
 }

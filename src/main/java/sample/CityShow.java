@@ -8,25 +8,23 @@ import java.util.ArrayList;
 import static sample.ViewController.addingCitiesFromChoose;
 import static sample.ViewController.removingCitiesFromChoose;
 
+/**
+ * Class that support helps the tableView of cities (the choosing by city)
+ */
 public class CityShow {
     private final SimpleStringProperty cityName;
     private CheckBox cb_request;
 
     public CityShow(String cityName) {
-
         this.cityName = new SimpleStringProperty(cityName);
         this.cb_request = new CheckBox();
-        cb_request.setOnAction(event -> {
+        cb_request.setOnAction(event -> { //on action of the select of box of cities
             if (cb_request.isSelected())
                 addingCitiesFromChoose(cityName);
             if (!cb_request.isSelected()) {
                 removingCitiesFromChoose(cityName);
             }
         });
-    }
-
-    private void chooseCity() {
-
     }
 
     public String getCityName() {

@@ -15,10 +15,10 @@ import static sample.ReadFile.mySplit;
 
 public class Parse {
 
-    private Stemmer stemmer;//
-    private HashSet<Character> delimiters; //
-    private HashSet<String> stopwords; //
-    private HashMap<String, String> months; //
+    private Stemmer stemmer;
+    private HashSet<Character> delimiters;
+    private HashSet<String> stopwords;
+    private HashMap<String, String> months;
     private ArrayList<String> allWords;
     private HashMap<String, Integer[]> terms; //{number of occurrence, location in text}
     private boolean isStem;
@@ -37,15 +37,6 @@ public class Parse {
         stemmer = new Stemmer();
     }
 
-//
-//    static class TreeCompare implements Comparator<String> {
-//        /* Compares keys based on the
-//           last word's natural ordering */
-//        public int compare(String a, String b) {
-//            return a.compareToIgnoreCase(b);
-//        }
-//
-//    }
 
     private void initialDelimiter() {
         delimiters.add('/');
@@ -121,11 +112,10 @@ public class Parse {
             String term = deleteSpares(allWords.get(i));
             allWords.set(i, term);
             String find = allWords.get(i);
-            //handle the percent with the %
             if (!find.equals("")) {
-                if (find.charAt(find.length() - 1) == ('%')) {
+                if (find.charAt(find.length() - 1) == ('%')) { //handle the percent with the %
                     i = i + handlePercent(i);
-                } else if (find.charAt(0) == '$') {
+                } else if (find.charAt(0) == '$') { //handle the percent with the $
                     i = i + handlePriceSign(i);
                 } else if (isNum(find)) {
                     i = i + centerOfNumbers(i);
@@ -137,7 +127,7 @@ public class Parse {
                     i = i + handleThe(i);
                 } else if (find.equalsIgnoreCase("u.s.") || find.equalsIgnoreCase("u.s") || find.equalsIgnoreCase("u.s.a.") || find.equalsIgnoreCase("u.s.a") || find.equalsIgnoreCase("usa")) {
                     if (terms.containsKey("USA")) {
-                        Integer[] arr = terms.get("USA");//~~~~************~~~~~~~~~~
+                        Integer[] arr = terms.get("USA");
                         Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put("USA", add);
                     } else {
@@ -160,8 +150,8 @@ public class Parse {
                                 term = removeDelimiter(term);
                                 checkLetter(term, i);
                             }
-                            delimiters.remove('%'); //check this
-                            delimiters.remove('$'); //check this
+                            delimiters.remove('%');
+                            delimiters.remove('$');
 
                         }
                     }
@@ -178,7 +168,7 @@ public class Parse {
         return terms;
     }
 
-
+    //Reset the parse for further use without calling the constructor!
     public void resetParse() {
         terms = new HashMap<>();
         stemmer = new Stemmer();
@@ -186,6 +176,7 @@ public class Parse {
     }
 
 
+    //Handles the checks of word and it's lower - upper case (for the entities rule).
     private void checkLetter(String term, int i) {
         String upper = term.toUpperCase();
         String lower = term.toLowerCase();
@@ -193,15 +184,15 @@ public class Parse {
             if (Character.isUpperCase(term.charAt(0))) { //first letter is upper
                 Integer[] arr = terms.get(upper);
                 Integer[] add = {arr[0] + 1, arr[1]};
-                terms.put(upper, add); //~~~~************~~~~~~~~~~
+                terms.put(upper, add);
             } else {
                 Integer[] arr = terms.get(upper); //this term is not with upper case, and in the hash it is upper so we change it
                 Integer[] add = {arr[0], arr[1]};
                 terms.remove(upper);
-                terms.put(lower, add); //~~~~************~~~~~~~~~~
+                terms.put(lower, add);
             }
         } else if (terms.containsKey(lower)) {
-            Integer[] arr = terms.get(lower);//~~~~************~~~~~~~~~~
+            Integer[] arr = terms.get(lower);
             Integer[] add = {arr[0] + 1, arr[1]};
             terms.put(lower, add);
         } else {
@@ -211,16 +202,16 @@ public class Parse {
             //first time First letter is upper - save all upper
             if (Character.isUpperCase(term.charAt(0))) { //first letter upper
                 Integer[] add = {1, i};
-                terms.put(upper, add);//~~~~************~~~~~~~~~~
+                terms.put(upper, add);
             } else { //first letter not upper
                 Integer[] add = {1, i};
-                terms.put(lower, add); //~~~~************~~~~~~~~~~
+                terms.put(lower, add);
             }
         }
     }
 
     //first rule - if we find "THE" all the words that will come after with uppercase letter will be saved as one term.
-    private int handleThe(int i) { //changed here!!!!!!!! --------!!!!!!!!!!!!
+    private int handleThe(int i) {
         String term = allWords.get(i);
         for (int j = i + 1; j < allWords.size() - 1; j++) {
             String termTheTmp = allWords.get(j);
@@ -229,11 +220,11 @@ public class Parse {
             } else {
                 if (terms.containsKey(term)) {
                     Integer[] arr = terms.get(term);
-                    Integer[] add = {arr[0] + 1, arr[1]};//~~~~************~~~~~~~~~~
+                    Integer[] add = {arr[0] + 1, arr[1]};
                     terms.put(term, add);
                 } else {
                     Integer[] add = {1, i};
-                    terms.put(term, add); //~~~~************~~~~~~~~~~
+                    terms.put(term, add);
                 }
                 return j - i;
             }
@@ -249,7 +240,7 @@ public class Parse {
     }
 
     //rule - mr/mrs
-    private int handleMrs(int i) {  //changed here!!!!!!!! --------!!!!!!!!!!!!
+    private int handleMrs(int i) {
         String term = allWords.get(i);
         term = term.toUpperCase();
         String termNo = "";
@@ -267,19 +258,19 @@ public class Parse {
                     //with mr.
                     if (terms.containsKey(term)) {
                         Integer[] arr = terms.get(term);
-                        Integer[] add = {arr[0] + 1, arr[1]};//~~~~************~~~~~~~~~~
+                        Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put(term, add);
                     } else {
                         Integer[] add = {1, i};
-                        terms.put(term, add); ////~~~~************~~~~~~~~~~
+                        terms.put(term, add);
                     }
                     //without mr
                     if (terms.containsKey(termNo)) {
                         Integer[] arr = terms.get(termNo);
-                        Integer[] add = {arr[0] + 1, arr[1]};//~~~~************~~~~~~~~~~
+                        Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put(termNo, add);
                     } else {
-                        Integer[] add = {1, i};//~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(termNo, add);
                     }
 
@@ -293,23 +284,23 @@ public class Parse {
                     termNo = termNo + " " + termTmps;
 
             } else {
-                term = deleteSpares(term); //change here!!! ---!!!
+                term = deleteSpares(term);
                 if (!termNo.equals(""))
-                    termNo = deleteSpares(termNo); //change here!!! ---!!!
+                    termNo = deleteSpares(termNo);
                 if (terms.containsKey(term)) {
                     Integer[] arr = terms.get(term);
-                    Integer[] add = {arr[0] + 1, arr[1]};//~~~~************~~~~~~~~~~
+                    Integer[] add = {arr[0] + 1, arr[1]};
                     terms.put(term, add);
                 } else {
-                    Integer[] add = {1, i};//~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(term, add);
                 }
                 if (terms.containsKey(termNo)) {
                     Integer[] arr = terms.get(termNo);
-                    Integer[] add = {arr[0] + 1, arr[1]};//~~~~************~~~~~~~~~~
+                    Integer[] add = {arr[0] + 1, arr[1]};
                     terms.put(term, add);
                 } else {
-                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(termNo, add);
                 }
 
@@ -374,6 +365,7 @@ public class Parse {
         return 0;
     }
 
+    // handles the numbers that have numeral description.  It will add the letter like in the rules
     private int handleNumbers(int i) {
         String term = allWords.get(i);
         if (term.contains(",")) {
@@ -403,10 +395,10 @@ public class Parse {
             number = number * 1000;
             if (terms.containsKey(number + "B")) {
                 Integer[] arr = terms.get(number + "B");
-                Integer[] add = {arr[0] + 1, arr[1]};//~~~~************~~~~~~~~~~
+                Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(number + "B", add);
             } else {
-                Integer[] add = {1, i};//~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(number + "B", add);
             }
             return 1;
@@ -414,45 +406,46 @@ public class Parse {
         return 0;
     }
 
+
     private void numberWithWords(double number, int i) {
         if (number >= 1000 && number < 1000000) {
             number = number / 1000;
             if (terms.containsKey(number + "K")) {
                 Integer[] arr = terms.get(number + "K");
-                Integer[] add = {arr[0] + 1, arr[1]};//~~~~************~~~~~~~~~~
+                Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(number + "K", add);
             } else {
-                Integer[] add = {1, i};//~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(number + "K", add);
             }
         } else if (number >= 1000000 && number < 1000000000) {
             number = number / 1000000;
             if (terms.containsKey(number + "M")) {
-                Integer[] arr = terms.get(number + "M"); //~~~~************~~~~~~~~~~
+                Integer[] arr = terms.get(number + "M");
                 Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(number + "M", add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(number + "M", add);
             }
         } else if (number >= 1000000000) {
             number = number / 10000000;
             if (terms.containsKey(number + "B")) {
-                Integer[] arr = terms.get(number + "B"); //~~~~************~~~~~~~~~~
+                Integer[] arr = terms.get(number + "B");
                 Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(number + "B", add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(number + "B", add);
             }
 
         } else {
             if (terms.containsKey(number + "")) {
-                Integer[] arr = terms.get(number + ""); //~~~~************~~~~~~~~~~
+                Integer[] arr = terms.get(number + "");
                 Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(number + "", add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(number + "", add);
             }
         }
@@ -489,11 +482,11 @@ public class Parse {
                     Double number = Double.parseDouble(arr[0]);
                     number = number * 1000000;
                     if (terms.containsKey(number + " M Dollars")) {
-                        Integer[] tmp = terms.get(number + " M Dollars"); //~~~~************~~~~~~~~~~
+                        Integer[] tmp = terms.get(number + " M Dollars");
                         Integer[] add = {tmp[0] + 1, tmp[1]};
                         terms.put(number + " M Dollars", add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(number + " M Dollars", add);
                     }
                 }
@@ -502,22 +495,22 @@ public class Parse {
                 double num = Double.parseDouble(term);
                 if (num < 1000000) {
                     if (terms.containsKey(num + " Dollars")) {
-                        Integer[] tmp = terms.get(num + " Dollars"); //~~~~************~~~~~~~~~~
+                        Integer[] tmp = terms.get(num + " Dollars");
                         Integer[] add = {tmp[0] + 1, tmp[1]};
                         terms.put(num + " Dollars", add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(num + " Dollars", add);
                     }
 
                 } else {
                     num = num / 1000000;
                     if (terms.containsKey(num + " M Dollars")) {
-                        Integer[] arr = terms.get(num + " M Dollars"); //~~~~************~~~~~~~~~~
+                        Integer[] arr = terms.get(num + " M Dollars");
                         Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put(num + " M Dollars", add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(num + " M Dollars", add);
                     }
 
@@ -528,6 +521,7 @@ public class Parse {
         return 0;
     }
 
+    //handle writing instead of $ - dollar
     private int handlePrice(int i, int location) {
         String term = allWords.get(i);
         if (term.contains(",")) {
@@ -538,21 +532,21 @@ public class Parse {
             double num = Double.parseDouble(term);
             if (num < 1000000) {
                 if (terms.containsKey(num + " Dollars")) {
-                    Integer[] arr = terms.get(num + " Dollars"); //~~~~************~~~~~~~~~~
+                    Integer[] arr = terms.get(num + " Dollars");
                     Integer[] add = {arr[0] + 1, arr[1]};
                     terms.put(num + " Dollars", add);
                 } else {
-                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(num + " Dollars", add);
                 }
             } else {
                 num = num / 1000000;
                 if (terms.containsKey(num + " M Dollars")) {
-                    Integer[] arr = terms.get(num + " M Dollars"); //~~~~************~~~~~~~~~~
+                    Integer[] arr = terms.get(num + " M Dollars");
                     Integer[] add = {arr[0] + 1, arr[1]};
                     terms.put(num + " M Dollars", add);
                 } else {
-                    Integer[] add = {1, i};//~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(num + " M Dollars", add);
                 }
 
@@ -564,21 +558,21 @@ public class Parse {
                 double num = Double.parseDouble(term);
                 if (num < 1000000) {
                     if (terms.containsKey(term + " " + nextTerm + " Dollars")) {
-                        Integer[] arr = terms.get(term + " " + nextTerm + " Dollars"); //~~~~************~~~~~~~~~~
+                        Integer[] arr = terms.get(term + " " + nextTerm + " Dollars");
                         Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put(term + " " + nextTerm + " Dollars", add);
                     } else {
-                        Integer[] add = {1, i};//~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(term + " " + nextTerm + " Dollars", add);
                     }
                 } else {
                     num = num / 1000000;
                     if (terms.containsKey(num + " M " + nextTerm + " Dollars")) {
-                        Integer[] arr = terms.get(num + " M " + nextTerm + " Dollars"); //~~~~************~~~~~~~~~~
+                        Integer[] arr = terms.get(num + " M " + nextTerm + " Dollars");
                         Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put(num + " M " + nextTerm + " Dollars", add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(num + " M " + nextTerm + " Dollars", add);
                     }
 
@@ -608,11 +602,11 @@ public class Parse {
                 Double number = Double.parseDouble(term);
                 number = number * 1000000;
                 if (terms.containsKey(number + " M Dollars")) {
-                    Integer[] arr = terms.get(number + " M Dollars"); //~~~~************~~~~~~~~~~
+                    Integer[] arr = terms.get(number + " M Dollars");
                     Integer[] add = {arr[0] + 1, arr[1]};
                     terms.put(number + " M Dollars", add);
                 } else {
-                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(number + " M Dollars", add);
                 }
                 return location + 1;
@@ -622,43 +616,45 @@ public class Parse {
 
     }
 
+
     private void numberWithWordsDollars(double number, int i) {
         if (number < 1000000) {
             //number = number / 1000;
             if (terms.containsKey(number + " Dollars")) {
-                Integer[] arr = terms.get(number + " Dollars"); //~~~~************~~~~~~~~~~
+                Integer[] arr = terms.get(number + " Dollars");
                 Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(number + " Dollars", add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(number + " Dollars", add);
             }
             //System.out.println(number + "K");
         } else if (number >= 1000000) {
             number = number / 1000000;
             if (terms.containsKey(number + " M Dollars")) {
-                Integer[] arr = terms.get(number + " M Dollars"); //~~~~************~~~~~~~~~~
+                Integer[] arr = terms.get(number + " M Dollars");
                 Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(number + " M Dollars", add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(number + " M Dollars", add);
             }
 
             // System.out.println(number + "M");
         } else {
             if (terms.containsKey(number + "")) {
-                Integer[] arr = terms.get(number + ""); //~~~~************~~~~~~~~~~
+                Integer[] arr = terms.get(number + "");
                 Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(number + "", add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(number + "", add);
             }
 
         }
     }
 
+    //rule of "between and" (e.g. between A and B)
     private int handleBetween(int i) {
         int toReturn = 0;
         if (i + 2 < allWords.size() - 1) {
@@ -712,27 +708,27 @@ public class Parse {
                         if (!num2.equals(""))
                             num2 = deleteSpares(num2);
                         if (terms.containsKey(num1 + "-" + num2)) {
-                            Integer[] arr = terms.get(num1 + "-" + num2); //~~~~************~~~~~~~~~~
+                            Integer[] arr = terms.get(num1 + "-" + num2);
                             Integer[] add = {arr[0] + 1, arr[1]};
                             terms.put(num1 + "-" + num2, add);
                         } else {
-                            Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                            Integer[] add = {1, i};
                             terms.put(num1 + "-" + num2, add);
                         }
                         if (terms.containsKey(num1)) {
-                            Integer[] arr = terms.get(num1); //~~~~************~~~~~~~~~~
+                            Integer[] arr = terms.get(num1);
                             Integer[] add = {arr[0] + 1, arr[1]};
                             terms.put(num1, add);
                         } else {
-                            Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                            Integer[] add = {1, i};
                             terms.put(num1, add);
                         }
                         if (terms.containsKey(num2)) {
-                            Integer[] arr = terms.get(num2); //~~~~************~~~~~~~~~~
+                            Integer[] arr = terms.get(num2);
                             Integer[] add = {arr[0] + 1, arr[1]};
                             terms.put(num2, add);
                         } else {
-                            Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                            Integer[] add = {1, i};
                             terms.put(num2, add);
                         }
                     }
@@ -813,27 +809,27 @@ public class Parse {
                     if (!num2.equals(""))
                         num2 = deleteSpares(num2);
                     if (terms.containsKey(num1 + "-" + num2)) {
-                        Integer[] arr = terms.get(num1 + "-" + num2); //~~~~************~~~~~~~~~~
+                        Integer[] arr = terms.get(num1 + "-" + num2);
                         Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put(num1 + "-" + num2, add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(num1 + "-" + num2, add);
                     }
                     if (terms.containsKey(num1)) {
-                        Integer[] arr = terms.get(num1); //~~~~************~~~~~~~~~~
+                        Integer[] arr = terms.get(num1);
                         Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put(num1, add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(num1, add);
                     }
                     if (terms.containsKey(num2)) {
-                        Integer[] arr = terms.get(num2); //~~~~************~~~~~~~~~~
+                        Integer[] arr = terms.get(num2);
                         Integer[] add = {arr[0] + 1, arr[1]};
                         terms.put(num2, add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(num2, add);
                     }
                 }
@@ -843,6 +839,7 @@ public class Parse {
         return toReturn;
     }
 
+    //handle the - rule - will save the term individually and as one term
     private int handleHyphen(int i) {
         String arr[] = quickSplit(allWords.get(i), "-");
         boolean minus0 = false;
@@ -903,20 +900,20 @@ public class Parse {
         }
         if (a0 && a1) {
             if (terms.containsKey(num0 + "-" + num1)) {
-                Integer[] tmp = terms.get(num0 + "-" + num1); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(num0 + "-" + num1);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num0 + "-" + num1, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(num0 + "-" + num1, add);
             }
             if (terms.containsKey(num0)) {
-                Integer[] tmp = terms.get(num0); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(num0);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num0, add);
 
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 if (num0.charAt(0) == '$') {
                     num0 = num0.substring(1);
                     handleNumHypen(num0, i);
@@ -924,12 +921,12 @@ public class Parse {
                     terms.put(num0, add);
             }
             if (terms.containsKey(num1)) {
-                Integer[] tmp = terms.get(num1); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(num1);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num1, add);
 
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 if (num1.charAt(0) == '$') {
                     num1 = num1.substring(1);
                     handleNumHypen(num1, i);
@@ -940,15 +937,15 @@ public class Parse {
         } else if (a0 && !a1) {
             arr[1] = arr[1].toLowerCase();
             if (terms.containsKey(num0 + "-" + arr[1])) {
-                Integer[] tmp = terms.get(num0 + "-" + arr[1]); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(num0 + "-" + arr[1]);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num0 + "-" + arr[1], add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(num0 + "-" + arr[1], add);
             }
             if (terms.containsKey(num0)) {
-                Integer[] tmp = terms.get(num0); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(num0);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num0, add);
             } else {
@@ -956,7 +953,7 @@ public class Parse {
                     num0 = num0.substring(1);
                     handleNumHypen(num0, i);
                 } else {
-                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(num0, add);
                 }
             }
@@ -964,15 +961,15 @@ public class Parse {
         } else if (!a0 && a1) {
             arr[0] = arr[0].toLowerCase();
             if (terms.containsKey(arr[0] + "-" + num1)) {
-                Integer[] tmp = terms.get(arr[0] + "-" + num1); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(arr[0] + "-" + num1);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(arr[0] + "-" + num1, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(arr[0] + "-" + num1, add);
             }
             if (terms.containsKey(num1)) {
-                Integer[] tmp = terms.get(num1); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(num1);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num1, add);
             } else {
@@ -980,7 +977,7 @@ public class Parse {
                     num1 = num1.substring(1);
                     handleNumHypen(num1, i);
                 } else {
-                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(num1, add);
                 }
             }
@@ -988,11 +985,11 @@ public class Parse {
         } else {
             String toAdd = arr[0] + "-" + arr[1];
             if (terms.containsKey(toAdd)) { //for the whole phrase
-                Integer[] tmp = terms.get(toAdd); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(toAdd);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(toAdd, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(toAdd, add);
             }
             checkLetter(arr[0], i);
@@ -1002,34 +999,35 @@ public class Parse {
         return 0;
     }
 
+    // handle the - rule but for numbers!
     private void handleNumHypen(String term, int i) {
-        //term=term.substring(1);
         if (term.contains(","))
             term = OurReplace(term, ",", "");
         double num = Double.parseDouble(term);
         if (num < 1000000) {
             if (terms.containsKey(num + " Dollars")) {
-                Integer[] tmp = terms.get(num + " Dollars"); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(num + " Dollars");
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(num + " Dollars", add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(num + " Dollars", add);
             }
         } else {
             num = num / 1000000;
             if (terms.containsKey(num + " M Dollars")) {
-                Integer[] arr = terms.get(num + " M Dollars"); //~~~~************~~~~~~~~~~
+                Integer[] arr = terms.get(num + " M Dollars");
                 Integer[] add = {arr[0] + 1, arr[1]};
                 terms.put(num + " M Dollars", add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(num + " M Dollars", add);
             }
 
         }
     }
 
+    //handle dates rule og month
     private int handleDateMonth(int i) {
         String termDay = allWords.get(i);
         String termMonth = "";
@@ -1050,20 +1048,20 @@ public class Parse {
                 if (e.getKey().contains(nextTerm.toLowerCase())) {
                     termMonth = e.getValue();
                     if (terms.containsKey(termMonth + "-" + termDay)) {
-                        Integer[] tmp = terms.get(termMonth + "-" + termDay); //~~~~************~~~~~~~~~~
+                        Integer[] tmp = terms.get(termMonth + "-" + termDay);
                         Integer[] add = {tmp[0] + 1, tmp[1]};
                         terms.put(termMonth + "-" + termDay, add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(termMonth + "-" + termDay, add);
                     }
                     if (yesYear) {
                         if (terms.containsKey(termYear + "-" + termMonth)) {
-                            Integer[] tmp = terms.get(termYear + "-" + termMonth); //~~~~************~~~~~~~~~~
+                            Integer[] tmp = terms.get(termYear + "-" + termMonth);
                             Integer[] add = {tmp[0] + 1, tmp[1]};
                             terms.put(termYear + "-" + termMonth, add);
                         } else {
-                            Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                            Integer[] add = {1, i};
                             terms.put(termYear + "-" + termMonth, add);
                         }
                         return 2;
@@ -1075,21 +1073,21 @@ public class Parse {
         } else {
             termMonth = months.get(nextTerm.toLowerCase());
             if (terms.containsKey(termMonth + "-" + termDay)) {
-                Integer[] tmp = terms.get(termMonth + "-" + termDay); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(termMonth + "-" + termDay);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(termMonth + "-" + termDay, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(termMonth + "-" + termDay, add);
             }
 
             if (yesYear) {
                 if (terms.containsKey(termYear + "-" + termMonth)) {
-                    Integer[] tmp = terms.get(termYear + "-" + termMonth); //~~~~************~~~~~~~~~~
+                    Integer[] tmp = terms.get(termYear + "-" + termMonth);
                     Integer[] add = {tmp[0] + 1, tmp[1]};
                     terms.put(termYear + "-" + termMonth, add);
                 } else {
-                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(termYear + "-" + termMonth, add);
                 }
                 return 2;
@@ -1098,6 +1096,7 @@ public class Parse {
         }
     }
 
+    //handle date rule of year
     private int handleDateYear(int i) {
         String termYear = allWords.get(i);
         String nextTerm = allWords.get(i + 1);
@@ -1118,20 +1117,20 @@ public class Parse {
                 if (e.getKey().contains(nextTerm.toLowerCase())) {
                     termMonth = e.getValue();
                     if (terms.containsKey(termYear + "-" + termMonth)) {
-                        Integer[] tmp = terms.get(termYear + "-" + termMonth); //~~~~************~~~~~~~~~~
+                        Integer[] tmp = terms.get(termYear + "-" + termMonth);
                         Integer[] add = {tmp[0] + 1, tmp[1]};
                         terms.put(termYear + "-" + termMonth, add);
                     } else {
-                        Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                        Integer[] add = {1, i};
                         terms.put(termYear + "-" + termMonth, add);
                     }
                     if (yesDay) {
                         if (terms.containsKey(termMonth + "-" + termDay)) {
-                            Integer[] tmp = terms.get(termMonth + "-" + termDay); //~~~~************~~~~~~~~~~
+                            Integer[] tmp = terms.get(termMonth + "-" + termDay);
                             Integer[] add = {tmp[0] + 1, tmp[1]};
                             terms.put(termMonth + "-" + termDay, add);
                         } else {
-                            Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                            Integer[] add = {1, i};
                             terms.put(termMonth + "-" + termDay, add);
                         }
                         return 2;
@@ -1142,23 +1141,21 @@ public class Parse {
             return 1;
         } else {
             termMonth = months.get(nextTerm.toLowerCase());
-
-
             if (terms.containsKey(termYear + "-" + termMonth)) {
-                Integer[] tmp = terms.get(termYear + "-" + termMonth); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(termYear + "-" + termMonth);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(termYear + "-" + termMonth, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(termYear + "-" + termMonth, add);
             }
             if (yesDay) {
                 if (terms.containsKey(termMonth + "-" + termDay)) {
-                    Integer[] tmp = terms.get(termMonth + "-" + termDay); //~~~~************~~~~~~~~~~
+                    Integer[] tmp = terms.get(termMonth + "-" + termDay);
                     Integer[] add = {tmp[0] + 1, tmp[1]};
                     terms.put(termMonth + "-" + termDay, add);
                 } else {
-                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(termMonth + "-" + termDay, add);
                 }
                 return 2;
@@ -1168,16 +1165,17 @@ public class Parse {
 
     }
 
+    //rule %
     private int handlePercent(int i) {
         String term = allWords.get(i);
         if (term.equalsIgnoreCase("percent")) {
             term = addLetter(allWords.get(i - 1)) + "%";
             if (terms.containsKey(term)) {
-                Integer[] tmp = terms.get(term); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(term);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(term, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(term, add);
             }
 
@@ -1185,11 +1183,11 @@ public class Parse {
         } else if (term.equalsIgnoreCase("percentage")) {
             term = addLetter(allWords.get(i - 1)) + "%";
             if (terms.containsKey(term)) {
-                Integer[] tmp = terms.get(term); //~~~~************~~~~~~~~~~
+                Integer[] tmp = terms.get(term);
                 Integer[] add = {tmp[0] + 1, tmp[1]};
                 terms.put(term, add);
             } else {
-                Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                Integer[] add = {1, i};
                 terms.put(term, add);
             }
 
@@ -1199,11 +1197,11 @@ public class Parse {
             if (isNum(term)) {
                 term = addLetter(term) + "%";
                 if (terms.containsKey(term)) {
-                    Integer[] tmp = terms.get(term); //~~~~************~~~~~~~~~~
+                    Integer[] tmp = terms.get(term);
                     Integer[] add = {tmp[0] + 1, tmp[1]};
                     terms.put(term, add);
                 } else {
-                    Integer[] add = {1, i}; //~~~~************~~~~~~~~~~
+                    Integer[] add = {1, i};
                     terms.put(term, add);
                 }
             }
@@ -1211,6 +1209,7 @@ public class Parse {
         }
     }
 
+    //Adds letter to number (for the rules)
     private String addLetter(String numberS) {
         if (numberS.contains(",")) {
             numberS = OurReplace(numberS, ",", "");
@@ -1235,6 +1234,7 @@ public class Parse {
         return numLet;
     }
 
+    // Checks if string is a number. (even one with , )
     private static boolean isNum(String s) {
         if (s.contains(",")) {
             s = s.replace(",", "");
@@ -1247,6 +1247,7 @@ public class Parse {
         return true;
     }
 
+    //Like the split function of java but faster
     private static String[] quickSplit(String str, String regex) {
         Vector<String> result = new Vector<String>();
         int start = 0;
@@ -1266,6 +1267,7 @@ public class Parse {
         return array;
     }
 
+    //removes the delimiters that "covers" the term. (e.g. #(dog)*# => dog
     private String deleteSpares(String term) {
         String end = term;
         char first = term.charAt(0);
@@ -1295,6 +1297,7 @@ public class Parse {
         return end;
     }
 
+    //Removes delimiters that are in the middle of term. (e.g : dog%%cad => dog cat (as one term)
     private String removeDelimiter(String term) {
         String tmps = term;
         for (int i = 0; i < tmps.length(); i++) {
@@ -1317,22 +1320,27 @@ public class Parse {
         return tmps;
     }
 
+    /**
+     * Two replaces of chars in string.
+     */
     public static String OurReplace(String s, String target, String replacement) {
-        StringBuilder sb = null;
+        StringBuilder change = null;
         int start = 0;
         for (int i; (i = s.indexOf(target, start)) != -1; ) {
-            if (sb == null) sb = new StringBuilder();
-            sb.append(s, start, i);
-            sb.append(replacement);
+            if (change == null)
+                change = new StringBuilder();
+            change.append(s, start, i);
+            change.append(replacement);
             start = i + target.length();
         }
-        if (sb == null) return s;
-        sb.append(s, start, s.length());
-        return sb.toString();
+        if (change == null)
+            return s;
+        change.append(s, start, s.length());
+        return change.toString();
     }
 
     private static String OurReplace(String s, char[] targets, String replacement) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder change = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char check = s.charAt(i);
             boolean contain = false;
@@ -1342,12 +1350,12 @@ public class Parse {
                 }
             }
             if (contain) {
-                sb.append(replacement);
+                change.append(replacement);
             } else {
-                sb.append(check);
+                change.append(check);
             }
         }
-        return sb.toString();
+        return change.toString();
     }
 
     private void addToCities2(String tmp, String docName, int locationInDoc, String bNoB) {
@@ -1359,10 +1367,7 @@ public class Parse {
                         cities.get(ci).getLocations().put(docName, new ArrayList<String>());
                     }
                     cities.get(ci).getLocations().get(docName).add(locationInDoc + bNoB);
-
-                    //(cities.get(tmp).locations.containsKey(docName));
                 } else {
-                    //ApiJson apiJson = new ApiJson();
                     City c = apiJson.findInCities(tmp);
                     if (c != null) {
                         c.getLocations().put(docName, new ArrayList<String>());

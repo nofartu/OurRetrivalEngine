@@ -15,6 +15,7 @@ public class Stemmer {
             snowballStemmer.setCurrent(s);
             snowballStemmer.stem();
             String newStem = snowballStemmer.getCurrent();
+            //only for words with upper case - the stemmer returns the letter in lowercase, so it will change back to upper cse
             if(!newStem.equals("")&&Character.isUpperCase(newStem.charAt(0))){
                 newStem=newStem.toUpperCase();
             }

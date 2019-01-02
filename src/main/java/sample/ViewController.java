@@ -168,6 +168,7 @@ public class ViewController implements Observer {
             } else {
                 paths += "\\WithoutStem";
             }
+            File directory = new File(paths);
             File currentFile = new File(paths + "\\Cities.txt");
             currentFile.delete();
             File currentFile1 = new File(paths + "\\dictionaryStem.txt");
@@ -182,6 +183,8 @@ public class ViewController implements Observer {
             currentFile5.delete();
             File currentFile6 = new File(paths + "\\Languages.txt");
             currentFile6.delete();
+            if (directory.exists())
+                directory.delete();
             System.gc();
             if (!cb_fileQuery.isDisabled() || !cb_handQuery.isDisabled()) {
                 cb_handQuery.setDisable(true);
@@ -197,6 +200,9 @@ public class ViewController implements Observer {
                 cb_semantic.setSelected(false);
                 btn_browseQuery.setDisable(true);
                 btn_chooseCity.setDisable(true);
+                comboBox.setDisable(true);
+                comboBox.setValue("");
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -494,6 +500,7 @@ public class ViewController implements Observer {
         cb_semantic.setDisable(false);
         cb_choseCity.setDisable(false);
         comboBox.setDisable(false);
+        comboBox.setValue("");
         setData();
         showAlert("Alert", "Dictionary uploaded", "Press ok to continue");
     }
@@ -546,6 +553,7 @@ public class ViewController implements Observer {
             chosenCities = new ArrayList<>();
             txt_Cities.setDisable(true);
             txt_Cities.setVisible(false);
+            comboBox.setValue("");
         }
     }
 
@@ -656,6 +664,7 @@ public class ViewController implements Observer {
 
     /**
      * parse the file of query
+     *
      * @param path
      * @return
      */
@@ -686,9 +695,10 @@ public class ViewController implements Observer {
 
     /**
      * operates the moment when the use clicks the "RUN" button.
-     *
      */
     public void runQuery() {
+        btn_runQuery.setDisable(true);
+        showAlert("Runing Query/Queries started!", "Don't touch anything", "");
         docsToShow = new LinkedList<>();
         String stopWords = System.getProperty("user.dir");
         //String stopWords = txtfld_stopWords.getText();
@@ -701,8 +711,11 @@ public class ViewController implements Observer {
                 String query = txtfld_QueryHand.getText();
                 searcher.doQuery(query);
                 collectedDocs(searcher.getDocs(), "100");
-                if (searcher.getDocs().size() == 0)
+                if (searcher.getDocs().size() == 0) {
                     showAlert("Attention!", "There is no documents for your query", "Please try another query.");
+                    txt_Cities.setText("");
+                    chosenCities = new ArrayList<>();
+                }
                 else
                     showDocsQueries(); //show the results
             }
@@ -714,18 +727,29 @@ public class ViewController implements Observer {
                     System.out.println("the query is:" + query);
                     Searcher searcher = new Searcher(stopWords, dirPath, stem, api, semantic, entry.getValue()[1], cb_choseCity.isSelected());
                     searcher.doQuery(query);
-                    if (searcher.getDocs().size() == 0)
+                    if (searcher.getDocs().size() == 0) {
                         showAlert("Attention!", "There is no documents for your query", "Please try another query.");
+                        txt_Cities.setText("");
+                        chosenCities = new ArrayList<>();
+                    }
                     else
                         collectedDocs(searcher.getDocs(), entry.getValue()[0]); //collect all the answers of the queries and prepare it to showing results!
                 }
             }
-            showDocsQueries(); //show the results
+            if (docsToShow.size() != 0)
+                showDocsQueries(); //show the results
+            else {
+                showAlert("Attention!", "There is problem with your query document", "Please try another query.");
+                txt_Cities.setText("");
+                chosenCities = new ArrayList<>();
+            }
         }
+        btn_runQuery.setDisable(false);
     }
 
     /**
      * collects all the doc for showing!
+     *
      * @param docs
      * @param numQuery
      */

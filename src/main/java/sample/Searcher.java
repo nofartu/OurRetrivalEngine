@@ -37,9 +37,11 @@ public class Searcher {
     private boolean stem;
     private boolean semantic;
     private boolean isCity;
-
     private int numOfDocs;
 
+    /*
+    constructor
+     */
     public Searcher(String stopwordsPath, String postPath, boolean stem, ApiJson apiJson, boolean semantic, String description, boolean isCity) {
         this.stem = stem;
         this.semantic = semantic;
@@ -63,9 +65,11 @@ public class Searcher {
         combinedFilesWithCity = new TreeMap<>();
         this.description = description;
         this.isCity = isCity;
-
     }
 
+    /*
+    parsing the query in our parser to be consistent with the postings and dictionaey
+     */
     private void parseTheQuery(String query) {
 
         HashMap<String, Integer[]> queryParsed = parse.parsing(query, "");
@@ -74,24 +78,33 @@ public class Searcher {
         }
         wordAndLocationsQuery = runQuery(queryParsed, 1);
     }
-
+    /*
+       parsing the description in our parser to be consistent with the postings and dictionaey
+        */
     private void parseTheDesc(String desc) {
         HashMap<String, Integer[]> queryParsed = parse.parsing(desc, "");
         wordAndLocationsDesc = runQuery(queryParsed, 2);
     }
 
+    /*
+    the main function that operates all the class
+    it is parsing all the information then sends to create the data structures that is needed to rank
+     */
     public void doQuery(String query) {
         parseTheQuery(query);
         docsContainsQuery = createDocsContainsQuery(wordAndLocationsQuery);
-        parse.resetParse();
-        parseTheDesc(description); //NEW!!!!!
+        parse.resetParse(); //reset so it wouldn't add it to the same data structure
+        parseTheDesc(description);
         docsContainsDesc = createDocsContainsQuery(wordAndLocationsDesc);
         parse.resetParse();
         if (semantic)
             docsContainsSemantic = createDocsContainsQuery(wordAndLocationsSemantic);
-        sendToRanker();
+        sendToRanker();  //sends to the function that do the proper sending to the ranker
     }
 
+    /*
+       create a data structure for each word in the dictionary it gets the postings
+     */
     private HashMap<String, ArrayList<String>> runQuery(HashMap<String, Integer[]> queryParsed, int who) { //who: 1 - query, 2 - description, 3 - semantic
         HashMap<String, ArrayList<String>> wordAndLocationsTmp = new HashMap<>();
         TreeMap<Integer, String> invertedLoc = new TreeMap<>();
@@ -100,40 +113,35 @@ public class Searcher {
             String keyLower = key.toLowerCase();
             String keyUpper = key.toUpperCase();
             if (dictionary.containsKey(keyLower)) {
-                //  if (!wordAndLocationsTmp.containsKey(key)) {
                 Integer[] fromDictionary = dictionary.get(keyLower);
-
-                //wordAndLocationsTmp.put(keyLower, getAllPostings(fromDictionary[0])); new!!!!!
                 invertedLoc.put(fromDictionary[0], keyLower);
                 insertToCountWords(who, keyLower, fromDictionary[0]);
-                //countWordsQuery.put(keyLower, fromDictionary[0]);
-                // }
             } else if (dictionary.containsKey(keyUpper)) {
-                //  if (!wordAndLocationsTmp.containsKey(key)) {
                 Integer[] fromDictionary = dictionary.get(keyUpper);
-                // wordAndLocationsTmp.put(keyUpper, getAllPostings(fromDictionary[0])); new!!!!!!!!
                 invertedLoc.put(fromDictionary[0], keyUpper);
                 insertToCountWords(who, keyUpper, fromDictionary[0]);
-                //countWordsQuery.put(keyUpper, fromDictionary[0]);
-                // }
             } else {
-                System.out.println("2 we don't have this word in our dictionary " + key);
             }
         }
-        //new!!
         wordAndLocationsTmp = getAllPostings(wordAndLocationsTmp, invertedLoc);
         return wordAndLocationsTmp;
     }
 
+    /*
+    inserts into the data structure the count of the ords in the query, description, semantic depanding on the number sent in who
+     */
     private void insertToCountWords(int who, String key, int value) {
-        if (who == 1)
+        if (who == 1)    // of the query
             countWordsQuery.put(key, value);
-        else if (who == 2)
+        else if (who == 2)      // of the description
             countWordsDesc.put(key, value);
-        else if (who == 3)
+        else if (who == 3)  // of the semantic
             countWordsSemantic.put(key, value);
     }
 
+    /*
+    recives the semantic words related to the words in the query and parsing them and send it to the data structure of words from semantic with all the information related
+     */
     private HashMap<String, ArrayList<String>> doSemantic(HashMap<String, Integer[]> queryParsed) {
         HashMap<String, Integer[]> separateQuery = new HashMap<>();
         parse.resetParse();
@@ -152,6 +160,10 @@ public class Searcher {
         return runQuery(query2Parsed, 3);
     }
 
+
+    /*
+    create and returns a data structure with all the postings for each word
+     */
     public HashMap<String, ArrayList<String>> getAllPostings(HashMap<String, ArrayList<String>> wordAndLocationsTmp, TreeMap<Integer, String> lineNumbers) {
         String line = "";
         String namePost = "";
@@ -198,36 +210,18 @@ public class Searcher {
         return wordAndLocationsTmp;
     }
 
-
+    /*
+    sends all the information to the ranker to get the top 50 ranked documents
+     */
     public void sendToRanker() {
         Ranker ranker = new Ranker(numOfDocs, isCity);
-        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery, docsContainsDesc, countWordsDesc, wordAndLocationsDesc, docsContainsSemantic, countWordsSemantic, wordAndLocationsSemantic, semantic); //change
-//        if (isCity)
-//            withCities();
+        rankedFiles = ranker.rankAll(docsContainsQuery, countWordsQuery, wordAndLocationsQuery, docsContainsDesc, countWordsDesc, wordAndLocationsDesc, docsContainsSemantic, countWordsSemantic, wordAndLocationsSemantic, semantic);
     }
 
-//    public HashMap<String, ArrayList<String>> getAllCityPostings(String word) {
-//        HashMap<String, City> c = getCities();
-//        return c.get(word).getLocations();
-//    }
 
-//    public void withCities() {
-//        HashMap<String, ArrayList<String>> files;
-//        HashMap<String, Double> tmp = new HashMap<>();
-//        tmp.putAll(rankedFiles);
-//        // int size = chosenCities.size();
-//        for (String city : chosenCities) {
-//            //for (String city : cities.keySet()) {
-//            files = getAllCityPostings(city);
-//            for (Map.Entry<String, ArrayList<String>> entry : files.entrySet()) {
-//                if (tmp.containsKey(entry.getKey())) {
-//                    combinedFilesWithCity.put(entry.getKey(), tmp.get(entry.getKey()));
-//                }
-//            }
-//        }
-//        rankedFiles = combinedFilesWithCity;
-//    }
-
+    /*
+    create a data structure that the key is document and each line in the arraylist contains a word in the query and the document
+     */
     public HashMap<String, ArrayList<String[]>> createDocsContainsQuery(HashMap<String, ArrayList<String>> wordAndLocations) {
         HashMap<String, ArrayList<String[]>> docsContainsTmp = new HashMap<>();
         for (Map.Entry<String, ArrayList<String>> entry : wordAndLocations.entrySet()) {
@@ -252,6 +246,9 @@ public class Searcher {
         return docsContainsTmp;
     }
 
+    /*
+    reades and parse the words from the API of the semantic words
+     */
     private ArrayList<String> semantic(String word) {
         ArrayList<String> semanticWords = new ArrayList<>();
         try {
@@ -277,7 +274,9 @@ public class Searcher {
         return null;
     }
 
-    //create an Hash with all the stop words
+    /*
+    create an Hash with all the stop words
+     */
     private HashSet<String> createHashStopWords(String path) {
         HashSet<String> stopwords = new HashSet<>();
         String line;

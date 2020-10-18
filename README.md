@@ -2,15 +2,21 @@
 This project has been developed as part of a Information Retrieval course, which took place during the fall semester of 2018 in Ben Gurion University. 
 This project can be divided into two parts: 
 - Part 1: text pre-processing:
-  -reading all documents from corpus
-  -parsing documents into terms and tokens
-  -stemming all the tokens
-  -Create inverted index, a dictionary and posting files
+
+  - reading all documents from corpus
+  
+  - parsing documents into terms and tokens
+  
+  - stemming all the tokens
+  
+  - Create inverted index, a dictionary and posting files
+  
  - Part 2: after having all the data saved and organized
+ 
   - Search for queries
+  
   - Rank and display them according to the relevancy
 
- 
 
 ## before you start
 In order to start running the notebook you must first download the corpus, stop words and create a place to save all information.

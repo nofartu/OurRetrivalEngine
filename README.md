@@ -3,9 +3,9 @@ This project has been developed as part of a Information Retrieval course, which
 This project can be divided into two parts: 
 - Part 1: text pre-processing:
 
-  - reading all documents from corpus
-  - parsing documents into terms and tokens
-  - stemming all the tokens
+  - Reading all documents from corpus
+  - Parsing documents into terms and tokens
+  - Stemming all the tokens
   - Create inverted index, a dictionary and posting files
   
  - Part 2: after having all the data saved and organized

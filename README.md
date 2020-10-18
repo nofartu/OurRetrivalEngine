@@ -4,18 +4,14 @@ This project can be divided into two parts:
 - Part 1: text pre-processing:
 
   - reading all documents from corpus
-  
   - parsing documents into terms and tokens
-  
   - stemming all the tokens
-  
   - Create inverted index, a dictionary and posting files
   
  - Part 2: after having all the data saved and organized
- 
-  - Search for queries
+    - Search for queries
   
-  - Rank and display them according to the relevancy
+    - Rank and display them according to the relevancy
 
 
 ## before you start
